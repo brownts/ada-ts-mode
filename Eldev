@@ -1,0 +1,9 @@
+; -*- mode: emacs-lisp; lexical-binding: t -*-
+
+;; Autodetermined by `eldev init'.
+(eldev-use-package-archive 'gnu-elpa)
+
+(eldev-use-plugin 'autoloads)
+
+;; Configure for automatic build/installation of the Ada grammar library.
+(setq ada-ts-mode-grammar-install 'auto)

@@ -1,0 +1,431 @@
+Code:
+  (lambda ()
+    (ada-ts-mode)
+    (setq-local indent-tabs-mode nil)
+    (call-interactively (key-binding (kbd "C-M-a"))))
+
+Name: compilation_unit / subprogram_declaration / procedure_specification (Beginning)
+
+Point-Char: |
+
+=-=
+procedure Hello_World|;
+
+=-=
+|procedure Hello_World;
+
+=-=-=
+
+Name: compilation_unit / subprogram_body / procedure_specification (Beginning)
+
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");|
+end Hello_World;
+
+=-=
+with Ada.Text_IO;
+
+|procedure Hello_World is
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");
+end Hello_World;
+
+=-=-=
+
+Name: compilation_unit / subprogram_declaration / function_specification (Beginning)
+
+=-=
+function Add (I, J : Integer) return Integer|;
+
+=-=
+|function Add (I, J : Integer) return Integer;
+
+=-=-=
+
+Name: compilation_unit / subprogram_body / function_specification (Beginning)
+
+=-=
+function Add (I, J : Integer) return Integer is
+begin
+   return I + J;|
+end Hello_World;
+
+=-=
+|function Add (I, J : Integer) return Integer is
+begin
+   return I + J;
+end Hello_World;
+
+=-=-=
+
+Name: compilation_unit / package_declaration / subprogram_declaration / procedure_specification (Beginning)
+
+=-=
+package Foo is
+
+   procedure Hello_World|;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package Foo is
+
+|   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_declaration / subprogram_declaration / function_specification (Beginning)
+
+=-=
+package Foo is
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer|;
+
+end Foo;
+=-=
+package Foo is
+
+   procedure Hello_World;
+
+|   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_declaration / procedure_specification (Beginning)
+
+=-=
+package body Foo is
+
+   procedure Hello_World|;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package body Foo is
+
+|   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_declaration / function_specification (Beginning)
+
+=-=
+package body Foo is
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer|;
+
+end Foo;
+=-=
+package body Foo is
+
+   procedure Hello_World;
+
+|   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_body / procedure_specification (Beginning)
+
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!")|;
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+
+end Foo;
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+|   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_body / function_specification (Beginning)
+
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J|;
+   end Add;
+
+end Foo;
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+
+|   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+
+end Foo;
+=-=-=
+
+Code:
+  (lambda ()
+    (ada-ts-mode)
+    (setq-local indent-tabs-mode nil)
+    (call-interactively (key-binding (kbd "C-M-e"))))
+
+Name: compilation_unit / subprogram_declaration / procedure_specification (End)
+
+Point-Char: |
+
+=-=
+procedure Hello_World|;
+
+=-=
+procedure Hello_World;
+|
+=-=-=
+
+Name: compilation_unit / subprogram_declaration / function_specification (End)
+
+=-=
+function Add (I, J : Integer) return Integer|;
+
+=-=
+function Add (I, J : Integer) return Integer;
+|
+=-=-=
+
+Name: compilation_unit / subprogram_body / procedure_specification (End)
+
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");|
+end Hello_World;
+
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");
+end Hello_World;
+|
+=-=-=
+
+Name: compilation_unit / subprogram_body / function_specification (End)
+
+=-=
+function Add (I, J : Integer) return Integer is
+begin
+   return I + J;|
+end Add;
+
+=-=
+function Add (I, J : Integer) return Integer is
+begin
+   return I + J;
+end Add;
+|
+=-=-=
+
+Name: compilation_unit / package_declaration / subprogram_declaration / procedure_specification (End)
+
+=-=
+package Foo is|
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package Foo is
+
+   procedure Hello_World;
+|
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_declaration / subprogram_declaration / function_specification (End)
+
+=-=
+package Foo is
+
+   procedure Hello_World;
+|
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package Foo is
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+|
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_declaration / procedure_specification (End)
+
+=-=
+package body Foo is|
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package body Foo is
+
+   procedure Hello_World;
+|
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_declaration / function_specification (End)
+
+=-=
+package body Foo is
+
+   procedure Hello_World;
+|
+   function Add (I, J : Integer) return Integer;
+
+end Foo;
+=-=
+package body Foo is
+
+   procedure Hello_World;
+
+   function Add (I, J : Integer) return Integer;
+|
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_body / procedure_specification (End)
+
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!")|;
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+
+end Foo;
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+|
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+
+end Foo;
+=-=-=
+
+Name: compilation_unit / package_body / subprogram_body / function_specification (End)
+
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J|;
+   end Add;
+
+end Foo;
+=-=
+with Ada.Text_IO;
+
+package body Foo is
+
+   procedure Hello_World is
+   begin
+      Ada.Text_IO.Put_Line ("Hello, world!");
+   end Hello_World;
+
+   function Add (I, J : Integer) return Integer is
+   begin
+      return I + J;
+   end Add;
+|
+end Foo;
+=-=-=

@@ -1,0 +1,241 @@
+#+TITLE: Ada Major Mode using Tree-Sitter
+#+AUTHOR: Troy Brown
+#+LANGUAGE: en
+#+OPTIONS: toc:nil ':t
+#+EXPORT_FILE_NAME: doc/ada-ts-mode.texi
+#+TEXINFO_DIR_CATEGORY: Emacs
+#+TEXINFO_DIR_TITLE: Ada Tree-Sitter Mode: (ada-ts-mode)
+#+TEXINFO_DIR_DESC: Ada Major Mode using Tree-Sitter
+
+A major mode for Ada files, which utilizes the Emacs built-in support
+for tree-sitter, first available starting with Emacs 29.  The
+tree-sitter functionality is used to build an in-memory concrete
+syntax tree of the parsed language, allowing operations such as syntax
+highlighting to be performed more accurately than historical methods
+(e.g., regular expressions).
+
+This major mode provides support for syntax highlighting, navigation,
+Imenu, and "which function" (i.e., displaying the current function
+name in the mode line).
+
+*Note*: This major mode is based on the Emacs built-in tree-sitter
+support, not to be confused with the separate Emacs tree-sitter
+package.  The two are not compatible with each other.
+
+
+* Prerequisites
+
+There are a number of requirements which must be met in order to use
+tree-sitter powered major modes.  The Emacs documentation should be
+consulted which will provide complete details.  The following are the
+main points to consider:
+
+- Emacs must have been built with tree-sitter support.  Versions of
+  Emacs prior to Emacs 29 do not have built-in support.  The built-in
+  support is optionally enabled when Emacs is built, so you must make
+  sure that the version of Emacs that you are using was built with
+  tree-sitter support.
+- The tree-sitter shared library must be installed on your system.
+  The specifics of how to do this will vary based on the Operating
+  System, so those details are not provided here for all platforms,
+  however an a Debian/Ubuntu installation, it would be similar to the
+  following:
+  #+BEGIN_SRC shell
+    sudo apt install libtree-sitter0
+  #+END_SRC
+  If you're building Emacs from source, you'll need the development
+  library instead:
+  #+BEGIN_SRC shell
+    sudo apt install libtree-sitter-dev
+  #+END_SRC
+  The following command can be used to determine if tree-sitter
+  support is enabled in Emacs and whether the tree-sitter library can
+  be found on your system:
+  - =M-: (treesit-available-p) RET=
+
+* Installation
+
+There are multiple ways in which a package can be installed in Emacs.
+The most convenient way is to use a package archive, however
+installation directly from the git repository is also possible.  In
+addition, there are multiple third party package managers available,
+but installation instructions in this section will focus only on the
+built-in package manager (i.e., =package.el=).  It is assumed that
+power-users will not need direction as to how to use other package
+managers.
+
+In addition to package management, it is also common practice to
+perform package configuration.  There are also multiple third party
+packages for managing your package configuration, however =use-package=
+is now built-in to Emacs.  Refer to the example configuration section
+for ideas on how to utilize =use-package= to setup your own personal
+configuration.
+
+** From the MELPA Package Archive
+
+This package can be installed from the MELPA package archive using the
+Emacs built-in package manager (i.e., =package.el=).  MELPA is not
+configured in the package manager by default, but the following can be
+used to configure the use of the MELPA archive.  Refer to [[https://melpa.org/#/getting-started][Getting
+Started]] for additional details on configuring and using the MELPA
+package archive.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+#+END_SRC
+
+Once configured as above, instruct the package manager to refresh the
+available packages and to perform the installation, as follows:
+
+- =M-x package-refresh-contents RET=
+- =M-x package-install RET ada-ts-mode RET=
+
+** From the Git Repository
+
+Installation directly from the source repository is possible using
+~package-vc-install~.  The following command can be used to perform this
+installation:
+
+=M-x package-vc-install RET https://github.com/brownts/ada-ts-mode RET=
+
+* Grammar Installation
+
+In order for ada-ts-mode to be useful, it needs to have the specific
+tree-sitter Ada language grammar library installed.  This library is
+different from the tree-sitter library mentioned in the prerequisites
+section (e.g., =libtree-sitter.so= vs =libtree-sitter-ada.so=).  The
+library is not bundled with ada-ts-mode, but is maintained separately.
+With the default configuration, the first time ada-ts-mode is loaded
+(in the absence of an existing installed library) it will prompt to
+download, build and install the grammar library.  The following
+settings provide control over this activity.
+
+#+VINDEX: ada-ts-mode-grammar
+- ~ada-ts-mode-grammar~ (default: https://github.com/briot/tree-sitter-ada) :: Location
+  of the tree-sitter Ada language grammar to be used by ada-ts-mode.
+#+VINDEX: ada-ts-mode-grammar-install
+- ~ada-ts-mode-grammar-install~ (default: ~prompt~) :: Controls the level of
+  automation in installing the grammar library (automatic, prompt first,
+  etc).
+
+In order to build the library, you will need to have a C compiler
+installed.  Refer to the Emacs documentation surrounding
+~treesit-install-language-grammar~, as ada-ts-mode uses the built-in
+Emacs functionality to perform the download, building and installation
+of the library.
+
+It's also possible to skip this step if you already have a pre-built
+library for the language.  In which case, placing the pre-built
+library in the correct location will allow ada-ts-mode to find and use
+the library.  You can customize ~treesit-extra-load-path~ to add extra
+locations to search for libraries.
+
+You will only be prompted if the library can't be found in one of the
+expected locations.  The prompting can also be controlled by changing
+the ~ada-ts-mode-grammar-install~ setting.
+
+If manually installing, or troubleshooting the installation of the Ada
+language grammar, you can use the following to check whether Emacs can
+locate the library:
+- =M-: (treesit-ready-p 'ada t) RET=
+- Make sure it indicates ~t~ in the echo area instead of ~nil~.
+
+* Syntax Highlighting
+
+There are 4 different levels of syntax highlighting available,
+providing an increasing amount of highlighting.  By default in Emacs,
+level 3 (controlled by ~treesit-font-lock-level~) is used to provide a
+compromise between providing too little and too much fontification.
+It should be noted that the levels are cumulative, meaning that each
+level also includes all of the fontification in the levels below it.
+The following provides the list of features and how they are mapped to
+the different font lock levels.
+
+- Level 1 :: comment, definition
+- Level 2 :: keyword, preprocessor, string, type
+- Level 3 :: attribute, assignment, constant, control, function,
+  number, operator
+- Level 4 :: bracket, delimiter, error, label
+
+* Navigation / Imenu
+
+The major mode implements the normal source navigation commands which
+can be used to move around the buffer (i.e., =C-M-a=, =C-M-e=, etc).  It
+should also be noted that =which-function-mode= is also supported and
+will show the current package and/or subprogram in the mode line, when
+enabled.
+
+With the provided Imenu support, additional options are available for
+ease of navigation within a single Ada file.  Currently package
+declarations, package bodies, subprogram declarations and subprogram
+bodies are enumerated.
+
+* Troubleshooting
+
+** Org Mode Source Code Blocks
+
+When Org Mode doesn't know the major mode for the language of a source
+block, it will guess by appending "-mode" to the end of the language
+name.  If we use a language name of "ada", this means it will look for
+a major mode named "ada-mode".  This default behavior doesn't work if
+we want to use Tree-Sitter enabled modes.  Maybe in the future it will
+be aware of these modes, but in the meantime, we can explicitly
+configure Org Mode to map to the Tree-Sitter major mode using the
+customization variable =org-src-lang-modes=.
+
+The following can be added to your configuration to persist the
+setting:
+
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))
+#+END_SRC
+
+* Example Configuration
+
+The following is an example configuration using =use-package= to manage
+this configuration.  It assumes that =package.el= is your package
+manager.  This checks to make sure tree-sitter support is enabled in
+Emacs before attempting to install/configure the package, thus your
+configuration will remain compatible with versions of Emacs which
+don't yet support tree-sitter, and will not install and configure this
+package in its absence.  Additionally, this also includes installation
+and configuration of recommended supporting packages and modes.
+
+#+BEGIN_SRC emacs-lisp
+  (when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+    (use-package ada-ts-mode
+      :ensure t
+      :defer t ; autoload updates `auto-mode-alist'
+      :init
+      ;; Configure source blocks for Org Mode.
+      (with-eval-after-load 'org-src
+        (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))))
+
+  ;; Configure Electric Pair
+
+  (use-package elec-pair
+    :ensure nil ; built-in
+    :hook (ada-ts-mode . electric-pair-local-mode))
+
+  ;; Configure snippets
+
+  (use-package ada-yasnippets
+    :ensure t
+    :defer t) ; autoload hooks into yasnippet
+
+  (use-package yasnippet
+    :ensure t
+    :hook (ada-ts-mode . yas-minor-mode-on))
+#+END_SRC
+
+* Variable Index
+:PROPERTIES:
+:APPENDIX: t
+:INDEX: vr
+:END:
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook #'org-texinfo-export-to-info nil t)
+# End:

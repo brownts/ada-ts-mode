@@ -1,0 +1,9 @@
+dist/
+.secrets
+*-autoloads.el
+*.elc
+*.info
+
+# Added automatically by ‘eldev init’.
+/.eldev
+/Eldev-local
