@@ -1,0 +1,129 @@
+Name: Nominal
+
+=-=
+package body Test is
+   X : Integer;
+end Test;
+
+private package body Test is
+   X : Integer;
+end Test;
+
+package body Test is
+begin
+   null;
+end Test;
+
+private package body Test is
+begin
+   null;
+end Test;
+
+package body Test is
+   X : Integer;
+begin
+   null;
+end Test;
+
+private package body Test is
+   X : Integer;
+begin
+   null;
+end Test;
+
+package body Test is
+   X : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+private package body Test is
+   X : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+package body Test is
+   package body Nested is
+      X : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end Nested;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package
+body
+  Test
+  with Foo
+is
+   X : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private package
+body
+  Test
+  with Foo
+is
+   X : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private
+package
+body
+  Test
+  with Foo
+is
+   X : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+package body Test is
+   package
+   body
+     Nested
+     with Foo
+   is
+      X : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end
+     Nested
+   ;
+end Test;
+=-=-=

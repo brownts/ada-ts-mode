@@ -1,0 +1,51 @@
+Name: Nominal
+
+=-=
+separate (XYZ)
+procedure Test is
+begin
+   null;
+end Test;
+
+separate (XYZ)
+function Test return Integer is
+begin
+   null;
+end Test;
+
+separate (XYZ)
+package body Test is
+end Test;
+
+separate (XYZ)
+task body Test is
+begin
+   null;
+end Test;
+
+separate (XYZ)
+protected body Test is
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+separate
+  (
+   XYZ
+  )
+procedure Test is
+begin
+   null;
+end Test;
+
+separate
+  (
+   ABC.XYZ
+  )
+procedure Test is
+begin
+   null;
+end Test;
+=-=-=

@@ -1,0 +1,110 @@
+Name: Broken Indent
+
+=-=
+package body Test is
+
+   -- (aspect_mark_list
+   --   (aspect_association (identifier)))
+
+   type Atomic_Array is array (Positive range <>) of Natural with
+                                                               Atomic_Components
+   ;
+
+   -- (aspect_mark_list
+   --   (aspect_association (identifier) => (expression)))
+
+   type Bit_Vector is array (0 .. 15) of Boolean with
+                                                   Component_Size => 1
+   ;
+   type Bit_Vector is array (0 .. 15) of Boolean with
+                                                   Component_Size
+                                                     =>
+                                                     1
+   ;
+
+   -- (aspect_mark_list
+   --   (aspect_association (identifier) => (expression)) ,
+   --   (aspect_association (identifier) => (expression)))
+
+   function Pop (S : in out Stack) return Elem with Pre => not Is_Empty (S),
+                                                    Post => not Is_Full (S)
+   ;
+   function Pop (S : in out Stack) return Elem with
+                                                 Pre => not Is_Empty (S),
+                                                 Post => not Is_Full (S)
+   ;
+   function Pop (S : in out Stack) return Elem with Pre
+                                                      =>
+                                                      not Is_Empty (S)
+                                                    ,
+                                                    Post
+                                                      =>
+                                                      not Is_Full (S)
+   ;
+   function Pop (S : in out Stack) return Elem with
+                                                 Pre
+                                                   =>
+                                                   not Is_Empty (S)
+                                                 ,
+                                                 Post
+                                                   =>
+                                                   not Is_Full (S)
+   ;
+
+   -- (aspect_mark_list
+   --   (aspect_association (identifier)) ,
+   --   (aspect_association (identifier) => (expression)) ,
+   --   (aspect_association (identifier) => (expression)))
+
+   procedure printf_int (format : char_array; value : int) with Import,
+                                                                Convention => C_Variadic_1,
+                                                                External_Name => "printf"
+   ;
+   procedure printf_int (format : char_array; value : int) with
+                                                             Import,
+                                                             Convention => C_Variadic_1,
+                                                             External_Name => "printf"
+   ;
+   procedure printf_int (format : char_array; value : int) with Import
+                                                                ,
+                                                                Convention
+                                                                  =>
+                                                                  C_Variadic_1
+                                                                ,
+                                                                External_Name
+                                                                  =>
+                                                                  "printf"
+   ;
+   procedure printf_int (format : char_array; value : int) with
+                                                             Import
+                                                             ,
+                                                             Convention
+                                                               =>
+                                                               C_Variadic_1
+                                                             ,
+                                                             External_Name
+                                                               =>
+                                                               "printf"
+   ;
+
+   -- (aspect_mark_list
+   --   (aspect_association (identifier) (tick) Class => (expression)))
+
+   type Set is interface with
+                           Invariant'Class => (Is_Empty (X)) = (Count (X) = 0)
+   ;
+   type Set is interface with Invariant
+                              '
+                              Class
+                                =>
+                                (Is_Empty (X)) = (Count (X) = 0)
+   ;
+   type Set is interface with
+                           Invariant
+                           '
+                           Class
+                             =>
+                             (Is_Empty (X)) = (Count (X) = 0)
+   ;
+end Test;
+=-=-=

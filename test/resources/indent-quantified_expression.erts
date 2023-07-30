@@ -1,0 +1,33 @@
+Name: Broken Indent
+
+=-=
+package body Test is
+   function Some_Even return Boolean is
+     (
+      for
+        some
+        X in 1 .. 10
+        =>
+        X mod 2 = 0);
+
+   function Some_Even return Boolean is
+     (
+      for
+        some
+        X of List
+        =>
+        X mod 2 = 0);
+
+   procedure Some_Factor is
+   begin
+      -- RM 4.5.8(13)
+      pragma Assert
+        (
+         for
+           some
+           X in 2 .. N when X * X <= N
+           =>
+           N mod X = 0);
+   end Some_Factor;
+end Test;
+=-=-=

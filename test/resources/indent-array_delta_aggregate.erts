@@ -1,0 +1,67 @@
+Name: Nominal
+
+=-=
+package Test is
+   type RGB is (Red, Green, Blue);
+   type RGB_Array is array (RGB) of Integer;
+
+   W : RGB_Array := (Red => 6, Green => 7, Blue => 8);
+
+   X : RGB_Array := (W with delta Blue => 9);
+   Y : RGB_Array := [W with delta Blue => 10];
+
+   X : RGB_Array := (W with delta Red => 77, Blue => 9);
+   Y : RGB_Array := [W with delta Red => 77, Blue => 10];
+
+   X : RGB_Array := (W with delta Red  => 77,
+                                  Blue => 9);
+   Y : RGB_Array := [W with delta Red  => 77,
+                                  Blue => 10];
+
+   X : RGB_Array := (W with delta Red  => 77
+                                  ,
+                                  Blue => 9);
+   Y : RGB_Array := [W with delta Red  => 77
+                                  ,
+                                  Blue => 10];
+
+   X : RGB_Array :=
+     ( W
+         with
+         delta
+         Red  => 77
+         ,
+         Blue => 9
+     )
+   ;
+   Y : RGB_Array :=
+     [ W
+         with delta
+         Red  => 77
+         ,
+         Blue => 10
+     ]
+   ;
+
+   X : RGB_Array :=
+     (
+      W
+        with
+        delta
+        Red  => 77
+        ,
+        Blue => 9
+     )
+   ;
+   Y : RGB_Array :=
+     [
+      W
+        with delta
+        Red  => 77
+        ,
+        Blue => 10
+     ]
+   ;
+
+end Test;
+=-=-=

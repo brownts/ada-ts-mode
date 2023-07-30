@@ -1,0 +1,31 @@
+Name: Nominal
+
+=-=
+package Test is
+   type RGB_Record is record
+      Red   : Integer;
+      Green : Integer;
+      Blue  : Integer;
+   end record;
+
+   W : RGB_Record := (Red => 6, Green => 7, Blue => 8);
+
+   X : RGB_Record := (W with delta Blue => 9);
+   X : RGB_Record := (W with delta Red => 77, Blue => 9);
+   X : RGB_Record := (W with delta Red => 77,
+                                   Blue => 9);
+   X : RGB_Record := (W with delta Red => 77
+                                   ,
+                                   Blue => 9);
+   X : RGB_Record :=
+     (
+      W
+        with
+        delta
+        Red => 77
+        ,
+        Blue => 9
+     )
+   ;
+end Test;
+=-=-=

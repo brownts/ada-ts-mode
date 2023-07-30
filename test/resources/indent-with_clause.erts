@@ -1,0 +1,139 @@
+Name: with_clause
+
+=-=
+with Ada.Text_IO;
+
+with System;
+
+with Ada.Text_IO,
+     System;
+
+with System,
+     Ada.Text_IO;
+
+with
+  Ada.Text_IO;
+
+with
+  System;
+
+with
+  Ada.Text_IO,
+  System;
+
+with
+  System,
+  Ada.Text_IO;
+
+with
+  Ada.Text_IO
+  ,
+  System
+;
+=-=-=
+
+Name: with_clause: limited
+
+=-=
+limited with Ada.Text_IO;
+
+limited with System;
+
+limited with Ada.Text_IO,
+             System;
+
+limited with System,
+             Ada.Text_IO;
+
+limited with
+  Ada.Text_IO;
+
+limited with
+  System;
+
+limited with
+  Ada.Text_IO,
+  System;
+
+limited with
+  System,
+  Ada.Text_IO;
+
+limited
+with
+  Ada.Text_IO
+  ,
+  System
+;
+=-=-=
+
+Name: with_clause: private
+
+=-=
+private with Ada.Text_IO;
+
+private with System;
+
+private with Ada.Text_IO,
+             System;
+
+private with System,
+             Ada.Text_IO;
+
+private with
+  Ada.Text_IO;
+
+private with
+  System;
+
+private with
+  Ada.Text_IO,
+  System;
+
+private with
+  System,
+  Ada.Text_IO;
+
+private
+with
+  Ada.Text_IO
+  ,
+  System
+;
+=-=-=
+
+Name: with_clause: limited private
+
+=-=
+limited private with Ada.Text_IO;
+
+limited private with System;
+
+limited private with Ada.Text_IO,
+                     System;
+
+limited private with System,
+                     Ada.Text_IO;
+
+limited private with
+  Ada.Text_IO;
+
+limited private with
+  System;
+
+limited private with
+  Ada.Text_IO,
+  System;
+
+limited private with
+  System,
+  Ada.Text_IO;
+
+limited
+private
+with
+  Ada.Text_IO
+  ,
+  System
+;
+=-=-=

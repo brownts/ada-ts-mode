@@ -1,0 +1,43 @@
+Name: Nominal
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (if X = 5 then 0 else 1);
+   Y := (if X = 5 then 0 elsif X = 4 then 0 else 1);
+end Test;
+=-=-=
+
+Name: Nominal "broken" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (
+         if
+           X = 5
+         then
+            0
+         else
+            1
+        )
+   ;
+   Y := (
+         if
+           X = 5
+         then
+            0
+         elsif
+           X = 4
+         then
+            0
+         else
+            1
+        )
+   ;
+end Test;
+=-=-=

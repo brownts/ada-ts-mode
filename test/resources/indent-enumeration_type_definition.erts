@@ -1,0 +1,55 @@
+Name: Normal
+
+=-=
+package Test is
+
+   type Color_Type is (Red, Green, Blue);
+
+   type Color_Type is ('R', 'G', 'B');
+
+   type Color_Type is
+     (Red,
+      Green,
+      Blue);
+
+   type Color_Type is
+     ('R',
+      'G',
+      'B');
+
+   type Color_Type is
+     ( Red,
+       Green,
+       Blue);
+
+   type Color_Type is
+     ( 'R',
+       'G',
+       'B');
+
+   type
+     Color_Type
+   is
+     (
+      Red
+      ,
+      Green
+      ,
+      Blue
+     )
+   ;
+
+   type
+     Color_Type
+   is
+     (
+      'R'
+      ,
+      'G'
+      ,
+      'B'
+     )
+   ;
+
+end Test;
+=-=-=

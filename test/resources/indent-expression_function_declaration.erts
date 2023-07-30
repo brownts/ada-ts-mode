@@ -1,0 +1,57 @@
+Name: Broken Indent
+
+=-=
+function Test (X, Y : Integer) return Integer is
+  (X + Y);
+
+function Test (X, Y : Integer) return Integer
+  is
+  (X + Y);
+
+function Test (X, Y : Integer) return Integer
+  is
+  (X + Y)
+;
+
+function
+  Test (X, Y : Integer) return Integer
+  is
+  (
+   X + Y
+  )
+;
+
+not overriding function Test (X, Y : Integer) return Integer is
+  (X + Y);
+
+not overriding function Test (X, Y : Integer) return Integer
+  is
+  (X + Y);
+
+not overriding function Test (X, Y : Integer) return Integer
+  is
+  (X + Y)
+;
+
+not overriding function
+  Test (X, Y : Integer) return Integer
+  is
+  (X + Y)
+;
+=-=-=
+
+Name: Custom "subprogram is" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+       (setq-local ada-ts-mode-indent-subprogram-is-offset 8))))
+
+=-=
+not overriding function
+  Test (X, Y : Integer) return Integer
+        is
+  (X + Y)
+;
+=-=-=

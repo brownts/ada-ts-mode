@@ -1,0 +1,20 @@
+Name: Broken Indent
+
+=-=
+package body Test is
+   protected
+   body
+     Protected_Body
+   is
+   separate
+   ;
+
+   protected
+   body
+     Protected_Body
+   is
+   separate
+     with Foo
+   ;
+end Test;
+=-=-=

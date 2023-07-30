@@ -1,0 +1,28 @@
+Name: Nominal (Package)
+
+=-=
+-- top-level comment
+
+with Ada.Text_IO;
+
+-- before package
+
+package
+  -- before name
+  Test_Pkg
+
+-- before package is
+is
+   -- inside package
+
+   X : Integer;
+
+   -- before end
+end
+  -- before endname
+  Test_Pkg
+-- before semicolon
+;
+
+-- after package
+=-=-=

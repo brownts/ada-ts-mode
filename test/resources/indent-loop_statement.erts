@@ -1,0 +1,277 @@
+Name: Nominal
+
+=-=
+package body Test is
+begin
+   for I in 1 .. 5 loop
+      null;
+   end loop;
+
+   for I in Integer loop
+      null;
+   end loop;
+
+   for I in Integer range 1 .. 5 loop
+      null;
+   end loop;
+
+   for I in reverse 1 .. 5 loop
+      null;
+   end loop;
+
+   for I in 1 .. 5 when I mod 2 = 0 loop
+      null;
+   end loop;
+
+   for I of Container loop
+      null;
+   end loop;
+
+   for I : Integer of Container loop
+      null;
+   end loop;
+
+   for I : Integer range 1 .. 5 of Container loop
+      null;
+   end loop;
+
+   for I of Container when I mod 2 = 1 loop
+      null;
+   end loop;
+
+   for I : Integer in List.Iterate loop
+      null;
+   end loop;
+
+   for I : Integer range 1 .. 5 in List.Iterate loop
+      null;
+   end loop;
+
+   for I : not null access Integer in List.Iterate loop
+      null;
+   end loop;
+
+   while I < 5 loop
+      I := I + 1;
+   end loop;
+
+   loop
+      I := I + 1;
+      exit when I = 5;
+   end loop;
+
+   FOR_LABEL: for I in 1 .. 5 loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+      for I in 1 .. 5 loop
+         null;
+      end loop FOR_LABEL;
+
+   FOR_LABEL: for I of Container loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+      for I of Container loop
+         null;
+      end loop FOR_LABEL;
+
+   WHILE_LABEL: while I < 5 loop
+      I := I + 1;
+   end loop WHILE_LABEL;
+
+   WHILE_LABEL:
+      while I < 5 loop
+         I := I + 1;
+      end loop WHILE_LABEL;
+
+   LOOP_LABEL: loop
+      I := I + 1;
+      exit LOOP_LABEL when I = 5;
+   end loop LOOP_LABEL;
+
+   LOOP_LABEL:
+      loop
+         I := I + 1;
+         exit LOOP_LABEL when I = 5;
+      end loop LOOP_LABEL;
+
+   FOR_LABEL
+   :
+      for
+        I
+        in
+        reverse
+        1 .. 5
+        when
+          I mod 2 = 0
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   FOR_LABEL
+   :
+      for
+        I
+        in
+        reverse
+        Integer
+        when
+          I mod 2 = 0
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   FOR_LABEL
+   :
+      for
+        I
+        in
+        reverse
+        Integer
+        range 1 .. 5
+        when
+          I mod 2 = 0
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   FOR_LABEL
+   :
+      for
+        I
+        :
+        Integer
+        range 1 .. 5
+        of
+        Container
+        when
+          I mod 2 = 1
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   FOR_LABEL
+   :
+      for
+        I
+        :
+        Integer
+        range 1 .. 5
+        in
+        reverse
+        List.Iterate
+        when
+          I mod 2 = 1
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   FOR_LABEL
+   :
+      for
+        I
+        :
+        not null access Integer
+        in
+        reverse
+        List.Iterate
+        when
+          I mod 2 = 1
+      loop
+         null;
+      end
+      loop
+        FOR_LABEL
+      ;
+
+   WHILE_LABEL
+   :
+      while
+        I < 5
+      loop
+         I := I + 1;
+      end
+      loop
+        WHILE_LABEL
+      ;
+
+   LOOP_LABEL
+   :
+      loop
+         I := I + 1;
+         exit LOOP_LABEL when I = 5;
+      end
+      loop
+        LOOP_LABEL
+      ;
+end Test;
+=-=-=
+
+Name: Custom "label" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+     (setq-local ada-ts-mode-indent-label-offset 8))))
+
+=-=
+package body Test is
+begin
+   FOR_LABEL: for I in 1 .. 5 loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+           for I in 1 .. 5 loop
+              null;
+           end loop FOR_LABEL;
+
+   FOR_LABEL: for I of Container loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+           for I of Container loop
+              null;
+           end loop FOR_LABEL;
+
+   WHILE_LABEL: while I < 5 loop
+      I := I + 1;
+   end loop WHILE_LABEL;
+
+   WHILE_LABEL:
+           while I < 5 loop
+              I := I + 1;
+           end loop WHILE_LABEL;
+
+   LOOP_LABEL: loop
+      I := I + 1;
+      exit LOOP_LABEL when I = 5;
+   end loop LOOP_LABEL;
+
+   LOOP_LABEL:
+           loop
+              I := I + 1;
+              exit LOOP_LABEL when I = 5;
+           end loop LOOP_LABEL;
+end Test;
+=-=-=

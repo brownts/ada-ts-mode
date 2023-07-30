@@ -1,0 +1,152 @@
+Name: Nominal (selective_accept)
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+   end select;
+
+   select
+      accept Do_Something;
+      null;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+         null;
+   end select;
+
+   select
+      accept Do_Something;
+   or
+      delay 50.0;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+   or
+      delay 50.0;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+         null;
+   or
+      delay 50.0;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+         null;
+   or
+      delay 50.0;
+      null;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+   or
+      when X > 4 =>
+         accept Do_Something;
+   end select;
+
+   select
+      when X > 5 =>
+         accept Do_Something;
+   else
+      null;
+   end select;
+
+   select
+      -- comment
+      when X > 5 =>
+         -- comment
+         accept Do_Something;
+      -- comment
+   or
+      -- comment
+      when X > 4 =>
+         -- comment
+         accept Do_Something;
+      -- comment
+   else
+      -- comment 5
+      null;
+      -- comment 6
+   end select;
+end Test;
+=-=-=
+
+Name: Nominal (timed_entry_call)
+
+=-=
+task body Test is
+begin
+   select
+      Do_Something;
+   or
+      delay 50.0;
+   end select;
+
+   select
+      Do_Something;
+      null;
+   or
+      delay 50.0;
+      null;
+   end select;
+end Test;
+=-=-=
+
+Name: Nominal (conditional_entry_call)
+
+=-=
+task body Test is
+begin
+   select
+      Do_Something;
+   else
+      null;
+   end select;
+
+   select
+      Do_Something;
+      null;
+   else
+      null;
+      null;
+   end select;
+end Test;
+=-=-=
+
+Name: Nominal (asynchronous_select)
+
+=-=
+task body Test is
+begin
+   select
+      Do_Something;
+   then abort
+      Do_Something_Else;
+   end select;
+
+   select
+      Do_Something;
+      null;
+   then abort
+      Do_Something_Else;
+      null;
+   end select;
+end Test;
+=-=-=

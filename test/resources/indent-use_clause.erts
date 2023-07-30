@@ -1,0 +1,80 @@
+Name: use_clause
+
+=-=
+use Ada.Text_IO;
+
+use System;
+
+use Ada.Text_IO,
+    System;
+
+use System,
+    Ada.Text_IO;
+
+use
+  Ada.Text_IO;
+
+use
+  System;
+
+use
+  Ada.Text_IO,
+  System;
+
+use
+  System,
+  Ada.Text_IO;
+
+use
+  Ada.Text_IO
+  ,
+  System
+;
+=-=-=
+
+Name: use_clause: type
+
+=-=
+use type Interfaces.Unsigned_32;
+
+use type Interfaces.Unsigned_32,
+         System.Address;
+
+use type
+  Interfaces.Unsigned_32;
+
+use type
+  Interfaces.Unsigned_32,
+  System.Address;
+
+use
+type
+  Interfaces.Unsigned_32
+  ,
+  System.Address
+;
+=-=-=
+
+Name: use_clause: all type
+
+=-=
+use all type Complex_Numbers.Complex;
+
+use all type Complex_Numbers.Complex,
+             Palette.Colour;
+
+use all type
+  Complex_Numbers.Complex;
+
+use all type
+  Complex_Numbers.Complex,
+  Palette.Colour;
+
+use
+all
+type
+  Complex_Numbers.Complex
+  ,
+  Palette.Colour
+;
+=-=-=

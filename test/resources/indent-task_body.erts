@@ -1,0 +1,64 @@
+Name: Nominal
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   end Task_Body;
+
+   task body Task_Body is
+      X : Integer;
+      Y : Integer;
+   begin
+      null;
+      null;
+   end Task_Body;
+
+   task body Task_Body with Foo is
+   begin
+      null;
+      null;
+   end Task_Body;
+
+   task body Task_Body with Foo is
+      X : Integer;
+      Y : Integer;
+   begin
+      null;
+      null;
+   end Task_Body;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package body Test is
+   task
+   body
+     Task_Body
+     with Foo
+   is
+   begin
+      null;
+      null;
+   end
+     Task_Body
+   ;
+
+   task
+   body
+     Task_Body
+     with Foo
+   is
+      X : Integer;
+      Y : Integer;
+   begin
+      null;
+      null;
+   end
+     Task_Body
+   ;
+end Test;
+=-=-=

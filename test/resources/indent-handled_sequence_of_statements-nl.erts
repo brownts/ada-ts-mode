@@ -1,0 +1,47 @@
+Name: End of Exception Handler - 1
+
+Point-Char: |
+
+=-=
+package body Test is
+begin
+   null;
+exception
+   when others =>
+      null;|
+end Test;
+=-=
+package body Test is
+begin
+   null;
+exception
+   when others =>
+      null;
+      |
+end Test;
+=-=-=
+
+Name: End of Exception Handler - 2
+
+Point-Char: |
+
+=-=
+package body Test is
+begin
+   null;
+exception
+   when others =>
+      null;
+      |
+end Test;
+=-=
+package body Test is
+begin
+   null;
+exception
+   when others =>
+      null;
+
+      |
+end Test;
+=-=-=

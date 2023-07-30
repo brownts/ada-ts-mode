@@ -1,0 +1,45 @@
+Name: Broken Indent
+
+=-=
+package body Test is
+   not overriding procedure
+     ABC
+     (X : Integer)
+   is
+   separate
+     with Foo
+   ;
+
+   not
+   overriding
+   procedure
+     ABC
+     (X : Integer)
+   is
+   separate
+     with Foo
+   ;
+
+   not overriding function
+     ABC
+     (X : Integer)
+     return
+       Integer
+   is
+   separate
+     with Foo
+   ;
+
+   not
+   overriding
+   function
+     ABC
+     (X : Integer)
+     return
+       Integer
+   is
+   separate
+     with Foo
+   ;
+end Test;
+=-=-=

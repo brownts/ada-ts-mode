@@ -1,0 +1,56 @@
+Name: Nominal
+
+=-=
+package Test is
+   task type Test_Type;
+
+   task type Test_Type is
+   end Test_Type;
+
+   task type Test_Type is
+   private
+   end Test_Type;
+
+   task type Test_Type is
+   private
+      entry Write (X: in Item);
+   end Test_Type;
+
+   task type Test_Type is
+      entry Start;
+      entry Stop;
+   end Test_Type;
+
+   task type Test_Type is
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end Test_Type;
+
+   task type Test_Type (B : Boolean := True) is new Foo and Bar with
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end Test_Type;
+
+   task
+   type
+     Test_Type
+     (B : Boolean := True)
+   is
+   new
+     Foo
+   and
+     Bar
+   with
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end
+     Test_Type
+   ;
+end Test;
+=-=-=

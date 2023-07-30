@@ -1,0 +1,20 @@
+Name: Broken Indent
+
+=-=
+package body Test is
+   task
+   body
+     Task_Body
+   is
+   separate
+   ;
+
+   task
+   body
+     Task_Body
+   is
+   separate
+     with Foo
+   ;
+end Test;
+=-=-=

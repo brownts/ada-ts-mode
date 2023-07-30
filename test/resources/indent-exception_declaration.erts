@@ -1,0 +1,55 @@
+Name: Nominal
+
+=-=
+package Test is
+   My_Exception : exception;
+
+   My_Exception_1, My_Exception_2 : exception;
+
+   My_Exception : exception with Foo;
+
+   My_Exception_1, My_Exception_2 : exception with Foo;
+
+   My_Exception : exception with Foo, Bar;
+
+   My_Exception_1, My_Exception_2 : exception with Foo, Bar;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package Test is
+   My_Exception
+   :
+   exception
+   ;
+
+   My_Exception_1
+   ,
+   My_Exception_2
+   :
+   exception
+   ;
+
+   My_Exception
+   :
+   exception
+     with Foo
+   ;
+
+   My_Exception_1
+   ,
+   My_Exception_2
+   :
+   exception
+     with Foo
+   ;
+
+   My_Exception
+   :
+   exception
+     with Foo
+   ;
+end Test;
+=-=-=

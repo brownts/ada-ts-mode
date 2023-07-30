@@ -1,0 +1,166 @@
+Name: Nominal
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   -- before case_statement
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      -- before case_statement_alternative
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+      -- before end of case_statement
+   end case;
+   -- after case_statement
+end Test;
+=-=-=
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+       (setq-local ada-ts-mode-indent-offset 8)
+       (setq-local ada-ts-mode-indent-when-offset 3))))
+
+Name: Modified indent offset
+
+=-=
+package body Test is
+        X : constant := 5;
+        Y : Integer;
+begin
+        -- before case_statement
+        case X is
+           -- before case_statement_alternative
+           when 5 =>
+                   -- before sequence_of_statements
+                   Y := 0;
+           -- before case_statement_alternative
+           when others =>
+                   -- before sequence_of_statements
+                   Y := 1;
+           -- before end of case_statement
+        end case;
+        -- after case_statement
+end Test;
+=-=-=
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+       (setq-local ada-ts-mode-indent-when-offset 0))))
+
+Name: Modified "when" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   -- before case_statement
+   case X is
+   -- before case_statement_alternative
+   when 5 =>
+      -- before sequence_of_statements
+      Y := 0;
+   -- before case_statement_alternative
+   when others =>
+      -- before sequence_of_statements
+      Y := 1;
+   -- before end of case_statement
+   end case;
+   -- after case_statement
+end Test;
+=-=-=
+
+Code: indent-transform
+
+Name: Nominal "broken" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   -- before case_statement
+   case
+     X
+   is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      -- before case_statement_alternative
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+      -- before end of case_statement
+   end case;
+   -- after case_statement
+end Test;
+=-=-=
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+       (setq-local ada-ts-mode-indent-broken-offset 8))))
+
+Name: Modified "broken" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   -- before case_statement
+   case
+           X
+   is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      -- before case_statement_alternative
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+      -- before end of case_statement
+   end case;
+   -- after case_statement
+end Test;
+=-=-=
+
+Code: indent-transform
+
+Name: Stacked discrete_choice_list
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   -- before case_statement
+   case X is
+      -- before case_statement_alternative
+      when 3 |
+           4 |
+           5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      -- before case_statement_alternative
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+      -- before end of case_statement
+   end case;
+   -- after case_statement
+end Test;
+=-=-=

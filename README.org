@@ -17,10 +17,10 @@ syntax tree of the parsed language, allowing operations such as syntax
 highlighting to be performed more accurately than historical methods
 (e.g., regular expressions).
 
-This major mode provides support for syntax highlighting, navigation,
-Imenu, "which function" (i.e., displaying the current function name in
-the mode line), indentation (via LSP), outlining (via
-=outline-minor-mode=) and casing.
+This major mode provides support for syntax highlighting, indentation,
+navigation, Imenu, "which function" (i.e., displaying the current
+function name in the mode line), outlining (via =outline-minor-mode=)
+and casing.
 
 *Note*: This major mode is based on the Emacs 29 (or newer) built-in
 tree-sitter support, not to be confused with the separate Emacs
@@ -164,48 +164,136 @@ the different font lock levels.
 
 * Indentation
 
-Built-in tree-sitter support for indentation is not currently
-available.  However, if ~ada-ts-mode~ is used in conjunction with the
-Ada Language Server, indentation support can be provided by the
-language server itself.
+Indentation follows the nesting structure of the language. Each nested
+level is indented a fixed amount. Thus the general indentation offset
+governs the amount of this indentation. Additional configurations
+address special cases, such as the indentation of a construct spanning
+multiple lines (i.e., broken indent).
+
+Multiple indentation back-ends are supported, but the default back-end
+uses the intrinsic tree-sitter support.  Additionally, an external
+indentation back-end using the Ada Language Server can be configured,
+which uses the Language Server to perform formatting.  In addition to
+configuring the indentation backed to use the LSP formatter, a
+Language Server client must be enabled in the buffer.
+
+Additionally, the LSP formatter does not use all of the user options
+below, it will only use the basic indentation offset and possibly the
+broken offset configuration.  Furthermore, because the LSP back-end
+uses a formatter rather than an indentation engine, depending on the
+configuration of the formatter, the back-end is likely to indent more
+than the current line.  See the documentation for the Language Server
+to learn about formatter details.
 
 The following user options can be customized to modify the indentation
 as needed.
 
 - User Option: ada-ts-mode-indent-backend ::
-  Selects the backend used to provide indentation support.  The
-  "Default" setting uses the default settings for ~indent-line-function~
-  and ~indent-region-function~.  See their documentation for further
-  details, although this usually performs indentation relative to the
-  previous line.  The "LSP" setting will use the Language Server
-  indentation support when a LSP client is active for the buffer.  If
-  no LSP client is active this falls back to using the "Default"
-  indentation.
+  Selects the back-end used to provide indentation support.  The
+  default uses Tree-sitter based indentation and supports all of the
+  indentation options specified below.  The "LSP" setting will use the
+  Language Server indentation support when a LSP client is active for
+  the buffer.  If no LSP client is active, or if the LSP formatter
+  refuses to format (e.g., when syntax errors are present) this falls
+  back to using Tree-sitter based indentation.
 
 - User Option: ada-ts-mode-indent-offset ::
   Indentation used for structural visualization.
+
+- User Option: ada-ts-mode-indent-when-offset ::
+  Indentation for case alternatives, relative to a case statement.
+
+- User Option: ada-ts-mode-indent-broken-offset ::
+  Continuation indentation when item does not completely reside on a
+  single line.
+
+- User Option: ada-ts-mode-indent-exp-item-offset ::
+  Continuation indentation for partial expressions.
+
+- User Option: ada-ts-mode-indent-subprogram-is-offset ::
+  Indentation for =is= keyword in a short form subprogram body (i.e.,
+  null procedure, expression function and abstract subprogram).
+
+- User Option: ada-ts-mode-indent-record-offset ::
+  Indentation of a record definition relative to the start of the type
+  declaration or representation clause when the =record= keyword appears
+  on a separate line.
+
+- User Option: ada-ts-mode-indent-label-offset ::
+  Indentation for a block or loop statement containing a label.
+
+- User Option: ada-ts-mode-indent-strategy ::
+  Indentation strategy to use, typically when =RET= or =TAB= are pressed
+  during editing.  Historically, pressing one of these keys would
+  drive a line-based indentation, however more complex indentation
+  strategies can be used due to the available of the syntax tree.  By
+  default, an "aggressive" indentation strategy is used that attempts
+  to perform indentation at a higher structural level (e.g.,
+  statement, subprogram, etc.) in order to correct possible incorrect
+  indentation that might have occurred while syntax errors were
+  present in the buffer.  The "line" indentation strategy performs the
+  historical behavior of only indenting the current line.
+
+  *Note*: This option is only supported when the tree-sitter indentation
+  is configured as the back-end.  The reason is to avoid conflicting
+  with formatting that the LSP formatter might perform.
+
+It should be noted that the offsets defined above are described in
+terms of each other, so that by customizing the standard indentation
+offset ~ada-ts-mode-indent-offset~, the other indentation offsets will
+be adjusted accordingly.  In other words, those settings either use
+the same value or a value derived from it.  Therefore, customizing the
+base value will have an affect on the remaining values as well.  If
+this is not the desired outcome, the other offsets should be
+customized as well.
+
+Indentation rules used in ~ada-ts-mode~, as in all tree-sitter based
+modes, are based on the syntax of the language.  When what currently
+exists in the buffer is not syntactically correct, the in-memory
+syntax tree will contain errors, since the buffer doesn't adhere to
+the grammar rules of the language (i.e., it contains syntax errors).
+To help combat this issue, a best-effort approach is used to perform
+indentation around syntax errors.  Furthermore, the indentation
+strategy can help recover from previously incorrect indentation that
+has occurred while the buffer was in a syntactically invalid state.
+
+If none of the existing indentation strategies are sufficient, a
+custom strategy can be created and used.  In order to create a
+strategy, a new strategy symbol should be specified in
+~ada-ts-mode-indent-strategy~, and an implementation of
+~ada-ts-mode-indent~ should be created, specializing on the new strategy
+symbol name.  Refer to existing instances of this function to
+understand how current strategy functions are implemented.
 
 ** Ada Language Server Indentation
 
 Since the Ada Language Server provides code formatting, not just an
 indentation engine, it may be necessary to configure the settings of
-the code formatter to meet behavioral desires.  Under the hood, Ada LS
-uses the GNAT pretty printer engine to format the line or region of
-the buffer.  For minimal impact to the buffer, it's likely desirable
-to use the =--source-line-breaks= switch to prevent the pretty printer
-from reformatting the buffer beyond indentation.  Refer to the GNAT
-User's Guide for the full set of options available for the pretty
-printer.
+the code formatter to meet behavioral desires.  Under the hood, the
+Ada LS may use either =GNATformat= or =GNATpp= (pretty print) although the
+later appears to be deprecated.  =GNATformat= is an opinionated
+formatter with only a few configuration options, while =GNATpp= contains
+many more options for the user to configure.  Configuration for either
+formatter occurs in the GNAT Project file in their corresponding
+packages (i.e., =Format= and =Pretty_Print=, respectively).  The Ada LS
+will read the settings from the project file to control formatting.
+The specific formatter to use is configured through the Ada LS
+=useGnatformat= setting.  See the Ada Language Server documentation for
+details about this setting and its default value.
+
+When using the =GNATpp= engine to format a line or region of the buffer,
+for minimal impact to the buffer, it's likely desirable to use the
+=--source-line-breaks= switch to prevent =GNATpp= from reformatting the
+buffer beyond indentation.  With the =GNATformat= engine, there is no
+control over the formatting, as it is opinionated.  Refer to their
+respective documentation for the full set of options available for the
+formatting engines.
 
 The value of ~ada-ts-mode-indent-offset~ is provided to the Ada Language
-Server as the LSP "tab size" parameter.  This corresponds to the main
-indentation amount (i.e., the =--indentation= switch for the pretty
-printer).
-
-The switches for the pretty printer should be configured in the
-project's GPR file.  GPR files support a =Pretty_Printer= package which
-is where the switches should reside.  The Ada LS will read the pretty
-printer switches from the project's GPR file to control formatting.
+Server as the =tabSize= parameter in the =textDocument/rangeFormatting=
+request.  This corresponds to the main indentation amount (i.e.,
+overriding the =--indentation= switch for =GNATpp= or the =Indentation=
+package setting for =GNATformat=).
 
 * Navigation
 
@@ -498,7 +586,9 @@ Emacs before attempting to install/configure the package, thus your
 configuration will remain compatible with versions of Emacs which
 don't yet support tree-sitter, and will not install and configure this
 package in its absence.  This also demonstrates how to configure
-indentation support through the Ada Language Server (assuming the user has configured an LSP client to be active in the buffer).
+external indentation support through the Ada Language Server (assuming
+the user has configured an LSP client to be active in the buffer), if
+that is preferred over the intrinsic indentation support.
 
 #+BEGIN_SRC emacs-lisp
   (when (and (fboundp 'treesit-available-p)
@@ -518,12 +608,19 @@ indentation support through the Ada Language Server (assuming the user has confi
       ;; Enable auto-casing
       :hook (ada-ts-mode . ada-ts-auto-case-mode)))
 
-  ;; Configure Electric Pair
+  ;; Configure Imenu
 
-  (use-package elec-pair
+  (use-package imenu
     :ensure nil ; built-in
-    :hook (ada-ts-mode . electric-pair-local-mode))
+    :custom (imenu-auto-rescan t)
+    :hook (ada-ts-mode . imenu-add-menubar-index))
 #+END_SRC
+
+* Resources
+- Recommended packages:
+  - [[https://github.com/brownts/gpr-ts-mode][gpr-ts-mode]]: Tree-sitter based GNAT Project Major Mode
+- Extended example configuration:
+  - [[https://github.com/brownts/dotemacs-ada][dotemacs-ada]]: Emacs configuration for Ada & GNAT Project
 
 * Command & Function Index
 :PROPERTIES:

@@ -1,0 +1,86 @@
+Name: Nominal
+
+=-=
+package Test is
+   X : constant Integer := 2;
+end Test;
+
+private package Test is
+   X : constant Integer := 2;
+end Test;
+
+package Test is
+   X : constant Integer;
+private
+   X : constant Integer := 2;
+end Test;
+
+private package Test is
+   X : constant Integer;
+private
+   X : constant Integer := 2;
+end Test;
+
+package Test is
+   package Nested is
+      X : constant Integer := 2;
+   end Nested;
+
+   package Nested is
+      X : constant Integer;
+   private
+      X : constant Integer := 2;
+   end Nested;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package
+  Test
+  with Foo
+is
+   X : constant Integer;
+private
+   X : constant Integer := 2;
+end
+  Test
+;
+
+private package
+  Test
+  with Foo
+is
+   X : constant Integer;
+private
+   X : constant Integer := 2;
+end
+  Test
+;
+
+private
+package
+  Test
+  with Foo
+is
+   X : constant Integer;
+private
+   X : constant Integer := 2;
+end
+  Test
+;
+
+package Test is
+   package
+     Nested
+     with Foo
+   is
+      X : constant Integer;
+   private
+      X : constant Integer := 2;
+   end
+     Nested
+   ;
+end Test;
+=-=-=

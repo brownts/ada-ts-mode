@@ -1,0 +1,74 @@
+Name: Nominal
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (case X is
+            when 5 => 0,
+            when others => 1);
+end Test;
+=-=-=
+
+Code:
+  (lambda ()
+    (indent-transform
+      (lambda ()
+        (setq-local ada-ts-mode-indent-when-offset 0))))
+
+Name: Modified "when" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (case X is
+         when 5 => 0,
+         when others => 1);
+end Test;
+=-=-=
+
+Code: indent-transform
+
+Name: Nominal "broken" indent offset
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (
+         case
+           -- before expression
+           X
+         -- before is
+         is
+            -- before case_expression_alternative
+            when 5 =>
+               -- before expression
+               0,
+            -- before case_expression_alternative
+            when others =>
+               -- before expression
+               1
+        )
+   ;
+end Test;
+=-=-=
+
+Name: Stacked discrete_choice_list
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   Y := (case X is
+            when 3 |
+                 4 |
+                 5 => 0,
+            when others => 1);
+end Test;
+=-=-=
