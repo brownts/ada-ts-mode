@@ -1,0 +1,293 @@
+Name: Before first case_statement_alternative (case line)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is|
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      |
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: Before first case_statement_alternative (before comment line)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is|
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      |
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: Before first case_statement_alternative (after comment line)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative|
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      |
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: case_statement_alternative (before comment line)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>|
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         |
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: case_statement_alternative (after comment line)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements|
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         |
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: case_statement_alternative (after last statement)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;|
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+         |
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+end Test;
+=-=-=
+
+Name: Last case_statement_alternative (after last statement)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;|
+   end case;
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+         |
+   end case;
+end Test;
+=-=-=
+
+Name: case_statement (after end case)
+
+Point-Char: |
+
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;|
+end Test;
+=-=
+package body Test is
+   X : constant := 5;
+   Y : Integer;
+begin
+   case X is
+      -- before case_statement_alternative
+      when 5 =>
+         -- before sequence_of_statements
+         Y := 0;
+      when others =>
+         -- before sequence_of_statements
+         Y := 1;
+   end case;
+   |
+end Test;
+=-=-=

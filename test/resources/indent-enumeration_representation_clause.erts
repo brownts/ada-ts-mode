@@ -1,0 +1,51 @@
+Name: Nominal
+
+=-=
+package Test is
+
+   for Color_Type use
+     (Red   => 1,
+      Green => 2,
+      Blue  => 3);
+
+   for Color_Type use
+     ('R' => 1,
+      'G' => 2,
+      'B' => 3);
+
+   for Color_Type use
+     ( Red   => 1,
+       Green => 2,
+       Blue  => 3);
+
+   for Color_Type use
+     ( 'R' => 1,
+       'G' => 2,
+       'B' => 3);
+
+   for
+     Color_Type
+   use
+     (
+      Red   => 1
+      ,
+      Green => 2
+      ,
+      Blue  => 3
+     )
+   ;
+
+   for
+     Color_Type
+   use
+     (
+      'R' => 1
+      ,
+      'G' => 2
+      ,
+      'B' => 3
+     )
+   ;
+
+end Test;
+=-=-=

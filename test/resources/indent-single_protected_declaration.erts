@@ -1,0 +1,44 @@
+Name: Nominal
+
+=-=
+package Test is
+   protected Test_Object is
+      procedure Increment;
+      procedure Decrement;
+      function Value return Integer;
+   end Test_Object;
+
+   protected Test_Object is
+      procedure Increment;
+      procedure Decrement;
+      function Value return Integer;
+   private
+      X : Integer := 0;
+   end Test_Object;
+
+   protected Test_Object is new Foo and Bar with
+      procedure Increment;
+      procedure Decrement;
+      function Value return Integer;
+   private
+      X : Integer := 0;
+   end Test_Object;
+
+   protected
+     Test_Object
+   is
+   new
+     Foo
+   and
+     Bar
+   with
+      procedure Increment;
+      procedure Decrement;
+      function Value return Integer;
+   private
+      X : Integer := 0;
+   end
+     Test_Object
+   ;
+end Test;
+=-=-=

@@ -1,0 +1,25 @@
+Name: Broken Indent
+
+=-=
+procedure Test.
+  ABC.
+  XYZ;
+
+procedure Test
+  .
+  ABC
+  .
+  XYZ;
+
+procedure
+  Test.
+    ABC.
+    XYZ;
+
+procedure
+  Test
+    .
+    ABC
+    .
+    XYZ;
+=-=-=

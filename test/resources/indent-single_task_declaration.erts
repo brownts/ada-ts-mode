@@ -1,0 +1,42 @@
+Name: Nominal
+
+=-=
+package Test is
+   task Test_Object;
+
+   task Test_Object is
+      entry Start;
+      entry Stop;
+   end Test_Object;
+
+   task Test_Object is
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end Test_Object;
+
+   task Test_Object is new Foo and Bar with
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end Test_Object;
+
+   task
+     Test_Object
+   is
+   new
+     Foo
+   and
+     Bar
+   with
+      entry Start;
+      entry Stop;
+   private
+      entry Write (X: in Item);
+   end
+     Test_Object
+   ;
+end Test;
+=-=-=

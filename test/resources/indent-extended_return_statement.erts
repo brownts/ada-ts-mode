@@ -1,0 +1,55 @@
+Name: Nominal
+
+=-=
+package body Test is
+   function Foo_1 return Integer is
+   begin
+      return X : constant Integer := 5;
+   end Foo_1;
+
+   function Foo_2 return Integer is
+   begin
+      return X : Integer do
+         X := 7;
+      end return;
+   end Foo_2;
+
+   function Foo_3 return Integer is
+   begin
+      return X : Integer do
+         null;
+         X := 7;
+      end return;
+   end Foo_3;
+
+   function Foo_1a return Integer is
+   begin
+      return
+        X : constant Integer := 5
+      ;
+   end Foo_1a;
+
+   function Foo_2a return Integer is
+   begin
+      return
+        X : Integer
+      do
+         X := 7;
+      end
+      return
+      ;
+   end Foo_2a;
+
+   function Foo_3a return Integer is
+   begin
+      return
+        X : Integer
+      do
+         null;
+         X := 7;
+      end
+      return
+      ;
+   end Foo_3a;
+end Test;
+=-=-=

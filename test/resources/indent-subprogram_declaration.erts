@@ -1,0 +1,103 @@
+Name: Broken Indent (procedure)
+
+=-=
+procedure Test (X : Integer)
+  with Foo;
+
+procedure Test
+  (X : Integer)
+  with Foo;
+
+procedure
+  Test
+  (X : Integer)
+  with Foo;
+
+private procedure
+  Test
+  (X : Integer)
+  with Foo;
+
+private
+procedure
+  Test
+  (X : Integer)
+  with Foo;
+
+not overriding procedure
+  Test
+  (X : Integer)
+  with Foo;
+
+not
+overriding
+procedure
+  Test
+  (X : Integer)
+  with Foo;
+
+package Test is
+   procedure
+     Nested
+     (X : Integer)
+     with Foo;
+end Test;
+=-=-=
+
+Name: Broken Indent (function)
+
+=-=
+function Test (X : Integer) return Integer
+  with Foo;
+
+function Test
+  (X : Integer) return Integer
+  with Foo;
+
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo;
+
+private function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo;
+
+private
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo;
+
+not overriding function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo;
+
+not
+overriding
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo;
+
+package Test is
+   function
+     Nested
+     (X : Integer)
+     return
+       Integer
+     with Foo;
+end Test;
+=-=-=

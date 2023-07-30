@@ -1,0 +1,23 @@
+Name: Nominal
+
+=-=
+package body Test is
+   package body ABC is separate;
+
+   package body ABC is separate with Foo;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package body Test is
+   package
+   body
+     ABC
+   is
+   separate
+     with Foo
+   ;
+end Test;
+=-=-=

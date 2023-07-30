@@ -1,0 +1,47 @@
+Name: Nominal
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      procedure Increment is
+      begin
+         X := X + 1;
+      end Increment;
+      procedure Decrement is
+      begin
+         X := X - 1;
+      end Decrement;
+      function Value return Integer is
+      begin
+         return X;
+      end Value;
+   end Protected_Body;
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package body Test is
+   protected
+   body
+     Protected_Body
+     with Foo
+   is
+      procedure Increment is
+      begin
+         X := X + 1;
+      end Increment;
+      procedure Decrement is
+      begin
+         X := X - 1;
+      end Decrement;
+      function Value return Integer is
+      begin
+         return X;
+      end Value;
+   end
+     Protected_Body
+   ;
+end Test;
+=-=-=

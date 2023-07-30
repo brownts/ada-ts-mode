@@ -1,0 +1,334 @@
+Name: Nominal
+
+=-=
+begin
+   null;
+end;
+
+begin
+   null;
+exception when others => null;
+end;
+
+begin
+   null;
+exception when others =>
+             null;
+end;
+
+begin
+   null;
+exception
+   when others =>
+      null;
+end;
+
+begin
+   null;
+exception when Constraint_Error => null;
+          when Storage_Error => null;
+          when others => null;
+end;
+
+begin
+   null;
+exception
+   when Constraint_Error => null;
+   when Storage_Error => null;
+   when others => null;
+end;
+
+begin
+   null;
+exception when EO1 : Constraint_Error => null;
+          when EO2 : Storage_Error => null;
+          when EO3 : others => null;
+end;
+
+begin
+   null;
+exception when EO1 : Constraint_Error =>
+             null;
+          when EO2 : Storage_Error =>
+             null;
+          when EO3 : others =>
+             null;
+end;
+
+begin
+   null;
+exception
+   when EO1 : Constraint_Error =>
+      null;
+   when EO2 : Storage_Error =>
+      null;
+   when others =>
+      null;
+end;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+begin
+   null;
+exception when
+            Constraint_Error
+            =>
+             null;
+             null;
+end;
+
+begin
+   null;
+exception
+   when
+     Constraint_Error
+     =>
+      null;
+      null;
+end;
+
+begin
+   null;
+exception when
+            EO1
+            :
+            Constraint_Error
+            =>
+             null;
+             null;
+end;
+
+begin
+   null;
+exception
+   when
+     EO1
+     :
+     Constraint_Error
+     =>
+      null;
+      null;
+end;
+
+begin
+   null;
+exception when
+            EO1
+            :
+            Constraint_Error
+            =>
+             null;
+             null;
+          when
+            EO2
+            :
+            Storage_Error
+            =>
+             null;
+             null;
+          when
+            E03
+            :
+            others
+            =>
+             null;
+             null;
+end;
+
+begin
+   null;
+exception
+   when
+     EO1
+     :
+     Constraint_Error
+     =>
+      null;
+      null;
+   when
+     EO2
+     :
+     Storage_Error
+     =>
+      null;
+      null;
+   when
+     E03
+     :
+     others
+     =>
+      null;
+      null;
+end;
+=-=-=
+
+Name: Stacked exception_choice_list
+=-=
+begin
+   null;
+exception when Constraint_Error |
+               Storage_Error =>
+             null;
+end;
+
+begin
+   null;
+exception when EO1 : Constraint_Error |
+                     Storage_Error =>
+             null;
+end;
+
+begin
+   null;
+exception when Constraint_Error |
+               Storage_Error =>
+             null;
+          when others =>
+             null;
+end;
+
+begin
+   null;
+exception when EO1 : Constraint_Error |
+                     Storage_Error =>
+             null;
+          when EO2 : others =>
+             null;
+end;
+
+begin
+   null;
+exception
+   when Constraint_Error |
+        Storage_Error =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when EO1 : Constraint_Error |
+              Storage_Error =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when Constraint_Error |
+        Storage_Error =>
+      null;
+   when others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when EO1 : Constraint_Error |
+              Storage_Error =>
+      null;
+   when EO2 : others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when Constraint_Error |
+        Storage_Error    |
+        Program_Error =>
+      null;
+   when others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when EO1 : Constraint_Error |
+              Storage_Error    |
+              Program_Error =>
+      null;
+   when EO2 : others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when Constraint_Error
+        |
+        Storage_Error
+        |
+        Program_Error
+     =>
+      null;
+   when others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when EO1 : Constraint_Error
+              |
+              Storage_Error
+              |
+              Program_Error
+     =>
+      null;
+   when EO2 : others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when
+     Constraint_Error
+     |
+     Storage_Error
+     |
+     Program_Error
+     =>
+      null;
+   when others =>
+      null;
+end;
+
+begin
+   null;
+exception
+   when
+     EO1
+     :
+     Constraint_Error
+     |
+     Storage_Error
+     |
+     Program_Error
+     =>
+      null;
+   when EO2 : others =>
+      null;
+end;
+=-=-=
+
+Name: Comment Indent
+
+=-=
+begin
+   -- before sequence_of_statements
+   null;
+   -- after sequence_of_statements
+exception
+   -- before exception_handler
+   when others =>
+      -- before sequence_of_statements
+      null;
+   -- after exception_handler
+end;
+=-=-=

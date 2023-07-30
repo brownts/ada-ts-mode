@@ -1,0 +1,388 @@
+Name: Nominal (procedure)
+
+=-=
+procedure Test (X : Integer) is
+begin
+   null;
+end Test;
+
+private procedure Test (X : Integer) is
+begin
+   null;
+end Test;
+
+procedure Test (X : Integer) is
+   Y : Integer;
+begin
+   null;
+end Test;
+
+private procedure Test (X : Integer) is
+   Y : Integer;
+begin
+   null;
+end Test;
+
+not overriding procedure Test (X : Integer) is
+begin
+   null;
+end Test;
+
+procedure Test (X : Integer) is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+private not overriding procedure Test (X : Integer) is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+package body Test is
+   procedure Nested (X : Integer) is
+      Y : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end Nested;
+end Test;
+=-=-=
+
+Name: Broken Indent (procedure)
+
+=-=
+procedure Test (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+procedure Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+procedure
+  Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private procedure
+  Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private
+procedure
+  Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+not overriding procedure
+  Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+not
+overriding
+procedure
+  Test
+  (X : Integer)
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+package body Test is
+   procedure
+     Nested
+     (X : Integer)
+     with Foo
+   is
+      Y : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end
+     Nested
+   ;
+end Test;
+=-=-=
+
+Name: Nominal (function)
+
+=-=
+function Test (X : Integer) return Integer is
+begin
+   null;
+end Test;
+
+function Test (X : Integer) return Integer is
+begin
+   null;
+end Test;
+
+private function Test (X : Integer) return Integer is
+begin
+   null;
+end Test;
+
+function Test (X : Integer) return Integer is
+   Y : Integer;
+begin
+   null;
+end Test;
+
+private function Test (X : Integer) return Integer is
+   Y : Integer;
+begin
+   null;
+end Test;
+
+not overriding function Test (X : Integer) return Integer is
+begin
+   null;
+end Test;
+
+function Test (X : Integer) return Integer is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+private not overriding function Test (X : Integer) return Integer is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end Test;
+
+package body Test is
+   function Nested (X : Integer) return Integer is
+      Y : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end Nested;
+end Test;
+=-=-=
+
+Name: Broken Indent (function)
+
+=-=
+function Test (X : Integer) return Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+function Test
+  (X : Integer) return Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+private
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+not overriding function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+not
+overriding
+function
+  Test
+  (X : Integer)
+  return
+    Integer
+  with Foo
+is
+   Y : Integer;
+begin
+   null;
+exception
+   when others =>
+      null;
+end
+  Test
+;
+
+package body Test is
+   function
+     Nested
+     (X : Integer)
+     return
+       Integer
+     with Foo
+   is
+      Y : Integer;
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end
+     Nested
+   ;
+end Test;
+=-=-=

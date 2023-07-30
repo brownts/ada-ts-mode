@@ -1,0 +1,39 @@
+Name: Nominal
+
+=-=
+package body Test is
+   function Add (X, Y : Integer) return Integer is
+     (declare
+         Z : constant Integer := X + Y;
+      begin
+         Z);
+
+   function Add (X, Y : Integer) return Integer is
+     (declare
+         Z : constant Integer := X + Y;
+      begin
+         Z +
+           3);
+end Test;
+=-=-=
+
+Name: Broken Indent
+
+=-=
+package body Test is
+   function Add (X, Y : Integer) return Integer is
+     (
+      declare
+         Z : constant Integer := X + Y;
+      begin
+         Z);
+
+   function Add (X, Y : Integer) return Integer is
+     (
+      declare
+         Z : constant Integer := X + Y;
+      begin
+         Z +
+           3);
+end Test;
+=-=-=

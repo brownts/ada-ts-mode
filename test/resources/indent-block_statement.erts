@@ -1,0 +1,60 @@
+Name: Nominal
+
+=-=
+package body Test is
+begin
+
+   begin
+      X := X + 1;
+   end;
+
+   BLOCK_LABEL:
+   begin
+      X := X + 1;
+   end BLOCK_LABEL;
+
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   end;
+
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   end;
+
+   BLOCK_LABEL:
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL
+   :
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   end
+     BLOCK_LABEL
+   ;
+
+end Test;
+=-=-=

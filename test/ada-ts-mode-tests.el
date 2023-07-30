@@ -62,12 +62,41 @@ perform custom initialization."
     (let* ((actual-menu (filter-menu (funcall imenu-create-index-function))))
       (should (equal menu actual-menu)))))
 
+(defun indent-transform (&optional setup)
+  "Indent transform function for test.
+
+SETUP can be used to perform custom initialization."
+  (default-transform)
+  (when setup
+    (funcall setup))
+  (goto-char (point-min))
+  (cl-flet ((line-length () (- (line-end-position)
+                               (line-beginning-position))))
+    (while (not (eobp))
+      (if (> (line-length) 0)
+          (if (= (following-char) ?\s)
+              (while (and (> (line-length) 0)
+                          (= (following-char) ?\s))
+                (delete-char 1))
+            (insert-char ?\s)))
+      (forward-line 1)
+      (beginning-of-line)))
+  (indent-region (point-min) (point-max)))
+
+(defun newline-transform ()
+  "Newline transform function for test."
+  (default-transform)
+  (call-interactively #'newline))
+
+
 (dolist (file (directory-files (ert-resource-directory)
                                nil
                                directory-files-no-dot-files-regexp))
   (let* ((file-noext (file-name-sans-extension file))
          (file-path (ert-resource-file file))
-         (transform (cond ((string-prefix-p "filling" file-noext) #'filling-transform)
+         (transform (cond ((string-suffix-p "-nl"     file-noext) #'newline-transform)
+                          ((string-prefix-p "filling" file-noext) #'filling-transform)
+                          ((string-prefix-p "indent"  file-noext) #'indent-transform)
                           (t #'default-transform))))
     (if (string-prefix-p "font-lock" file-noext)
         (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
