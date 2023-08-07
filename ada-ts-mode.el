@@ -199,6 +199,24 @@ those instances."
    '((procedure_specification name: _ @font-lock-function-name-face)
      (function_specification name: _ @font-lock-function-name-face)
      (subprogram_body endname: _ @font-lock-function-name-face)
+     (entry_declaration "entry"
+                        :anchor (comment) :*
+                        :anchor (identifier) @font-lock-function-name-face)
+     (entry_body (identifier) @font-lock-function-name-face)
+     (accept_statement entry_direct_name: _ @font-lock-function-name-face)
+     (accept_statement entry_identifier: _ @font-lock-function-name-face)
+     (single_protected_declaration "protected"
+                                   :anchor (comment) :*
+                                   :anchor (identifier) @font-lock-variable-name-face)
+     (single_protected_declaration
+      (protected_definition "end" (identifier) @font-lock-variable-name-face))
+     (protected_body (identifier) @font-lock-variable-name-face)
+     (single_task_declaration "task"
+                              :anchor (comment) :*
+                              :anchor (identifier) @font-lock-variable-name-face)
+     (single_task_declaration
+      (task_definition "end" (identifier) @font-lock-variable-name-face))
+     (task_body (identifier) @font-lock-variable-name-face)
      (generic_instantiation
       ["procedure" "function"]
       name: _ @font-lock-function-name-face)
@@ -340,7 +358,12 @@ those instances."
      (private_type_declaration (identifier) @font-lock-type-face)
      (private_extension_declaration (identifier) @font-lock-type-face)
      (protected_type_declaration (identifier) @font-lock-type-face "is")
-     (protected_definition "end" (identifier) @font-lock-type-face)
+     (protected_type_declaration
+      (protected_definition "end" (identifier) @font-lock-type-face))
+     (task_type_declaration "type"
+                            :anchor (comment) :*
+                            :anchor (identifier) @font-lock-type-face)
+     (task_type_declaration (task_definition endname: _ @font-lock-type-face))
      (subtype_declaration (identifier) @font-lock-type-face)
      (_ subtype_mark: (selected_component
                        selector_name: _ @font-lock-type-face))
