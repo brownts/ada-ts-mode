@@ -339,6 +339,8 @@ those instances."
      (incomplete_type_declaration (identifier) @font-lock-type-face)
      (private_type_declaration (identifier) @font-lock-type-face)
      (private_extension_declaration (identifier) @font-lock-type-face)
+     (protected_type_declaration (identifier) @font-lock-type-face "is")
+     (protected_definition "end" (identifier) @font-lock-type-face)
      (subtype_declaration (identifier) @font-lock-type-face)
      (_ subtype_mark: (selected_component
                        selector_name: _ @font-lock-type-face))
