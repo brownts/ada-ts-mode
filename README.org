@@ -7,6 +7,9 @@
 #+TEXINFO_DIR_TITLE: Ada Tree-Sitter Mode: (ada-ts-mode)
 #+TEXINFO_DIR_DESC: Ada Major Mode using Tree-Sitter
 
+#+HTML: <a href="https://melpa.org/#/ada-ts-mode"><img alt="MELPA" src="https://melpa.org/packages/ada-ts-mode-badge.svg"/></a>
+#+HTML: <a href="https://github.com/brownts/ada-ts-mode/actions/workflows/test.yml"><img alt="CI" src="https://github.com/brownts/ada-ts-mode/actions/workflows/test.yml/badge.svg"/></a>
+
 A major mode for Ada files, which utilizes the Emacs built-in support
 for tree-sitter, first available starting with Emacs 29.  The
 tree-sitter functionality is used to build an in-memory concrete
