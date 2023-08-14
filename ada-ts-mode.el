@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.2
+;; Version: 0.5.3
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -34,6 +34,7 @@
 
 ;;; Code:
 
+(require 'info-look)
 (require 'lisp-mnt)
 (require 'treesit)
 (eval-when-compile (require 'rx))
@@ -618,6 +619,12 @@ Return non-nil to indicate that it is."
   (add-to-list 'auto-mode-alist
                `(,(rx (or ".adb" ".ads" ".adc") eos) . ada-ts-mode))
   (add-to-list 'major-mode-remap-alist '(ada-mode . ada-ts-mode)))
+
+(info-lookup-add-help
+ :topic 'symbol
+ :mode '(emacs-lisp-mode . "ada")
+ :regexp "\\bada-ts-[^][()`'‘’,\" \t\n]+"
+ :doc-spec '(("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)")))
 
 (provide 'ada-ts-mode)
 

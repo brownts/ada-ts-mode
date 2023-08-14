@@ -113,13 +113,13 @@ With the default configuration, the first time ada-ts-mode is loaded
 download, build and install the grammar library.  The following
 settings provide control over this activity.
 
-#+VINDEX: ada-ts-mode-grammar
-- ~ada-ts-mode-grammar~ (default: https://github.com/briot/tree-sitter-ada) :: Location
-  of the tree-sitter Ada language grammar to be used by ada-ts-mode.
-#+VINDEX: ada-ts-mode-grammar-install
-- ~ada-ts-mode-grammar-install~ (default: ~prompt~) :: Controls the level of
-  automation in installing the grammar library (automatic, prompt first,
-  etc).
+- User Option: ada-ts-mode-grammar ::
+  Location of the tree-sitter Ada language grammar to be used by
+  ada-ts-mode.
+
+- User Option: ada-ts-mode-grammar-install ::
+  Controls the level of automation in installing the grammar library
+  (automatic, prompt first, etc).
 
 In order to build the library, you will need to have a C compiler
 installed.  Refer to the Emacs documentation surrounding
