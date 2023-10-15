@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.3
+;; Version: 0.5.4
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -186,7 +186,15 @@ those instances."
    '(((term name: (identifier) @font-lock-constant-face)
       (:match "^\\(?:[tT][rR][uU][eE]\\|[fF][aA][lL][sS][eE]\\)$"
               @font-lock-constant-face))
-     (enumeration_type_definition (identifier) @font-lock-constant-face))
+     (enumeration_type_definition (identifier) @font-lock-constant-face)
+     (enumeration_representation_clause
+      (enumeration_aggregate
+       (named_array_aggregate
+        (array_component_association
+         (discrete_choice_list
+          (discrete_choice
+           (expression
+            (term name: (identifier) @font-lock-constant-face)))))))))
 
    ;; Delimiters
    :language 'ada
@@ -269,6 +277,7 @@ those instances."
       :anchor (identifier) @font-lock-variable-name-face)
      (loop_parameter_specification
       :anchor (identifier) @font-lock-constant-face)
+     (iterator_specification :anchor (identifier) @font-lock-variable-name-face)
      (discriminant_specification (identifier) @font-lock-variable-name-face ":")
      (discriminant_specification (identifier) @font-lock-constant-face ":")
      (variant_part (identifier) @font-lock-variable-name-face)
