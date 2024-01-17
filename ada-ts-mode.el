@@ -1,10 +1,10 @@
 ;;; ada-ts-mode.el --- Major mode for Ada using Tree-sitter  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 Troy Brown
+;; Copyright (C) 2023-2024 Troy Brown
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.4
+;; Version: 0.5.5
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -477,7 +477,9 @@ Return nil if there is no name or if NODE is not a defun node."
             node
             (lambda (n)
               (let ((node-type (treesit-node-type n)))
-                (string-equal "identifier" node-type)))))))
+                (string-equal "identifier" node-type))))))
+     ("subunit"
+      (treesit-node-child-by-field-name node "parent_unit_name")))
    t))
 
 (defun ada-ts-mode--package-p (node)
@@ -577,7 +579,8 @@ Return non-nil to indicate that it is."
                              "subprogram_body"
                              "subprogram_body_stub"
                              "subprogram_declaration"
-                             "subprogram_renaming_declaration")
+                             "subprogram_renaming_declaration"
+                             "subunit")
                      eos)
                 .
                 ada-ts-mode--defun-p))
