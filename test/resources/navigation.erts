@@ -1,7 +1,6 @@
 Code:
   (lambda ()
-    (ada-ts-mode)
-    (setq-local indent-tabs-mode nil)
+    (default-transform)
     (call-interactively (key-binding (kbd "C-M-a"))))
 
 Name: compilation_unit / subprogram_declaration / procedure_specification (Beginning)
@@ -216,8 +215,7 @@ end Foo;
 
 Code:
   (lambda ()
-    (ada-ts-mode)
-    (setq-local indent-tabs-mode nil)
+    (default-transform)
     (call-interactively (key-binding (kbd "C-M-e"))))
 
 Name: compilation_unit / subprogram_declaration / procedure_specification (End)

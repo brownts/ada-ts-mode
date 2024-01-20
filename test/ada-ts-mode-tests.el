@@ -19,14 +19,43 @@
 
 ;;; Code:
 
+(require 'ada-ts-mode)
 (require 'ert)
 (require 'ert-x)
+(require 'treesit)
 
-(ert-deftest ada-ts-mode-test-filling ()
-  (ert-test-erts-file (ert-resource-file "filling.erts")))
+(defun default-transform ()
+  "Default transform function for test."
+  (ada-ts-mode)
+  (cl-assert (not (treesit-search-subtree
+                   (treesit-buffer-root-node) "ERROR")))
+  (setq-local indent-tabs-mode nil))
 
-(ert-deftest ada-ts-mode-test-navigation ()
-  (ert-test-erts-file (ert-resource-file "navigation.erts")))
+(defun filling-transform ()
+  "Filling transform function for test."
+  (default-transform)
+  (fill-paragraph))
+
+(dolist (file
+         (directory-files
+          (expand-file-name "resources"
+                            (file-name-directory
+                             (cond (load-in-progress load-file-name)
+                                   ((bound-and-true-p byte-compile-current-file)
+                                    byte-compile-current-file)
+                                   (t (buffer-file-name)))))
+          nil
+          (rx bos
+              (or (not ".")
+                  (seq "." (not "."))
+                  (seq ".." (+ anychar)))
+              )))
+  (let* ((file-noext (file-name-sans-extension file))
+         (transform (cond ((string-prefix-p "filling" file-noext) #'filling-transform)
+                          (t #'default-transform))))
+    (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
+             (ert-test-erts-file (ert-resource-file ,file)
+                                 (function ,transform))))))
 
 (provide 'ada-ts-mode-tests)
 
