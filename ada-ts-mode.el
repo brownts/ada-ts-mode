@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.5
+;; Version: 0.5.6
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -205,9 +205,18 @@ those instances."
    :language 'ada
    :feature 'definition
    :override 'prepend
-   '((procedure_specification name: _ @font-lock-function-name-face)
-     (function_specification name: _ @font-lock-function-name-face)
-     (subprogram_body endname: _ @font-lock-function-name-face)
+   '((procedure_specification name: (identifier) @font-lock-function-name-face)
+     (procedure_specification name: (selected_component
+                                     selector_name: (identifier)
+                                     @font-lock-function-name-face))
+     (function_specification name: (identifier) @font-lock-function-name-face)
+     (function_specification name: (selected_component
+                                    selector_name: (identifier)
+                                    @font-lock-function-name-face))
+     (subprogram_body endname: (identifier) @font-lock-function-name-face)
+     (subprogram_body endname: (selected_component
+                                selector_name: (identifier)
+                                @font-lock-function-name-face))
      (entry_declaration "entry"
                         :anchor (comment) :*
                         :anchor (identifier) @font-lock-function-name-face)
@@ -228,7 +237,18 @@ those instances."
      (task_body (identifier) @font-lock-variable-name-face)
      (generic_instantiation
       ["procedure" "function"]
-      name: _ @font-lock-function-name-face)
+      name: (identifier) @font-lock-function-name-face)
+     (generic_instantiation
+      ["procedure" "function"]
+      name: (selected_component
+             selector_name: (identifier) @font-lock-function-name-face))
+     (generic_instantiation
+      ["procedure" "function"]
+      generic_name: (identifier) @font-lock-function-name-face)
+     (generic_instantiation
+      ["procedure" "function"]
+      generic_name: (selected_component
+                     selector_name: (identifier) @font-lock-function-name-face))
      (subprogram_renaming_declaration
       callable_entity_name: (identifier) @font-lock-function-name-face)
      (subprogram_renaming_declaration
