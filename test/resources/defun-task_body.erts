@@ -1,0 +1,14 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_body / task_body
+
+=-=
+package body Test is
+   task body ABC is
+   begin
+      null;|
+   end ABC;
+end Test;
+=-=-=

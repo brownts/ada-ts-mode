@@ -1,0 +1,11 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / task_type_declaration
+
+=-=
+package Test is
+   task type ABC|;
+end Test;
+=-=-=

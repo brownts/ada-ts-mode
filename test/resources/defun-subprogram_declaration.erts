@@ -1,0 +1,69 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: subprogram_declaration / procedure (identifier)
+
+=-=
+procedure ABC|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: subprogram_declaration / procedure (selected_component)
+
+=-=
+procedure ABC.DEF|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: subprogram_declaration / function (identifier)
+
+=-=
+function ABC return Integer|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: subprogram_declaration / function (selected_component)
+
+=-=
+function ABC.DEF return Integer|;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / subprogram_declaration / procedure
+
+=-=
+package Test is
+   procedure ABC|;
+end Test;
+=-=-=
+
+Name: package_declaration / subprogram_declaration / function
+
+=-=
+package Test is
+   function ABC return Integer|;
+end Test;
+=-=-=
+
+Name: generic_package_declaration / subprogram_declaration / procedure
+
+=-=
+generic
+package Test is
+   procedure ABC|;
+end Test;
+=-=-=
+
+Name: generic_package_declaration / subprogram_declaration / function
+
+=-=
+generic
+package Test is
+   function ABC return Integer|;
+end Test;
+=-=-=

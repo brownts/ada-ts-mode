@@ -1,0 +1,84 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "XYZ"))
+
+Name: subunit (identifier)
+
+=-=
+separate (XYZ)|
+procedure ABC is
+begin
+   null;
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.UVW"))
+
+Name: subunit (selected_component)
+
+=-=
+separate (XYZ.UVW)|
+procedure ABC is
+begin
+   null;
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: subunit / package_body
+
+=-=
+separate (XYZ)
+package body ABC is
+|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: subunit / protected_body
+
+=-=
+separate (XYZ)
+protected body ABC is
+|
+   procedure Foo;
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: subunit / subprogram_body / procedure
+
+=-=
+separate (XYZ)
+procedure ABC is
+begin
+   null;|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: subunit / subprogram_body / function
+
+=-=
+separate (XYZ)
+function ABC return Integer is
+begin
+   return 1;|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: subunit / task_body
+
+=-=
+separate (XYZ)
+task body ABC is
+begin
+   null;|
+end ABC;
+=-=-=

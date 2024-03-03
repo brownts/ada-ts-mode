@@ -1,0 +1,18 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "XYZ.ABC"))
+
+Name: Broken selected_component
+
+=-=
+package
+  XYZ
+  .
+  ABC
+is
+end
+  XYZ
+  .
+  ABC
+;
+=-=-=

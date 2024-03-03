@@ -1,0 +1,28 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: generic_package_declaration / formal_package_declaration
+
+=-=
+generic
+   with package DEF is new GHI|;
+package ABC is
+end ABC;
+=-=-=
+
+Name: generic_subprogram_declaration / procedure / formal_package_declaration
+
+=-=
+generic
+   with package DEF is new GHI|;
+procedure ABC;
+=-=-=
+
+Name: generic_subprogram_declaration / function / formal_package_declaration
+
+=-=
+generic
+   with package DEF is new GHI|;
+function ABC return Integer;
+=-=-=

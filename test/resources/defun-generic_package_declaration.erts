@@ -1,0 +1,47 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: generic_package_declaration (identifier)
+
+=-=
+generic
+package ABC is
+   |
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: generic_package_declaration (selected_component)
+
+=-=
+generic
+package ABC.DEF is
+   |
+end ABC.DEF;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / generic_package_declaration
+
+=-=
+package Test is
+   generic
+   package ABC is
+      |
+   end ABC;
+end Test;
+=-=-=
+
+Name: package_body / generic_package_declaration
+
+=-=
+package body Test is
+   generic
+   package ABC is
+      |
+   end ABC;
+end Test;
+=-=-=

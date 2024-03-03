@@ -1,0 +1,13 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / protected_type_declaration
+
+=-=
+package Test is
+   protected type ABC is
+      |
+   end ABC;
+end Test;
+=-=-=

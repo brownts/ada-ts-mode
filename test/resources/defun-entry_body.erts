@@ -1,0 +1,18 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.XYZ.ABC"))
+
+Name: package_body / protected_body / entry_body
+
+=-=
+package body Test is
+   protected body XYZ is
+      entry ABC
+        when X > Y
+      is
+      begin
+         null|;
+      end ABC;
+   end XYZ;
+end Test;
+=-=-=

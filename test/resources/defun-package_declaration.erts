@@ -1,0 +1,21 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: package_declaration (identifier)
+
+=-=
+package ABC is
+|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: package_declaration (selected_component)
+
+=-=
+package ABC.DEF is
+|
+end ABC.DEF;
+=-=-=

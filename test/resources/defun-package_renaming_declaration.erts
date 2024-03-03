@@ -1,0 +1,35 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: package_renaming_declaration (identifier)
+
+=-=
+package ABC renames DEF.GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: package_renaming_declaration (selected_component)
+
+=-=
+package ABC.DEF renames DEF.GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / package_renaming_declaration
+
+=-=
+package Test is
+   package ABC renames DEF.GHI|;
+end Test;
+=-=-=
+
+Name: package_body / package_renaming_declaration
+
+=-=
+package body Test is
+   package ABC renames DEF.GHI|;
+end Test;
+=-=-=

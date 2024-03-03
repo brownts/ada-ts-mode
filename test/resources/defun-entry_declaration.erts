@@ -1,0 +1,43 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.XYZ.ABC"))
+
+Name: package_body / protected_type_declaration / protected_definition / entry_declaration
+
+=-=
+package body Test is
+   protected type XYZ is
+      entry ABC|;
+   end XYZ;
+end Test;
+=-=-=
+
+Name: package_body / single_protected_declaration / protected_definition / entry_declaration
+
+=-=
+package body Test is
+   protected XYZ is
+      entry ABC|;
+   end XYZ;
+end Test;
+=-=-=
+
+Name: package_body / task_type_declaration / task_definition / entry_declaration
+
+=-=
+package body Test is
+   task type XYZ is
+      entry ABC|;
+   end XYZ;
+end Test;
+=-=-=
+
+Name: package_body / single_task_declaration / task_definition / entry_declaration
+
+=-=
+package body Test is
+   task XYZ is
+      entry ABC|;
+   end XYZ;
+end Test;
+=-=-=

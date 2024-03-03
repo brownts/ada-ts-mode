@@ -1,0 +1,53 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: generic_package_declaration / formal_concrete_subprogram_declaration / procedure
+
+=-=
+generic
+   with procedure DEF|;
+package ABC is
+end ABC;
+=-=-=
+
+Name: generic_package_declaration / formal_concrete_subprogram_declaration / function
+
+=-=
+generic
+   with function DEF return Integer|;
+package ABC is
+end ABC;
+=-=-=
+
+Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / procedure
+
+=-=
+generic
+   with procedure DEF|;
+procedure ABC;
+=-=-=
+
+Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / function
+
+=-=
+generic
+   with function DEF return Integer|;
+procedure ABC;
+=-=-=
+
+Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / procedure
+
+=-=
+generic
+   with procedure DEF|;
+function ABC return Integer;
+=-=-=
+
+Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / function
+
+=-=
+generic
+   with function DEF return Integer|;
+function ABC return Integer;
+=-=-=

@@ -1,0 +1,91 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: generic_instantiation (identifier) / package
+
+=-=
+package ABC is new GHI|;
+=-=-=
+
+Name: generic_instantiation (identifier) / procedure
+
+=-=
+procedure ABC is new GHI|;
+=-=-=
+
+Name: generic_instantiation (identifier) / function
+
+=-=
+function ABC is new GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: generic_instantiation (selected_component) / package
+
+=-=
+package ABC.DEF is new GHI|;
+=-=-=
+
+Name: generic_instantiation (selected_component) / procedure
+
+=-=
+procedure ABC.DEF is new GHI|;
+=-=-=
+
+Name: generic_instantiation (selected_component) / function
+
+=-=
+function ABC.DEF is new GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / generic_instantiation / package
+
+=-=
+package Test is
+   package ABC is new GHI|;
+end Test;
+=-=-=
+
+Name: package_declaration / generic_instantiation / procedure
+
+=-=
+package Test is
+   procedure ABC is new GHI|;
+end Test;
+=-=-=
+
+Name: package_declaration / generic_instantiation / function
+
+=-=
+package Test is
+   function ABC is new GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_instantiation / package
+
+=-=
+package body Test is
+   package ABC is new GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_instantiation / procedure
+
+=-=
+package body Test is
+   procedure ABC is new GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_instantiation / function
+
+=-=
+package body Test is
+   function ABC is new GHI|;
+end Test;
+=-=-=

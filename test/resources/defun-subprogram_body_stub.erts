@@ -1,0 +1,21 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.ABC")))
+
+Name: package_body / subprogram_body_stub / procedure
+
+=-=
+package body Test is
+   procedure ABC is separate|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC")))
+
+Name: package_body / subprogram_body_stub / function
+
+=-=
+package body Test is
+   function ABC return Integer is separate|;
+end Test;
+=-=-=

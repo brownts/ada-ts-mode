@@ -1,0 +1,11 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / expression_function_declaration
+
+=-=
+package Test is
+   function ABC (X : Integer) return Integer is (X + 1)|;
+end Test;
+=-=-=

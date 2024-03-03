@@ -23,6 +23,7 @@
 (require 'ert)
 (require 'ert-x)
 (require 'treesit)
+(require 'which-func)
 
 (defun default-transform ()
   "Default transform function for test."
@@ -30,6 +31,11 @@
   (cl-assert (not (treesit-search-subtree
                    (treesit-buffer-root-node) "ERROR")))
   (setq-local indent-tabs-mode nil))
+
+(defun defun-transform (name)
+  "Defun NAME transform function for test."
+  (default-transform)
+  (cl-assert (string-equal (which-function) name)))
 
 (defun filling-transform ()
   "Filling transform function for test."

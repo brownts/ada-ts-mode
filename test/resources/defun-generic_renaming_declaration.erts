@@ -1,0 +1,91 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: generic_renaming_declaration (identifier) / package
+
+=-=
+generic package ABC renames GHI|;
+=-=-=
+
+Name: generic_renaming_declaration (identifier) / procedure
+
+=-=
+generic procedure ABC renames GHI|;
+=-=-=
+
+Name: generic_renaming_declaration (identifier) / function
+
+=-=
+generic function ABC renames GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: generic_renaming_declaration (selected_component) / package
+
+=-=
+generic package ABC.DEF renames GHI|;
+=-=-=
+
+Name: generic_renaming_declaration (selected_component) / procedure
+
+=-=
+generic procedure ABC.DEF renames GHI|;
+=-=-=
+
+Name: generic_renaming_declaration (selected_component) / function
+
+=-=
+generic function ABC.DEF renames GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / generic_renaming_declaration / package
+
+=-=
+package Test is
+   generic package ABC renames GHI|;
+end Test;
+=-=-=
+
+Name: package_declaration / generic_renaming_declaration / procedure
+
+=-=
+package Test is
+   generic procedure ABC renames GHI|;
+end Test;
+=-=-=
+
+Name: package_declaration / generic_renaming_declaration / function
+
+=-=
+package Test is
+   generic function ABC renames GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_renaming_declaration / package
+
+=-=
+package body Test is
+   generic package ABC renames GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_renaming_declaration / procedure
+
+=-=
+package body Test is
+   generic procedure ABC renames GHI|;
+end Test;
+=-=-=
+
+Name: package_body / generic_renaming_declaration / function
+
+=-=
+package body Test is
+   generic function ABC renames GHI|;
+end Test;
+=-=-=

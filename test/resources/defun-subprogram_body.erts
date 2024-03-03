@@ -1,0 +1,45 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: subprogram_body / procedure (identifier)
+
+=-=
+procedure ABC is
+begin
+   null;|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: subprogram_body / procedure (selected_component)
+
+=-=
+procedure ABC.DEF is
+begin
+   null;|
+end ABC.DEF;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: subprogram_body / function (identifier)
+
+=-=
+function ABC return Integer is
+begin
+   return 1;|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: subprogram_body / function (selected_component)
+
+=-=
+function ABC.DEF return Integer is
+begin
+   return 1;|
+end ABC.DEF;
+=-=-=

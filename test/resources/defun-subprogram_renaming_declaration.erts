@@ -1,0 +1,63 @@
+Point-Char: |
+
+Code: (lambda () (defun-transform "ABC"))
+
+Name: subprogram_renaming_declaration (identifier) / procedure
+
+=-=
+procedure ABC renames DEF.GHI|;
+=-=-=
+
+Name: subprogram_renaming_declaration (identifier) / function
+
+=-=
+function ABC return Integer renames DEF.GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
+Name: subprogram_renaming_declaration (selected_component) / procedure
+
+=-=
+procedure ABC.DEF renames DEF.GHI|;
+=-=-=
+
+Name: subprogram_renaming_declaration (selected_component) / function
+
+=-=
+function ABC.DEF return Integer renames DEF.GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
+
+Name: package_declaration / subprogram_renaming_declaration / procedure
+
+=-=
+package Test is
+   procedure ABC renames DEF.GHI|;
+end Test;
+=-=-=
+
+Name: package_declaration / subprogram_renaming_declaration / function
+
+=-=
+package Test is
+   function ABC return Integer renames DEF.GHI|;
+end Test;
+=-=-=
+
+Name: package_body / subprogram_renaming_declaration / procedure
+
+=-=
+package body Test is
+   procedure ABC renames DEF.GHI|;
+end Test;
+=-=-=
+
+Name: package_body / subprogram_renaming_declaration / function
+
+=-=
+package body Test is
+   function ABC return Integer renames DEF.GHI|;
+end Test;
+=-=-=
