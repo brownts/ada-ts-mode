@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.6
+;; Version: 0.5.7
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -217,6 +217,10 @@ those instances."
      (subprogram_body endname: (selected_component
                                 selector_name: (identifier)
                                 @font-lock-function-name-face))
+     (subprogram_default default_name: (identifier) @font-lock-function-name-face)
+     (subprogram_default default_name: (selected_component
+                                        selector_name: (identifier)
+                                        @font-lock-function-name-face))
      (entry_declaration "entry"
                         :anchor (comment) :*
                         :anchor (identifier) @font-lock-function-name-face)
