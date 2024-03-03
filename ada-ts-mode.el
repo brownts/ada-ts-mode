@@ -484,15 +484,28 @@ Return nil if there is no name or if NODE is not a defun node."
                (string-equal "package_declaration"
                              (treesit-node-type n)))))
        "name"))
+     ("package_declaration"
+      (when (not (string-equal "generic_package_declaration"
+                               (treesit-node-type (treesit-node-parent node))))
+        (treesit-node-child-by-field-name node "name")))
      ((or "generic_instantiation"
           "package_body"
-          "package_declaration"
           "package_renaming_declaration")
       (treesit-node-child-by-field-name node "name"))
      ("generic_renaming_declaration"
       (treesit-node-child-by-field-name node "defining_program_unit_name"))
-     ((or "formal_package_declaration"
-          "package_body_stub")
+     ((or "entry_body"
+          "entry_declaration"
+          "formal_package_declaration"
+          "package_body_stub"
+          "protected_body"
+          "protected_body_stub"
+          "protected_type_declaration"
+          "single_protected_declaration"
+          "single_task_declaration"
+          "task_body"
+          "task_body_stub"
+          "task_type_declaration")
       (car (treesit-filter-child
             node
             (lambda (n)
@@ -534,8 +547,11 @@ Return non-nil to indicate that it is."
 
 (defun ada-ts-mode--defun-p (node)
   "Determine if NODE is candidate for defun."
-  (or (ada-ts-mode--package-p node)
-      (ada-ts-mode--subprogram-p node)))
+  (pcase (treesit-node-type node)
+    ("package_declaration"
+     (not (string-equal "generic_package_declaration"
+                        (treesit-node-type (treesit-node-parent node)))))
+    (_ t)))
 
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"
@@ -583,7 +599,9 @@ Return non-nil to indicate that it is."
 
   ;; Navigation.
   (setq-local treesit-defun-type-regexp
-              `(,(rx bos (or "expression_function_declaration"
+              `(,(rx bos (or "entry_body"
+                             "entry_declaration"
+                             "expression_function_declaration"
                              "formal_abstract_subprogram_declaration"
                              "formal_concrete_subprogram_declaration"
                              "formal_package_declaration"
@@ -596,11 +614,19 @@ Return non-nil to indicate that it is."
                              "package_body_stub"
                              "package_declaration"
                              "package_renaming_declaration"
+                             "protected_body"
+                             "protected_body_stub"
+                             "protected_type_declaration"
+                             "single_protected_declaration"
+                             "single_task_declaration"
                              "subprogram_body"
                              "subprogram_body_stub"
                              "subprogram_declaration"
                              "subprogram_renaming_declaration"
-                             "subunit")
+                             "subunit"
+                             "task_body"
+                             "task_body_stub"
+                             "task_type_declaration")
                      eos)
                 .
                 ada-ts-mode--defun-p))
