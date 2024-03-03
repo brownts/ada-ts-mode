@@ -452,10 +452,23 @@ those instances."
 
 ;;; Imenu
 
+(defun ada-ts-mode--node-to-name (node)
+  "Return value of NODE as a name string."
+  (pcase (treesit-node-type node)
+    ("identifier"
+     (treesit-node-text node t))
+    ("selected_component"
+     (string-join
+      (append (ensure-list (ada-ts-mode--node-to-name
+                            (treesit-node-child-by-field-name node "prefix")))
+              (list (ada-ts-mode--node-to-name
+                     (treesit-node-child-by-field-name node "selector_name"))))
+      treesit-add-log-defun-delimiter))))
+
 (defun ada-ts-mode--defun-name (node)
   "Return the defun name of NODE.
 Return nil if there is no name or if NODE is not a defun node."
-  (treesit-node-text
+  (ada-ts-mode--node-to-name
    (pcase (treesit-node-type node)
      ((or "expression_function_declaration"
           "formal_abstract_subprogram_declaration"
@@ -512,8 +525,7 @@ Return nil if there is no name or if NODE is not a defun node."
               (let ((node-type (treesit-node-type n)))
                 (string-equal "identifier" node-type))))))
      ("subunit"
-      (treesit-node-child-by-field-name node "parent_unit_name")))
-   t))
+      (treesit-node-child-by-field-name node "parent_unit_name")))))
 
 (defun ada-ts-mode--package-p (node)
   "Determine if NODE is a package declaration, body or stub.
