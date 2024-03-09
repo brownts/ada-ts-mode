@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.7
+;; Version: 0.5.8
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -76,6 +76,31 @@ specified.  See `treesit-language-source-alist' for full details."
   :group 'ada-ts
   :link '(custom-manual :tag "Grammar Installation" "(ada-ts-mode)Grammar Installation")
   :package-version "0.5.0")
+
+(defcustom ada-ts-mode-imenu-nesting-strategy-function
+  #'ada-ts-mode-imenu-nesting-strategy-before
+  "Configuration for Imenu nesting strategy function."
+  :type `(choice (const :tag "Place Before Nested Entries"
+                        ,#'ada-ts-mode-imenu-nesting-strategy-before)
+                 (const :tag "Place Within Nested Entries"
+                        ,#'ada-ts-mode-imenu-nesting-strategy-within)
+                 (function :tag "Custom function"))
+  :group 'ada-ts
+  :package-version "0.5.8")
+
+(defcustom ada-ts-mode-imenu-nesting-strategy-placeholder "<<parent>>"
+  "Placeholder for an item used in some Imenu nesting strategies."
+  :type 'string
+  :group 'ada-ts-
+  :package-version "0.5.8")
+
+(defcustom ada-ts-mode-imenu-sort-function #'identity
+  "Configuration for Imenu sorting function."
+  :type `(choice (const :tag "In Buffer Order" ,#'identity)
+                 (const :tag "Alphabetically" ,#'ada-ts-mode-imenu-sort-alphabetically)
+                 (function :tag "Custom function"))
+  :group 'ada-ts
+  :package-version "0.5.8")
 
 (defvar ada-ts-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -539,7 +564,12 @@ Return non-nil to indicate that it is."
     ("package_declaration"
      (not (string-equal "generic_package_declaration"
                         (treesit-node-type (treesit-node-parent node)))))
-    (_ t)))
+    ((or "formal_package_declaration"
+         "generic_package_declaration"
+         "package_body"
+         "package_body_stub"
+         "package_renaming_declaration")
+     t)))
 
 (defun ada-ts-mode--subprogram-p (node)
   "Determine if NODE is a subprogram declaration, body or stub.
@@ -553,15 +583,112 @@ Return non-nil to indicate that it is."
         (let ((node-type (treesit-node-type n)))
           (or (string-equal "function" node-type)
               (string-equal "procedure" node-type))))))
-    (_ t)))
+    ((or "expression_function_declaration"
+         "formal_abstract_subprogram_declaration"
+         "formal_concrete_subprogram_declaration"
+         "generic_subprogram_declaration"
+         "null_procedure_declaration"
+         "subprogram_body"
+         "subprogram_body_stub"
+         "subprogram_declaration"
+         "subprogram_renaming_declaration")
+     t)))
 
 (defun ada-ts-mode--defun-p (node)
   "Determine if NODE is candidate for defun."
-  (pcase (treesit-node-type node)
-    ("package_declaration"
-     (not (string-equal "generic_package_declaration"
-                        (treesit-node-type (treesit-node-parent node)))))
-    (_ t)))
+  (let ((type (treesit-node-type node)))
+    (and type
+         (string-match (car treesit-defun-type-regexp) type)
+         (pcase type
+           ("package_declaration"
+            (not (string-equal "generic_package_declaration"
+                               (treesit-node-type (treesit-node-parent node)))))
+           (_ t)))))
+
+(defun ada-ts-mode-imenu-nesting-strategy-before (item-name marker subtrees)
+  "Nesting strategy which places item before the list of nested entries.
+
+An entry is added for ITEM-NAME at item's MARKER location and another
+entry is added after it for ITEM-NAME containing SUBTREES."
+  (list (cons item-name marker)
+        (cons item-name subtrees)))
+
+(defun ada-ts-mode-imenu-nesting-strategy-within (item-name marker subtrees)
+  "Nesting strategy which places item within list of nested entries.
+
+An entry is added for ITEM-NAME containing SUBTREES where SUBTREES is
+modified to include a `ada-ts-mode-imenu-nesting-strategy-placeholder'
+first item at item's MARKER location."
+  (let* ((empty-entry
+          (cons ada-ts-mode-imenu-nesting-strategy-placeholder marker))
+         (new-subtrees
+          (cons empty-entry subtrees)))
+    (list (cons item-name new-subtrees))))
+
+(defun ada-ts-mode-imenu-sort-alphabetically (items)
+  "Alphabetical sort of Imenu ITEMS."
+  (sort items
+        (lambda (x y)
+          (let ((x-name (car x))
+                (y-name (car y))
+                (placeholder ada-ts-mode-imenu-nesting-strategy-placeholder))
+            ;; Always put placeholder first, even if not alphabetical.
+            (or (string= x-name placeholder)
+                (and (not (string= y-name placeholder))
+                     (string< (car x) (car y))))))))
+
+(defun ada-ts-mode--imenu-index (tree item-p branch-p item-name-fn branch-name-fn)
+  "Return Imenu index for a specific item category given TREE.
+
+ITEM-P is a predicate for testing the item category's node.
+ITEM-NAME-FN determines the name of the item given the item's node.
+BRANCH-P is a predicate for determining if a node is a branch.  This is
+used to identify higher level nesting structures (i.e., packages,
+subprograms, etc.) which encompass the item.  BRANCH-NAME-FN determines
+the name of the branch given the branch node."
+  (let* ((node (car tree))
+         (subtrees
+          (funcall ada-ts-mode-imenu-sort-function
+                   (mapcan (lambda (tree)
+                             (ada-ts-mode--imenu-index tree
+                                                       item-p
+                                                       branch-p
+                                                       item-name-fn
+                                                       branch-name-fn))
+                           (cdr tree))))
+         (marker (set-marker (make-marker)
+                             (treesit-node-start node)))
+         (item (funcall item-p node))
+         (item-name (when item (funcall item-name-fn node)))
+         (branch (funcall branch-p node))
+         (branch-name (when branch (funcall branch-name-fn node))))
+    (cond ((and item (not subtrees))
+           (list (cons item-name marker)))
+          ((and item subtrees)
+           (funcall ada-ts-mode-imenu-nesting-strategy-function
+                    item-name marker subtrees))
+          ((and branch subtrees)
+           (list (cons branch-name subtrees)))
+          (t subtrees))))
+
+(defun ada-ts-mode--imenu ()
+  "Return Imenu alist for the current buffer."
+  (let* ((root (treesit-buffer-root-node))
+         (tree (treesit-induce-sparse-tree root #'ada-ts-mode--defun-p))
+         (index-package (ada-ts-mode--imenu-index tree
+                                                  #'ada-ts-mode--package-p
+                                                  #'ada-ts-mode--defun-p
+                                                  #'ada-ts-mode--defun-name
+                                                  #'ada-ts-mode--defun-name))
+         (index-subprogram (ada-ts-mode--imenu-index tree
+                                                     #'ada-ts-mode--subprogram-p
+                                                     #'ada-ts-mode--defun-p
+                                                     #'ada-ts-mode--defun-name
+                                                     #'ada-ts-mode--defun-name)))
+    (seq-filter (lambda (i) (cdr i))
+                (list
+                 (cons "Package"    index-package)
+                 (cons "Subprogram" index-subprogram)))))
 
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"
@@ -643,34 +770,7 @@ Return non-nil to indicate that it is."
   (setq-local treesit-defun-name-function #'ada-ts-mode--defun-name)
 
   ;; Imenu.
-  (setq-local treesit-simple-imenu-settings
-              `(("Package"
-                 ,(rx bos (or "formal_package_declaration"
-                              "generic_instantiation"
-                              "generic_package_declaration"
-                              "generic_renaming_declaration"
-                              "package_body"
-                              "package_body_stub"
-                              "package_declaration"
-                              "package_renaming_declaration")
-                      eos)
-                 ada-ts-mode--package-p
-                 nil)
-                ("Subprogram"
-                 ,(rx bos (or "expression_function_declaration"
-                              "formal_abstract_subprogram_declaration"
-                              "formal_concrete_subprogram_declaration"
-                              "generic_instantiation"
-                              "generic_renaming_declaration"
-                              "generic_subprogram_declaration"
-                              "null_procedure_declaration"
-                              "subprogram_body"
-                              "subprogram_body_stub"
-                              "subprogram_declaration"
-                              "subprogram_renaming_declaration")
-                      eos)
-                 ada-ts-mode--subprogram-p
-                 nil)))
+  (setq-local imenu-create-index-function #'ada-ts-mode--imenu)
 
   ;; Font-lock.
   (setq-local treesit-font-lock-settings ada-ts-mode--font-lock-settings)

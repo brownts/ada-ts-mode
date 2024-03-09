@@ -1,0 +1,191 @@
+Name: Place Within Nested Entries Strategy (default placeholder)
+
+Code: (lambda () (imenu-transform
+                  `(("Package"    ("Test" ("XYZ" (,ada-ts-mode-imenu-nesting-strategy-placeholder)
+                                                 ("UVW_1")
+                                                 ("UVW_2")
+                                                 ("UVW_3")
+                                                 ("UVW_4" (,ada-ts-mode-imenu-nesting-strategy-placeholder)
+                                                          ("DEF_3"))
+                                                 ("ABC_4" ("DEF_9")))))
+                    ("Subprogram" ("Test" ("XYZ" ("UVW_4" ("DEF_0")
+                                                          ("DEF_1")
+                                                          ("DEF_2"))
+                                                 ("\"+\"")
+                                                 ("ABC_1")
+                                                 ("ABC_2")
+                                                 ("ABC_3")
+                                                 ("ABC_4" (,ada-ts-mode-imenu-nesting-strategy-placeholder)
+                                                          ("DEF_6")
+                                                          ("\"+\"")
+                                                          ("DEF_7")
+                                                          ("\"-\"")
+                                                          ("DEF_8"))))))
+                 (lambda ()
+                   (setq-local ada-ts-mode-imenu-nesting-strategy-function
+                               #'ada-ts-mode-imenu-nesting-strategy-within))))
+
+=-=
+separate (Test)
+package body XYZ is
+
+   package UVW_1 is
+   end UVW_1;
+
+   package body UVW_2 is
+   end UVW_2;
+
+   package body UVW_3 is separate;
+
+   generic
+      with procedure DEF_0;
+      with function DEF_1 return Integer;
+      with function DEF_2 return Integer is abstract;
+      with package DEF_3 is new GHI;
+   package UVW_4 is
+   end UVW_4;
+
+   function "+" (Left, Right : Integer) return Integer is (Left + Right);
+   function ABC_1 return Integer is separate;
+   procedure ABC_2;
+   procedure ABC_3 is separate;
+
+   generic
+      with procedure DEF_6;
+      with function "+" (Left, Right: Integer) return Integer;
+      with function DEF_7 return Integer;
+      with function "-" (Left, Right: Integer) return Integer;
+      with function DEF_8 return Integer is abstract;
+      with package DEF_9 is new GHI;
+   procedure ABC_4;
+
+end XYZ;
+=-=-=
+
+Name: Place Within Nested Entries Strategy (custom placeholder)
+
+Code: (lambda () (imenu-transform
+                  `(("Package"    ("Test" ("XYZ" ("...placeholder...")
+                                                 ("UVW_1")
+                                                 ("UVW_2")
+                                                 ("UVW_3")
+                                                 ("UVW_4" ("...placeholder...")
+                                                          ("DEF_3"))
+                                                 ("ABC_4" ("DEF_9")))))
+                    ("Subprogram" ("Test" ("XYZ" ("UVW_4" ("DEF_0")
+                                                          ("DEF_1")
+                                                          ("DEF_2"))
+                                                 ("\"+\"")
+                                                 ("ABC_1")
+                                                 ("ABC_2")
+                                                 ("ABC_3")
+                                                 ("ABC_4" ("...placeholder...")
+                                                          ("DEF_6")
+                                                          ("\"+\"")
+                                                          ("DEF_7")
+                                                          ("\"-\"")
+                                                          ("DEF_8"))))))
+                 (lambda ()
+                   (setq-local ada-ts-mode-imenu-nesting-strategy-function
+                               #'ada-ts-mode-imenu-nesting-strategy-within)
+                   (setq-local ada-ts-mode-imenu-nesting-strategy-placeholder
+                               "...placeholder..."))))
+
+=-=
+separate (Test)
+package body XYZ is
+
+   package UVW_1 is
+   end UVW_1;
+
+   package body UVW_2 is
+   end UVW_2;
+
+   package body UVW_3 is separate;
+
+   generic
+      with procedure DEF_0;
+      with function DEF_1 return Integer;
+      with function DEF_2 return Integer is abstract;
+      with package DEF_3 is new GHI;
+   package UVW_4 is
+   end UVW_4;
+
+   function "+" (Left, Right : Integer) return Integer is (Left + Right);
+   function ABC_1 return Integer is separate;
+   procedure ABC_2;
+   procedure ABC_3 is separate;
+
+   generic
+      with procedure DEF_6;
+      with function "+" (Left, Right: Integer) return Integer;
+      with function DEF_7 return Integer;
+      with function "-" (Left, Right: Integer) return Integer;
+      with function DEF_8 return Integer is abstract;
+      with package DEF_9 is new GHI;
+   procedure ABC_4;
+
+end XYZ;
+=-=-=
+
+Name: Custom "No Placeholder" Strategy
+
+Code: (lambda () (imenu-transform
+                  `(("Package"    ("Test" ("XYZ" ("UVW_1")
+                                                 ("UVW_2")
+                                                 ("UVW_3")
+                                                 ("UVW_4" ("DEF_3"))
+                                                 ("ABC_4" ("DEF_9")))))
+                    ("Subprogram" ("Test" ("XYZ" ("UVW_4" ("DEF_0")
+                                                          ("DEF_1")
+                                                          ("DEF_2"))
+                                                 ("\"+\"")
+                                                 ("ABC_1")
+                                                 ("ABC_2")
+                                                 ("ABC_3")
+                                                 ("ABC_4" ("DEF_6")
+                                                          ("\"+\"")
+                                                          ("DEF_7")
+                                                          ("\"-\"")
+                                                          ("DEF_8"))))))
+                 (lambda ()
+                   (setq-local ada-ts-mode-imenu-nesting-strategy-function
+                               (lambda (item-name _marker subtrees)
+                                 (list (cons item-name subtrees)))))))
+
+=-=
+separate (Test)
+package body XYZ is
+
+   package UVW_1 is
+   end UVW_1;
+
+   package body UVW_2 is
+   end UVW_2;
+
+   package body UVW_3 is separate;
+
+   generic
+      with procedure DEF_0;
+      with function DEF_1 return Integer;
+      with function DEF_2 return Integer is abstract;
+      with package DEF_3 is new GHI;
+   package UVW_4 is
+   end UVW_4;
+
+   function "+" (Left, Right : Integer) return Integer is (Left + Right);
+   function ABC_1 return Integer is separate;
+   procedure ABC_2;
+   procedure ABC_3 is separate;
+
+   generic
+      with procedure DEF_6;
+      with function "+" (Left, Right: Integer) return Integer;
+      with function DEF_7 return Integer;
+      with function "-" (Left, Right: Integer) return Integer;
+      with function DEF_8 return Integer is abstract;
+      with package DEF_9 is new GHI;
+   procedure ABC_4;
+
+end XYZ;
+=-=-=

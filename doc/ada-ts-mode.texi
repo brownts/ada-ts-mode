@@ -42,7 +42,8 @@ package.  The two are not compatible with each other.
 * Installation::
 * Grammar Installation::
 * Syntax Highlighting::
-* Navigation / Imenu::
+* Navigation::
+* Imenu::
 * Troubleshooting::
 * Example Configuration::
 * Variable Index::
@@ -230,8 +231,8 @@ number, operator
 bracket, delimiter, error, label
 @end table
 
-@node Navigation / Imenu
-@chapter Navigation / Imenu
+@node Navigation
+@chapter Navigation
 
 The major mode implements the normal source navigation commands which
 can be used to move around the buffer (i.e., @samp{C-M-a}, @samp{C-M-e}, etc).  It
@@ -239,10 +240,47 @@ should also be noted that @samp{which-function-mode} is also supported and
 will show the current package and/or subprogram in the mode line, when
 enabled.
 
+@node Imenu
+@chapter Imenu
+
 With the provided Imenu support, additional options are available for
-ease of navigation within a single Ada file.  Currently package
-declarations, package bodies, subprogram declarations and subprogram
-bodies are enumerated.
+ease of navigation within an Ada source file.  Imenu supports indexing
+of packages and subprograms (declarations, bodies and stubs).
+
+@defopt ada-ts-mode-imenu-nesting-strategy-function
+Function to use for constructing nested items within the Imenu data
+structure.  The specific nesting function the user should use will
+depend on which user interface is used to consume Imenu data, as
+different interfaces behave differently with respect to how they
+handle nested items.  Some interfaces will display both an entry for
+the item as well as an entry for items nested within that item.  In
+that case, using ``Place Before Nested Entries'' is a good choice.
+Other user interfaces remove duplicate entries, so using ``Place
+Within Nested Entries'' will create a placeholder entry in the list
+of sub-items.  If none of these are satisfactory, a custom function
+can be used to implement a different strategy.
+@end defopt
+
+@defopt ada-ts-mode-imenu-nesting-strategy-placeholder
+Placeholder to use for the ``Place Within Nested Entries'' strategy.
+This placeholder could also be used with a custom function if it
+supports a placeholder.  If this option is customized, it should be
+configured such that it doesn't interfere with other valid item
+names.  Therefore, it is suggested to choose a placeholder which is
+not a valid item name.  For example, surrounding a string with
+parenthesis or brackets.
+@end defopt
+
+@defopt ada-ts-mode-imenu-sort-function
+The items in each Imenu category can be sorted for each nesting
+level.  The current options are to use ``In Buffer Order'' which will
+list the items as they appear in the buffer, or to sort the items
+``Alphabetically''.  Optionally, a custom sort function can be used if
+neither of these are suitable.  A custom sort function should be
+aware of the possible existence of a placeholder and to order that
+before any ``sorted'' items in order to put the placeholder at the top
+of the list.
+@end defopt
 
 @node Troubleshooting
 @chapter Troubleshooting
