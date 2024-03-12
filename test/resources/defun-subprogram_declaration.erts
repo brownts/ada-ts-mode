@@ -24,12 +24,28 @@ Name: subprogram_declaration / function (identifier)
 function ABC return Integer|;
 =-=-=
 
+Code: (lambda () (defun-transform "\"+\""))
+
+Name: subprogram_declaration / function (string_literal)
+
+=-=
+function "+" (Left, Right : Integer) return Integer|;
+=-=-=
+
 Code: (lambda () (defun-transform "ABC.DEF"))
 
-Name: subprogram_declaration / function (selected_component)
+Name: subprogram_declaration / function (selected_component / identifier)
 
 =-=
 function ABC.DEF return Integer|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: subprogram_declaration / function (selected_component / string_literal)
+
+=-=
+function ABC."+" (Left, Right : Integer) return Integer|;
 =-=-=
 
 Code: (lambda () (defun-transform "Test.ABC"))
@@ -42,13 +58,25 @@ package Test is
 end Test;
 =-=-=
 
-Name: package_declaration / subprogram_declaration / function
+Name: package_declaration / subprogram_declaration / function (identifier)
 
 =-=
 package Test is
    function ABC return Integer|;
 end Test;
 =-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_declaration / subprogram_declaration / function (string_literal)
+
+=-=
+package Test is
+   function "+" (Left, Right : Integer) return Integer|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
 
 Name: generic_package_declaration / subprogram_declaration / procedure
 
@@ -65,5 +93,16 @@ Name: generic_package_declaration / subprogram_declaration / function
 generic
 package Test is
    function ABC return Integer|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: generic_package_declaration / subprogram_declaration / function (string_literal)
+
+=-=
+generic
+package Test is
+   function "+" (Left, Right : Integer) return Integer|;
 end Test;
 =-=-=

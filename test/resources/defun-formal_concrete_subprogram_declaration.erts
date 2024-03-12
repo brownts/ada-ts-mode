@@ -11,7 +11,7 @@ package ABC is
 end ABC;
 =-=-=
 
-Name: generic_package_declaration / formal_concrete_subprogram_declaration / function
+Name: generic_package_declaration / formal_concrete_subprogram_declaration / function (identifier)
 
 =-=
 generic
@@ -19,6 +19,19 @@ generic
 package ABC is
 end ABC;
 =-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_package_declaration / formal_concrete_subprogram_declaration / function (string_literal)
+
+=-=
+generic
+   with function "+" (Left, Right : Integer) return Integer|;
+package ABC is
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
 
 Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / procedure
 
@@ -28,13 +41,25 @@ generic
 procedure ABC;
 =-=-=
 
-Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / function
+Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / function (identifier)
 
 =-=
 generic
    with function DEF return Integer|;
 procedure ABC;
 =-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_subprogram_declaration / procedure / formal_concrete_subprogram_declaration / function (string_literal)
+
+=-=
+generic
+   with function "+" (Left, Right : Integer) return Integer|;
+procedure ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
 
 Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / procedure
 
@@ -44,10 +69,20 @@ generic
 function ABC return Integer;
 =-=-=
 
-Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / function
+Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / function (identifier)
 
 =-=
 generic
    with function DEF return Integer|;
+function ABC return Integer;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_subprogram_declaration / function / formal_concrete_subprogram_declaration / function (string_literal)
+
+=-=
+generic
+   with function "+" (Left, Right : Integer) return Integer|;
 function ABC return Integer;
 =-=-=

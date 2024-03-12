@@ -2,10 +2,20 @@ Point-Char: |
 
 Code: (lambda () (defun-transform "Test.ABC"))
 
-Name: package_declaration / expression_function_declaration
+Name: package_declaration / expression_function_declaration (identifier)
 
 =-=
 package Test is
    function ABC (X : Integer) return Integer is (X + 1)|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_declaration / expression_function_declaration (string_literal)
+
+=-=
+package Test is
+   function "+" (Left, Right : Integer) return Integer is (Left + Right)|;
 end Test;
 =-=-=

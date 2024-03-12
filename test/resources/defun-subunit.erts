@@ -61,13 +61,25 @@ end ABC;
 
 Code: (lambda () (defun-transform "XYZ.ABC"))
 
-Name: subunit / subprogram_body / function
+Name: subunit / subprogram_body / function (identifier)
 
 =-=
 separate (XYZ)
 function ABC return Integer is
 begin
    return 1;|
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "XYZ.\"+\""))
+
+Name: subunit / subprogram_body / function (string_literal)
+
+=-=
+separate (XYZ)
+function "+" (Left, Right : Integer) return Integer is
+begin
+   return Left + Right;|
 end ABC;
 =-=-=
 

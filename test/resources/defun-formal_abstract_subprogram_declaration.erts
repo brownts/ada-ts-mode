@@ -20,6 +20,19 @@ package ABC is
 end ABC;
 =-=-=
 
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_package_declaration / formal_abstract_subprogram_declaration / function (string_literal)
+
+=-=
+generic
+   with function "+" (Left, Right : Integer) return Integer is abstract|;
+package ABC is
+end ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
+
 Name: generic_subprogram_declaration / procedure / formal_abstract_subprogram_declaration / procedure
 
 =-=
@@ -35,6 +48,18 @@ generic
    with function DEF return Integer is abstract|;
 procedure ABC;
 =-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_subprogram_declaration / procedure / formal_abstract_subprogram_declaration / function (string_literal)
+
+=-=
+generic
+   with function "+" (Left, Right : Integer) return Integer is abstract|;
+procedure ABC;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.DEF"))
 
 Name: generic_subprogram_declaration / function / formal_abstract_subprogram_declaration / procedure
 

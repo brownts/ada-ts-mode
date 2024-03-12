@@ -1,6 +1,6 @@
 ;;; ada-ts-mode-tests.el --- Tests for Tree-sitter-based Ada mode -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 Troy Brown
+;; Copyright (C) 2023-2024 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 
@@ -21,6 +21,7 @@
 
 (require 'ada-ts-mode)
 (require 'ert)
+(require 'ert-font-lock nil 'noerror) ; Emacs 30+
 (require 'ert-x)
 (require 'treesit)
 (require 'which-func)
@@ -57,11 +58,18 @@
                   (seq ".." (+ anychar)))
               )))
   (let* ((file-noext (file-name-sans-extension file))
+         (file-path (ert-resource-file file))
          (transform (cond ((string-prefix-p "filling" file-noext) #'filling-transform)
                           (t #'default-transform))))
-    (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
-             (ert-test-erts-file (ert-resource-file ,file)
-                                 (function ,transform))))))
+    (if (string-prefix-p "font-lock" file-noext)
+        (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
+                 (skip-unless (featurep 'ert-font-lock))
+                 (with-temp-buffer
+                   (insert-file-contents ,file-path)
+                   (funcall #',transform))
+                 (ert-font-lock-test-file ,file-path 'ada-ts-mode)))
+      (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
+               (ert-test-erts-file ,file-path #',transform))))))
 
 (provide 'ada-ts-mode-tests)
 

@@ -33,13 +33,35 @@ begin
 end ABC;
 =-=-=
 
+Code: (lambda () (defun-transform "\"+\""))
+
+Name: subprogram_body / function (string_literal)
+
+=-=
+function "+" (Left, Right : Integer) return Integer is
+begin
+   return Left + Right;|
+end "+";
+=-=-=
+
 Code: (lambda () (defun-transform "ABC.DEF"))
 
-Name: subprogram_body / function (selected_component)
+Name: subprogram_body / function (selected_component / identifier)
 
 =-=
 function ABC.DEF return Integer is
 begin
    return 1;|
 end ABC.DEF;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: subprogram_body / function (selected_component / string_literal)
+
+=-=
+function ABC."+" (Left, Right : Integer) return Integer is
+begin
+   return Left + Right;|
+end ABC."+";
 =-=-=

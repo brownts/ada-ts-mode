@@ -16,6 +16,15 @@ generic
 function ABC return Integer|;
 =-=-=
 
+Code: (lambda () (defun-transform "\"+\""))
+
+Name: generic_subprogram_declaration (string_literal) / function
+
+=-=
+generic
+function "+" (Left, Right : Integer) return Integer|;
+=-=-=
+
 Code: (lambda () (defun-transform "ABC.DEF"))
 
 Name: generic_subprogram_declaration (selected_component) / procedure
@@ -25,11 +34,20 @@ generic
 procedure ABC.DEF|;
 =-=-=
 
-Name: generic_subprogram_declaration (selected_component) / function
+Name: generic_subprogram_declaration (selected_component / identifier) / function
 
 =-=
 generic
 function ABC.DEF return Integer|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_subprogram_declaration (selected_component / string_literal) / function
+
+=-=
+generic
+function ABC."+" (Left, Right : Integer) return Integer|;
 =-=-=
 
 Code: (lambda () (defun-transform "Test.ABC"))
@@ -43,7 +61,7 @@ package Test is
 end Test;
 =-=-=
 
-Name: package_declaration / generic_subprogram_declaration / function
+Name: package_declaration / generic_subprogram_declaration / function (identifier)
 
 =-=
 package Test is
@@ -51,6 +69,19 @@ package Test is
    function ABC return Integer|;
 end Test;
 =-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_declaration / generic_subprogram_declaration / function (string_literal)
+
+=-=
+package Test is
+   generic
+   function "+" (Left, Right : Integer) return Integer|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
 
 Name: package_body / generic_subprogram_declaration / procedure
 
@@ -61,11 +92,22 @@ package body Test is
 end Test;
 =-=-=
 
-Name: package_body / generic_subprogram_declaration / function
+Name: package_body / generic_subprogram_declaration / function (identifier)
 
 =-=
 package body Test is
    generic
    function ABC return Integer|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_body / generic_subprogram_declaration / function (string_literal)
+
+=-=
+package body Test is
+   generic
+   function "+" (Left, Right : Integer) return Integer|;
 end Test;
 =-=-=

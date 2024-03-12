@@ -14,10 +14,18 @@ Name: generic_instantiation (identifier) / procedure
 procedure ABC is new GHI|;
 =-=-=
 
-Name: generic_instantiation (identifier) / function
+Name: generic_instantiation (identifier) / function (identifier)
 
 =-=
 function ABC is new GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "\"+\""))
+
+Name: generic_instantiation (identifier) / function (string_literal)
+
+=-=
+function "+" is new GHI|;
 =-=-=
 
 Code: (lambda () (defun-transform "ABC.DEF"))
@@ -34,10 +42,18 @@ Name: generic_instantiation (selected_component) / procedure
 procedure ABC.DEF is new GHI|;
 =-=-=
 
-Name: generic_instantiation (selected_component) / function
+Name: generic_instantiation (selected_component) / function (selected_component / identifier)
 
 =-=
 function ABC.DEF is new GHI|;
+=-=-=
+
+Code: (lambda () (defun-transform "ABC.\"+\""))
+
+Name: generic_instantiation (selected_component) / function (selected_component / string_literal)
+
+=-=
+function ABC."+" is new GHI|;
 =-=-=
 
 Code: (lambda () (defun-transform "Test.ABC"))
@@ -58,13 +74,25 @@ package Test is
 end Test;
 =-=-=
 
-Name: package_declaration / generic_instantiation / function
+Name: package_declaration / generic_instantiation / function (identifier)
 
 =-=
 package Test is
    function ABC is new GHI|;
 end Test;
 =-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_declaration / generic_instantiation / function (string_literal)
+
+=-=
+package Test is
+   function "+" is new GHI|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.ABC"))
 
 Name: package_body / generic_instantiation / package
 
@@ -82,10 +110,20 @@ package body Test is
 end Test;
 =-=-=
 
-Name: package_body / generic_instantiation / function
+Name: package_body / generic_instantiation / function (identifier)
 
 =-=
 package body Test is
    function ABC is new GHI|;
+end Test;
+=-=-=
+
+Code: (lambda () (defun-transform "Test.\"+\""))
+
+Name: package_body / generic_instantiation / function (string_literal)
+
+=-=
+package body Test is
+   function "+" is new GHI|;
 end Test;
 =-=-=

@@ -209,18 +209,15 @@ those instances."
      (procedure_specification name: (selected_component
                                      selector_name: (identifier)
                                      @font-lock-function-name-face))
-     (function_specification name: (identifier) @font-lock-function-name-face)
+     (function_specification name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (function_specification name: (selected_component
-                                    selector_name: (identifier)
-                                    @font-lock-function-name-face))
-     (subprogram_body endname: (identifier) @font-lock-function-name-face)
+                                    selector_name: _ @font-lock-function-name-face))
+     (subprogram_body endname: [(identifier) (string_literal)] @font-lock-function-name-face)
      (subprogram_body endname: (selected_component
-                                selector_name: (identifier)
-                                @font-lock-function-name-face))
-     (subprogram_default default_name: (identifier) @font-lock-function-name-face)
+                                selector_name: _ @font-lock-function-name-face))
+     (subprogram_default default_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (subprogram_default default_name: (selected_component
-                                        selector_name: (identifier)
-                                        @font-lock-function-name-face))
+                                        selector_name: _ @font-lock-function-name-face))
      (entry_declaration "entry"
                         :anchor (comment) :*
                         :anchor (identifier) @font-lock-function-name-face)
@@ -241,38 +238,35 @@ those instances."
      (task_body (identifier) @font-lock-variable-name-face)
      (generic_instantiation
       ["procedure" "function"]
-      name: (identifier) @font-lock-function-name-face)
+      name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (generic_instantiation
       ["procedure" "function"]
       name: (selected_component
-             selector_name: (identifier) @font-lock-function-name-face))
+             selector_name: _ @font-lock-function-name-face))
      (generic_instantiation
       ["procedure" "function"]
-      generic_name: (identifier) @font-lock-function-name-face)
+      generic_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (generic_instantiation
       ["procedure" "function"]
       generic_name: (selected_component
-                     selector_name: (identifier) @font-lock-function-name-face))
+                     selector_name: _ @font-lock-function-name-face))
      (subprogram_renaming_declaration
-      callable_entity_name: (identifier) @font-lock-function-name-face)
+      callable_entity_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (subprogram_renaming_declaration
       callable_entity_name: (selected_component
-                             selector_name: (identifier)
-                             @font-lock-function-name-face))
+                             selector_name: _ @font-lock-function-name-face))
      (generic_renaming_declaration
       ["procedure" "function"]
-      defining_program_unit_name: (identifier) @font-lock-function-name-face)
+      defining_program_unit_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (generic_renaming_declaration
       ["procedure" "function"]
       defining_program_unit_name: (selected_component
-                                   selector_name: (identifier)
-                                   @font-lock-function-name-face))
+                                   selector_name: _ @font-lock-function-name-face))
      (generic_renaming_declaration
-      generic_function_name: (identifier) @font-lock-function-name-face)
+      generic_function_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (generic_renaming_declaration
       generic_function_name: (selected_component
-                              selector_name: (identifier)
-                              @font-lock-function-name-face))
+                              selector_name: _ @font-lock-function-name-face))
      (generic_renaming_declaration
       generic_procedure_name: (identifier) @font-lock-function-name-face)
      (generic_renaming_declaration
@@ -311,15 +305,15 @@ those instances."
    :language 'ada
    :feature 'function
    '((function_call
-      name: (identifier) @font-lock-function-name-face)
+      name: [(identifier) (string_literal)] @font-lock-function-call-face)
      (function_call
       name: (selected_component
-             selector_name: (identifier) @font-lock-function-name-face))
+             selector_name: _ @font-lock-function-call-face))
      (procedure_call_statement
-      name: (identifier) @font-lock-function-name-face)
+      name: (identifier) @font-lock-function-call-face)
      (procedure_call_statement
       name: (selected_component
-             selector_name: (identifier) @font-lock-function-name-face)))
+             selector_name: (identifier) @font-lock-function-call-face)))
 
    ;; Keywords
    :language 'ada
@@ -459,7 +453,7 @@ those instances."
 (defun ada-ts-mode--node-to-name (node)
   "Return value of NODE as a name string."
   (pcase (treesit-node-type node)
-    ("identifier"
+    ((or "identifier" "string_literal")
      (treesit-node-text node t))
     ("selected_component"
      (string-join

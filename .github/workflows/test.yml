@@ -12,9 +12,9 @@ jobs:
   test:
     strategy:
       matrix:
-        emacs_version:
-          - release-snapshot
+        emacs-version: ['29.1', '29.2', 'snapshot']
     runs-on: ubuntu-latest
+    continue-on-error: ${{matrix.emacs-version == 'snapshot'}}
 
     steps:
       - name: Checkout
@@ -28,10 +28,10 @@ jobs:
       - name: Setup Emacs
         uses: purcell/setup-emacs@master
         with:
-          version: ${{matrix.emacs_version}}
+          version: ${{matrix.emacs-version}}
 
-      - name: Install Eldev
-        run: curl -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev | sh
+      - name: Setup Eldev
+        uses: emacs-eldev/setup-eldev@v1
 
       - name: Test the project
         run: |
