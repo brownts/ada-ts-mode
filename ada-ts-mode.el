@@ -86,12 +86,14 @@ specified.  See `treesit-language-source-alist' for full details."
                         ,#'ada-ts-mode-imenu-nesting-strategy-within)
                  (function :tag "Custom function"))
   :group 'ada-ts
+  :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
   :package-version "0.5.8")
 
 (defcustom ada-ts-mode-imenu-nesting-strategy-placeholder "<<parent>>"
   "Placeholder for an item used in some Imenu nesting strategies."
   :type 'string
-  :group 'ada-ts-
+  :group 'ada-ts
+  :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
   :package-version "0.5.8")
 
 (defcustom ada-ts-mode-imenu-sort-function #'identity
@@ -100,6 +102,7 @@ specified.  See `treesit-language-source-alist' for full details."
                  (const :tag "Alphabetically" ,#'ada-ts-mode-imenu-sort-alphabetically)
                  (function :tag "Custom function"))
   :group 'ada-ts
+  :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
   :package-version "0.5.8")
 
 (defvar ada-ts-mode-syntax-table
