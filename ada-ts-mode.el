@@ -632,9 +632,10 @@ first item at item's MARKER location."
   "Alphabetical sort of Imenu ITEMS."
   (sort items
         (lambda (x y)
-          (let ((x-name (car x))
-                (y-name (car y))
-                (placeholder ada-ts-mode-imenu-nesting-strategy-placeholder))
+          (let ((x-name (downcase (car x)))
+                (y-name (downcase (car y)))
+                (placeholder (downcase
+                              ada-ts-mode-imenu-nesting-strategy-placeholder)))
             ;; Always put placeholder first, even if not alphabetical.
             (or (string= x-name placeholder)
                 (and (not (string= y-name placeholder))
