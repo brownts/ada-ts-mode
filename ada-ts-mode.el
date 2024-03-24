@@ -258,12 +258,14 @@ those instances."
      (single_protected_declaration
       (protected_definition "end" (identifier) @font-lock-variable-name-face))
      (protected_body (identifier) @font-lock-variable-name-face)
+     (protected_body_stub (identifier) @font-lock-variable-name-face)
      (single_task_declaration "task"
                               :anchor (comment) :*
                               :anchor (identifier) @font-lock-variable-name-face)
      (single_task_declaration
       (task_definition "end" (identifier) @font-lock-variable-name-face))
      (task_body (identifier) @font-lock-variable-name-face)
+     (task_body_stub (identifier) @font-lock-variable-name-face)
      (generic_instantiation
       ["procedure" "function"]
       name: [(identifier) (string_literal)] @font-lock-function-name-face)
