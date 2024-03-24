@@ -119,3 +119,86 @@ package body XYZ is
 
 end XYZ;
 =-=-=
+
+Name: with_clause
+
+Code: (lambda () (imenu-transform
+                  '(("With Clause" ("Ada")
+                                   ("Ada.Text_IO")
+                                   ("Text_IO")
+                                   ("ABC")
+                                   ("DEF")
+                                   ("XYZ.ABC")))))
+
+=-=
+with Ada, Ada.Text_IO, Text_IO;
+with ABC;
+with DEF;
+with XYZ.ABC;
+=-=-=
+
+Name: Tasks, Protected Units and Types
+
+Code: (lambda () (imenu-transform
+                  '(("Package" ("Test")
+                               ("Test"))
+                    ("Protected" ("Test" ("Protected_Type_Declaration")
+                                         ("Single_Protected_Declaration")
+                                         ("Protected_Body")
+                                         ("Protected_Body_Stub")))
+                    ("Task" ("Test" ("Task_Type_Declaration")
+                                    ("Single_Task_Declaration")
+                                    ("Task_Body")
+                                    ("Task_Body_Stub")))
+                    ("Type Declaration" ("Test" ("Formal_Complete_Type_Declaration")
+                                                ("Formal_Incomplete_Type_Declaration"))
+                                        ("Test" ("Full_Type_Declaration")
+                                                ("Subtype_Declaration")
+                                                ("Incomplete_Type_Declaration")
+                                                ("Private_Type_Declaration")
+                                                ("Private_Extension_Declaration")
+                                                ("Task_Type_Declaration")
+                                                ("Protected_Type_Declaration"))))))
+
+=-=
+generic
+   type Formal_Complete_Type_Declaration is private;
+   type Formal_Incomplete_Type_Declaration;
+package Test is
+end Test;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   subtype Subtype_Declaration is Full_Type_Declaration;
+
+   type Incomplete_Type_Declaration;
+
+   type Private_Type_Declaration is private;
+
+   type Private_Extension_Declaration is new Private_Type_Declaration with private;
+
+   task type Task_Type_Declaration;
+
+   protected type Protected_Type_Declaration is
+   end Protected_Type_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+   task body Task_Body is
+   begin
+      null;
+   end Task_Body;
+
+   protected body Protected_Body is
+   end Protected_Body;
+
+   task body Task_Body_Stub is separate;
+
+   protected body Protected_Body_Stub is separate;
+end Test;
+=-=-=

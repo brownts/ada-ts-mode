@@ -1,0 +1,173 @@
+Code: (lambda () (imenu-transform
+               '(("Subprogram"       ("Test" ("Subprogram_Declaration")))
+                 ("Protected"        ("Test" ("Single_Protected_Declaration")))
+                 ("Task"             ("Test" ("Single_Task_Declaration")))
+                 ("Type Declaration" ("Test" ("Full_Type_Declaration")))
+                 ("With Clause"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'package)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "package" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=
+
+Code: (lambda () (imenu-transform
+               '(("Package"          ("Test"))
+                 ("Protected"        ("Test" ("Single_Protected_Declaration")))
+                 ("Task"             ("Test" ("Single_Task_Declaration")))
+                 ("Type Declaration" ("Test" ("Full_Type_Declaration")))
+                 ("With Clause"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'subprogram)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "subprogram" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=
+
+Code: (lambda () (imenu-transform
+               '(("Package"          ("Test"))
+                 ("Subprogram"       ("Test" ("Subprogram_Declaration")))
+                 ("Task"             ("Test" ("Single_Task_Declaration")))
+                 ("Type Declaration" ("Test" ("Full_Type_Declaration")))
+                 ("With Clause"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'protected)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "protected" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=
+
+Code: (lambda () (imenu-transform
+               '(("Package"          ("Test"))
+                 ("Subprogram"       ("Test" ("Subprogram_Declaration")))
+                 ("Protected"        ("Test" ("Single_Protected_Declaration")))
+                 ("Type Declaration" ("Test" ("Full_Type_Declaration")))
+                 ("With Clause"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'task)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "task" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+    procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=
+
+Code: (lambda () (imenu-transform
+               '(("Package"          ("Test"))
+                 ("Subprogram"       ("Test" ("Subprogram_Declaration")))
+                 ("Protected"        ("Test" ("Single_Protected_Declaration")))
+                 ("Task"             ("Test" ("Single_Task_Declaration")))
+                 ("With Clause"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'type-declaration)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "type-declaration" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=
+
+Code: (lambda () (imenu-transform
+               '(("Package"          ("Test"))
+                 ("Subprogram"       ("Test" ("Subprogram_Declaration")))
+                 ("Protected"        ("Test" ("Single_Protected_Declaration")))
+                 ("Task"             ("Test" ("Single_Task_Declaration")))
+                 ("Type Declaration" ("Test" ("Full_Type_Declaration"))))
+               (lambda () (setq-local ada-ts-mode-imenu-categories
+                                      (seq-filter (lambda (category) (not (eq category 'with-clause)))
+                                                  ada-ts-mode-imenu-categories)))))
+
+Name: Without "with-clause" category
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=

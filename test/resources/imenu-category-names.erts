@@ -1,0 +1,33 @@
+Code: (lambda () (imenu-transform
+               '(("*Package*"          ("Test"))
+                 ("*Subprogram*"       ("Test" ("Subprogram_Declaration")))
+                 ("*Protected*"        ("Test" ("Single_Protected_Declaration")))
+                 ("*Task*"             ("Test" ("Single_Task_Declaration")))
+                 ("*Type Declaration*" ("Test" ("Full_Type_Declaration")))
+                 ("*With Clause*"      ("Ada.Text_IO")))
+               (lambda () (setq-local ada-ts-mode-imenu-category-name-alist
+                                      '((package          . "*Package*")
+                                        (subprogram       . "*Subprogram*")
+                                        (protected        . "*Protected*")
+                                        (task             . "*Task*")
+                                        (type-declaration . "*Type Declaration*")
+                                        (with-clause      . "*With Clause*"))))))
+
+Name: Alternative Category Names
+
+=-=
+with Ada.Text_IO;
+
+package body Test is
+
+   type Full_Type_Declaration is new Integer range 0 .. 255;
+
+   procedure Subprogram_Declaration;
+
+   task Single_Task_Declaration;
+
+   protected Single_Protected_Declaration is
+   end Single_Protected_Declaration;
+
+end Test;
+=-=-=

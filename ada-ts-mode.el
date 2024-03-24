@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.5.8
+;; Version: 0.6.0
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -77,6 +77,39 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "Grammar Installation" "(ada-ts-mode)Grammar Installation")
   :package-version "0.5.0")
 
+(defcustom ada-ts-mode-imenu-categories
+  '(package
+    subprogram
+    protected
+    task
+    type-declaration
+    with-clause)
+  "Configuration of Imenu categories."
+  :type '(repeat :tag "Categories"
+                 (choice :tag "Category"
+                         (const :tag "Package" package)
+                         (const :tag "Subprogram" subprogram)
+                         (const :tag "Protected" protected)
+                         (const :tag "Task" task)
+                         (const :tag "Type Declaration" type-declaration)
+                         (const :tag "With Clause" with-clause)))
+  :group 'ada-ts
+  :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
+  :package-version "0.6.0")
+
+(defcustom ada-ts-mode-imenu-category-name-alist
+  '((package          . "Package")
+    (subprogram       . "Subprogram")
+    (protected        . "Protected")
+    (task             . "Task")
+    (type-declaration . "Type Declaration")
+    (with-clause      . "With Clause"))
+  "Configuration of Imenu category names."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'ada-ts
+  :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
+  :package-version "0.6.0")
+
 (defcustom ada-ts-mode-imenu-nesting-strategy-function
   #'ada-ts-mode-imenu-nesting-strategy-before
   "Configuration for Imenu nesting strategy function."
@@ -121,14 +154,13 @@ specified.  See `treesit-language-source-alist' for full details."
 (defun ada-ts-mode--syntax-propertize (beg end)
   "Apply syntax text property to character literals between BEG and END.
 
-This is necessary to suppress interpreting syntactic meaning from
-a chararacter literal (e.g., double-quote character incorrectly
-interpreted as the beginning or end of a string).  The
-single-quote character is not defined in the syntax table as a
-string since it is also used with attributes.  Thus, it is
-defined in the syntax table as punctuation and we identify
-character literal instances here and apply the string property to
-those instances."
+This is necessary to suppress interpreting syntactic meaning from a
+chararacter literal (e.g., double-quote character incorrectly
+interpreted as the beginning or end of a string).  The single-quote
+character is not defined in the syntax table as a string since it is
+also used with attributes.  Thus, it is defined in the syntax table as
+punctuation and we identify character literal instances here and apply
+the string property to those instances."
   (goto-char beg)
   (while (re-search-forward (rx "'" anychar "'") end t)
     (pcase (treesit-node-type
@@ -555,6 +587,15 @@ Return nil if there is no name or if NODE is not a defun node."
      ("subunit"
       (treesit-node-child-by-field-name node "parent_unit_name")))))
 
+(defun ada-ts-mode--type-declaration-name (node)
+  "Return the type declaration name of NODE."
+  (ada-ts-mode--node-to-name
+   (car (treesit-filter-child
+         node
+         (lambda (n)
+           (string-equal (treesit-node-type n)
+                         "identifier"))))))
+
 (defun ada-ts-mode--package-p (node)
   "Determine if NODE is a package declaration, body or stub.
 Return non-nil to indicate that it is."
@@ -598,6 +639,50 @@ Return non-nil to indicate that it is."
          "subprogram_declaration"
          "subprogram_renaming_declaration")
      t)))
+
+(defun ada-ts-mode--protected-p (node)
+  "Determine if NODE is a protected declaration, body, body stub or type."
+  (pcase (treesit-node-type node)
+    ((or "protected_body"
+         "protected_body_stub"
+         "protected_type_declaration"
+         "single_protected_declaration")
+     t)))
+
+(defun ada-ts-mode--task-p (node)
+  "Determine if NODE is a task declaration, body, body stub type."
+  (pcase (treesit-node-type node)
+    ((or "single_task_declaration"
+         "task_body"
+         "task_body_stub"
+         "task_type_declaration")
+     t)))
+
+(defun ada-ts-mode--type-declaration-p (node)
+  "Determine if NODE is a type declaration."
+  (pcase (treesit-node-type node)
+    ((or "formal_complete_type_declaration"
+         "formal_incomplete_type_declaration"
+         "incomplete_type_declaration"
+         "private_extension_declaration"
+         "private_type_declaration"
+         "protected_type_declaration"
+         "task_type_declaration"
+         "subtype_declaration")
+     t)
+    ("full_type_declaration"
+     (let ((child (treesit-node-type (treesit-node-child node 0))))
+       (and (not (string-equal child "task_type_declaration"))
+            (not (string-equal child "protected_type_declaration")))))))
+
+(defun ada-ts-mode--with-clause-name-p (node)
+  "Determine if NODE is a library unit name within a with clause."
+  (and (string-equal (treesit-node-type (treesit-node-parent node))
+                     "with_clause")
+       (pcase (treesit-node-type node)
+         ((or "identifier"
+              "selected_component")
+          t))))
 
 (defun ada-ts-mode--defun-p (node)
   "Determine if NODE is candidate for defun."
@@ -680,21 +765,80 @@ the name of the branch given the branch node."
 (defun ada-ts-mode--imenu ()
   "Return Imenu alist for the current buffer."
   (let* ((root (treesit-buffer-root-node))
-         (tree (treesit-induce-sparse-tree root #'ada-ts-mode--defun-p))
-         (index-package (ada-ts-mode--imenu-index tree
-                                                  #'ada-ts-mode--package-p
-                                                  #'ada-ts-mode--defun-p
-                                                  #'ada-ts-mode--defun-name
-                                                  #'ada-ts-mode--defun-name))
-         (index-subprogram (ada-ts-mode--imenu-index tree
-                                                     #'ada-ts-mode--subprogram-p
-                                                     #'ada-ts-mode--defun-p
-                                                     #'ada-ts-mode--defun-name
-                                                     #'ada-ts-mode--defun-name)))
-    (seq-filter (lambda (i) (cdr i))
-                (list
-                 (cons "Package"    index-package)
-                 (cons "Subprogram" index-subprogram)))))
+         (defun-tree
+          (and (seq-intersection '(package subprogram protected task)
+                                 ada-ts-mode-imenu-categories)
+               (treesit-induce-sparse-tree root #'ada-ts-mode--defun-p)))
+         (index-package
+          (and (memq 'package ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index defun-tree
+                                         #'ada-ts-mode--package-p
+                                         #'ada-ts-mode--defun-p
+                                         #'ada-ts-mode--defun-name
+                                         #'ada-ts-mode--defun-name)))
+         (index-subprogram
+          (and (memq 'subprogram ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index defun-tree
+                                         #'ada-ts-mode--subprogram-p
+                                         #'ada-ts-mode--defun-p
+                                         #'ada-ts-mode--defun-name
+                                         #'ada-ts-mode--defun-name)))
+         (index-protected
+          (and (memq 'protected ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index defun-tree
+                                         #'ada-ts-mode--protected-p
+                                         #'ada-ts-mode--defun-p
+                                         #'ada-ts-mode--defun-name
+                                         #'ada-ts-mode--defun-name)))
+         (index-task
+          (and (memq 'task ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index defun-tree
+                                         #'ada-ts-mode--task-p
+                                         #'ada-ts-mode--defun-p
+                                         #'ada-ts-mode--defun-name
+                                         #'ada-ts-mode--defun-name)))
+         (index-type-declaration
+          (and (memq 'type-declaration ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index
+                (treesit-induce-sparse-tree
+                 root
+                 (lambda (node)
+                   (or (ada-ts-mode--defun-p node)
+                       (ada-ts-mode--type-declaration-p node))))
+                #'ada-ts-mode--type-declaration-p
+                #'ada-ts-mode--defun-p
+                #'ada-ts-mode--type-declaration-name
+                #'ada-ts-mode--defun-name)))
+         (index-with-clause
+          (and (memq 'with-clause ada-ts-mode-imenu-categories)
+               (ada-ts-mode--imenu-index
+                (treesit-induce-sparse-tree
+                 root
+                 #'ada-ts-mode--with-clause-name-p
+                 nil
+                 3) ; Limit search depth for speed
+                #'identity
+                #'ignore
+                #'ada-ts-mode--node-to-name
+                #'ignore)))
+         (imenu-alist
+          ;; Respect category ordering in `ada-ts-mode-imenu-categories'
+          (mapcar (lambda (category)
+                    (let ((name (alist-get category
+                                           ada-ts-mode-imenu-category-name-alist))
+                          (index (pcase category
+                                   ('package          index-package)
+                                   ('subprogram       index-subprogram)
+                                   ('protected        index-protected)
+                                   ('task             index-task)
+                                   ('type-declaration index-type-declaration)
+                                   ('with-clause      index-with-clause)
+                                   (_ (error "Unknown cateogry: %s" category)))))
+                      (cons name index)))
+                  ada-ts-mode-imenu-categories)))
+
+    ;; Remove empty categories
+    (seq-filter (lambda (i) (cdr i)) imenu-alist)))
 
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"

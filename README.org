@@ -172,7 +172,24 @@ enabled.
 
 With the provided Imenu support, additional options are available for
 ease of navigation within an Ada source file.  Imenu supports indexing
-of packages and subprograms (declarations, bodies and stubs).
+of declarations, bodies and stubs for packages, subprograms, task
+units and protected units as well as type declarations and with
+clauses.
+
+- User Option: ada-ts-mode-imenu-categories ::
+  The set of categories to be used for Imenu.  Since there are a
+  number of different categories supported, it may be a distraction to
+  display categories that aren't desired.  Therefore, the set of
+  categories can be customized to reduce clutter or to increase
+  performance.  The order in which the categories are listed will be
+  respected when the Imenu indexing is performed.  This is helpful if
+  specific ordering of categories is desired.
+
+- User Option: ada-ts-mode-imenu-category-name-alist ::
+  The mapping between categories and the displayed name for the
+  category.  This customization may be helpful if you are expecting a
+  specific name for a category, use plural instead of singular nouns,
+  or want to customize for internationalization.
 
 - User Option: ada-ts-mode-imenu-nesting-strategy-function ::
   Function to use for constructing nested items within the Imenu data
