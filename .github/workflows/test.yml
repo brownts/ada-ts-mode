@@ -12,21 +12,41 @@ jobs:
   test:
     strategy:
       matrix:
-        emacs-version: ['29.1', '29.2', 'snapshot']
-    runs-on: ubuntu-latest
+        emacs-version: ['29.1', '29.2']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            emacs-version: 'snapshot'
+    runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.emacs-version == 'snapshot'}}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Tree-Sitter Library
+      - name: Install Texinfo (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt --assume-yes install libtree-sitter-dev
+          sudo apt --assume-yes install texinfo
+
+      - name: Install Texinfo (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          install: texinfo
+
+      # See https://lists.gnu.org/archive/html/emacs-devel/2021-09/msg00521.html
+      - name: Fix MSYS2 makeinfo Installation (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo @echo off>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
+          echo perl ${{runner.temp}}\msys64\usr\bin\makeinfo %%*>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
+          echo ${{runner.temp}}\msys64\mingw64\bin>> %GITHUB_PATH%
 
       - name: Setup Emacs
-        uses: purcell/setup-emacs@master
+        uses: jcs090218/setup-emacs@master
         with:
           version: ${{matrix.emacs-version}}
 
@@ -34,6 +54,4 @@ jobs:
         uses: emacs-eldev/setup-eldev@v1
 
       - name: Test the project
-        run: |
-          sudo apt --assume-yes install texinfo
-          eldev -p -dtT test
+        run: eldev -p -dtT test
