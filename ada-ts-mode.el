@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.6.0
+;; Version: 0.6.1
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -226,6 +226,7 @@ the string property to those instances."
    :feature 'attribute
    '(((attribute_designator) @font-lock-property-use-face)
      (range_attribute_designator "range" @font-lock-property-use-face)
+     (reduction_attribute_designator (identifier) @font-lock-property-use-face)
      (component_declaration (identifier) @font-lock-property-name-face)
      (component_choice_list (identifier) @font-lock-property-name-face)
      (component_clause local_name: _ @font-lock-property-name-face))
@@ -310,8 +311,16 @@ the string property to those instances."
       generic_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (generic_instantiation
       ["procedure" "function"]
+      generic_name: (function_call name: [(identifier) (string_literal)]
+                                   @font-lock-function-name-face))
+     (generic_instantiation
+      ["procedure" "function"]
       generic_name: (selected_component
                      selector_name: _ @font-lock-function-name-face))
+     (generic_instantiation
+      ["procedure" "function"]
+      generic_name: (function_call name: (selected_component
+                                          selector_name: _ @font-lock-function-name-face)))
      (subprogram_renaming_declaration
       callable_entity_name: [(identifier) (string_literal)] @font-lock-function-name-face)
      (subprogram_renaming_declaration
@@ -366,16 +375,54 @@ the string property to those instances."
    ;; Function/Procedure Calls
    :language 'ada
    :feature 'function
-   '((function_call
-      name: [(identifier) (string_literal)] @font-lock-function-call-face)
-     (function_call
-      name: (selected_component
-             selector_name: _ @font-lock-function-call-face))
+   :override 'prepend
+   '(((function_call
+       name: [(identifier) (string_literal)] @font-lock-function-call-face
+       :anchor (comment) :*
+       :anchor (actual_parameter_part))
+      @function-call
+      (:pred ada-ts-mode--named-function-call-p @function-call))
+     ((function_call
+       name: (selected_component
+              selector_name: _ @font-lock-function-call-face)
+       :anchor (comment) :*
+       :anchor (actual_parameter_part))
+      @function-call
+      (:pred ada-ts-mode--named-function-call-p @function-call))
+     (function_call (attribute_designator) @font-lock-function-call-face
+                    :anchor (comment) :*
+                    :anchor (actual_parameter_part))
+     ((procedure_call_statement
+       name: (identifier) @font-lock-function-call-face :anchor)
+      @procedure-call
+      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+     ((procedure_call_statement
+       name: (identifier) @font-lock-function-call-face
+       :anchor (comment) :*
+       :anchor (actual_parameter_part))
+      @procedure-call
+      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+     ((procedure_call_statement
+       name: (selected_component
+              selector_name: (identifier) @font-lock-function-call-face)
+       :anchor)
+      @procedure-call
+      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+     ((procedure_call_statement
+       name: (selected_component
+              selector_name: (identifier) @font-lock-function-call-face)
+       :anchor (comment) :*
+       :anchor (actual_parameter_part))
+      @procedure-call
+      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
      (procedure_call_statement
-      name: (identifier) @font-lock-function-call-face)
+      (attribute_designator) @font-lock-function-call-face :anchor)
      (procedure_call_statement
-      name: (selected_component
-             selector_name: (identifier) @font-lock-function-call-face)))
+      (attribute_designator) @font-lock-function-call-face
+      :anchor (comment) :*
+      :anchor (actual_parameter_part))
+     (reduction_attribute_designator
+      (identifier) @font-lock-function-call-face))
 
    ;; Keywords
    :language 'ada
@@ -491,6 +538,29 @@ the string property to those instances."
    '((ERROR) @font-lock-warning-face))
 
   "Font-lock settings for `ada-ts-mode'.")
+
+(defun ada-ts-mode--named-function-call-p (node)
+  "Check if NODE is a named function call.
+
+Certain places use a function_call node in the syntax tree, such as a
+generic instantiation, because it has similar syntax to a function call,
+but it isn't an actual function call."
+  (let ((node-type (treesit-node-type node))
+        (parent-node-type (treesit-node-type (treesit-node-parent node))))
+    (and (string-equal node-type "function_call")
+         (not (string-equal parent-node-type "generic_instantiation"))
+         (not (string-equal parent-node-type "assignment_statement"))
+         (let ((function-name (ada-ts-mode--node-to-name
+                               (treesit-node-child-by-field-name node "name"))))
+           (not (string-suffix-p ".all" function-name 'ignore-case))))))
+
+(defun ada-ts-mode--named-procedure-call-p (node)
+  "Check if NODE is a named procedure call."
+  (let ((node-type (treesit-node-type node)))
+    (and (string-equal node-type "procedure_call_statement")
+         (let ((procedure-name (ada-ts-mode--node-to-name
+                                (treesit-node-child-by-field-name node "name"))))
+           (not (string-suffix-p ".all" procedure-name 'ignore-case))))))
 
 (defun ada-ts-mode--mode-in-p (node)
   "Check if mode for NODE is \\='in\\='."

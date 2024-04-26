@@ -241,6 +241,54 @@ setting:
     (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))
 #+END_SRC
 
+** Function Calls not Highlighted Correctly
+
+If you observe places in the syntax highlighting where functions calls
+are not being properly highlighted, such as an array being highlighted
+as a function call, or a parameterless function call not being
+highlighted, this is due to ambiguities in the syntax.  From a pure
+syntax perspective, array accesses look the same as function calls.
+Also parameterless function calls look the same as variable accesses.
+In places where it can be determined from the syntax (such as a
+generic package instantiation) care is taken to avoid highlighting
+these places as function calls.  In other places, it cannot be known
+from the syntax tree alone and that is where the syntax highlighting
+will become inaccurate.
+
+One way to address this slightly inaccurate syntax highlighting of
+function calls, is simply to disable it.  An easy way to perform this
+is through the use of the =treesit-font-lock-recompute-features=
+function.  Using this function when loading the major mode will allow
+you to customize which features are enabled/disabled from the default
+settings.
+
+#+BEGIN_SRC emacs-lisp
+  (defun ada-ts-mode-setup ()
+    (treesit-font-lock-recompute-features nil '(function)))
+
+  (add-hook 'ada-ts-mode-hook #'ada-ts-mode-setup)
+#+END_SRC
+
+If disabling function call highlighting is not sufficiently
+satisfying, another approach is to augment the syntax highlighting of
+=ada-ts-mode= with that of the Ada language server.  The language server
+is capable of providing semantic highlighting, which is what is needed
+in this situation.  Refer to the Ada language server and a
+corresponding Emacs Language Server Protocol (LSP) client.  Not all
+LSP clients for Emacs support semantic highlighting, so investigate
+first before selecting one.  When semantic highlighting is used with
+=ada-ts-mode=, inaccurate function call highlighting will be corrected.
+This includes both places where function calls are being highlighted,
+which aren't real function calls, as well as places which are function
+calls but are not being highlighted.  In addition to function call
+highlighting, semantic highlighting provides highlighting of other
+semantic information, therefore it is highly recommended.
+
+If you do observe places where function call syntax highlighting is
+inaccurate and it can be determined from the syntax tree, this is
+considered a bug and should be reported by filing an issue against the
+package.
+
 * Example Configuration
 
 The following is an example configuration using =use-package= to manage
