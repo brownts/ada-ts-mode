@@ -225,7 +225,7 @@ the string property to those instances."
    :language 'ada
    :feature 'attribute
    '(((attribute_designator) @font-lock-property-use-face)
-     ((range_attribute_designator) @font-lock-property-use-face)
+     (range_attribute_designator "range" @font-lock-property-use-face)
      (component_declaration (identifier) @font-lock-property-name-face)
      (component_choice_list (identifier) @font-lock-property-name-face)
      (component_clause local_name: _ @font-lock-property-name-face))
