@@ -36,6 +36,10 @@ jobs:
         with:
           install: texinfo
 
+      - name: Install Texinfo (MacOS)
+        if: runner.os == 'macOS'
+        run: brew install texinfo
+
       # See https://lists.gnu.org/archive/html/emacs-devel/2021-09/msg00521.html
       - name: Fix MSYS2 makeinfo Installation (Windows)
         if: runner.os == 'Windows'
