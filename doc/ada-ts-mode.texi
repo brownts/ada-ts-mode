@@ -66,7 +66,7 @@ Troubleshooting
 @node Prerequisites
 @chapter Prerequisites
 
-There are a number of requirements which must be met in order to use
+There are a couple of requirements which must be met in order to use
 tree-sitter powered major modes.  The Emacs documentation should be
 consulted which will provide complete details.  The following are the
 main points to consider:
@@ -75,29 +75,27 @@ main points to consider:
 @item
 Emacs must have been built with tree-sitter support.  Versions of
 Emacs prior to Emacs 29 do not have built-in support.  The built-in
-support is optionally enabled when Emacs is built, so you must make
-sure that the version of Emacs that you are using was built with
-tree-sitter support.
+support is optionally enabled when Emacs is built.  It is almost
+guaranteed that any pre-built Emacs 29 or newer executable supplied
+as part of an OS package manager (e.g., APT, Homebrew, MSYS2, etc.)
+will have been built with this capability enabled.
 @item
 The tree-sitter shared library must be installed on your system.
 The specifics of how to do this will vary based on the Operating
-System, so those details are not provided here for all platforms,
-however an a Debian/Ubuntu installation, it would be similar to the
-following:
-@example
-sudo apt install libtree-sitter0
-@end example
-If you're building Emacs from source, you'll need the development
-library instead:
-@example
-sudo apt install libtree-sitter-dev
-@end example
+System.  However, a pre-built Emacs 29 or newer executable that is
+installed by the OS package manager will likely have identified this
+library as a prerequisite and have installed it along with Emacs.
+Therefore, it is unlikely you will need to manually install this
+library if you installed Emacs with an OS package manager.
+
 The following command can be used to determine if tree-sitter
 support is enabled in Emacs and whether the tree-sitter library can
 be found on your system:
 @itemize
 @item
 @samp{M-: (treesit-available-p) RET}
+@item
+Make sure it indicates @code{t} in the echo area instead of @code{nil}.
 @end itemize
 @end itemize
 
