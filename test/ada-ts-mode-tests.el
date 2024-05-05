@@ -62,33 +62,28 @@ perform custom initialization."
     (let* ((actual-menu (filter-menu (funcall imenu-create-index-function))))
       (should (equal menu actual-menu)))))
 
-(dolist (file
-         (directory-files
-          (expand-file-name "resources"
-                            (file-name-directory
-                             (cond (load-in-progress load-file-name)
-                                   ((bound-and-true-p byte-compile-current-file)
-                                    byte-compile-current-file)
-                                   (t (buffer-file-name)))))
-          nil
-          (rx bos
-              (or (not ".")
-                  (seq "." (not "."))
-                  (seq ".." (+ anychar)))
-              )))
-(let* ((file-noext (file-name-sans-extension file))
-       (file-path (ert-resource-file file))
-       (transform (cond ((string-prefix-p "filling" file-noext) #'filling-transform)
-                        (t #'default-transform))))
-  (if (string-prefix-p "font-lock" file-noext)
+(dolist (file (directory-files (ert-resource-directory)
+                               nil
+                               directory-files-no-dot-files-regexp))
+  (let* ((file-noext (file-name-sans-extension file))
+         (file-path (ert-resource-file file))
+         (transform (cond ((string-prefix-p "filling" file-noext) #'filling-transform)
+                          (t #'default-transform))))
+    (if (string-prefix-p "font-lock" file-noext)
+        (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
+                 (skip-unless (featurep 'ert-font-lock))
+                 (with-temp-buffer
+                   (insert-file-contents ,file-path)
+                   (funcall #',transform))
+                 (let ((prev-level treesit-font-lock-level))
+                   (unwind-protect
+                       (progn
+                         ;; Force full fontification
+                         (setq treesit-font-lock-level 4)
+                         (ert-font-lock-test-file ,file-path 'ada-ts-mode))
+                     (setq treesit-font-lock-level prev-level)))))
       (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
-               (skip-unless (featurep 'ert-font-lock))
-               (with-temp-buffer
-                 (insert-file-contents ,file-path)
-                 (funcall #',transform))
-               (ert-font-lock-test-file ,file-path 'ada-ts-mode)))
-    (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
-             (ert-test-erts-file ,file-path #',transform))))))
+               (ert-test-erts-file ,file-path #',transform))))))
 
 (provide 'ada-ts-mode-tests)
 

@@ -12,11 +12,11 @@ begin
 
    for I in AA'Range (1) loop
       --       ^^^^^ font-lock-property-use-face
-      --             ^ ^ nil
+      --             ^ ^ font-lock-bracket-face
       --              ^ font-lock-number-face
       for J in AA'Range (2) loop
          --       ^^^^^ font-lock-property-use-face
-         --             ^ ^ nil
+         --             ^ ^ font-lock-bracket-face
          --              ^ font-lock-number-face
          AA (I, J) := 0.0;
       end loop;

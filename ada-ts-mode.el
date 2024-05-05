@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.6.1
+;; Version: 0.6.2
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -350,6 +350,21 @@ the string property to those instances."
      (extended_return_object_declaration (identifier) @font-lock-variable-name-face ":")
      (extended_return_object_declaration (identifier) @font-lock-constant-face ":" "constant")
      (exception_declaration (identifier) @font-lock-type-face)
+     (exception_renaming_declaration :anchor (identifier) @font-lock-type-face)
+     (exception_renaming_declaration
+      exception_name: (identifier) @font-lock-type-face)
+     (exception_renaming_declaration
+      exception_name: (selected_component
+                       selector_name: (identifier) @font-lock-type-face))
+     (raise_expression
+      exception_name: (identifier) @font-lock-type-face)
+     (raise_expression
+      exception_name: (selected_component
+                       selector_name: (identifier) @font-lock-type-face))
+     (raise_statement name: (identifier) @font-lock-type-face)
+     (raise_statement
+      name: (selected_component
+             selector_name: (identifier) @font-lock-type-face))
      (choice_parameter_specification (identifier) @font-lock-variable-name-face)
      (choice_parameter_specification (identifier) @font-lock-constant-face)
      (parameter_specification (identifier) @font-lock-variable-name-face ":")
