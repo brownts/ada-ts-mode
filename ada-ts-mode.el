@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.6.2
+;; Version: 0.6.3
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -255,7 +255,8 @@ the string property to those instances."
          (discrete_choice_list
           (discrete_choice
            (expression
-            (term name: (identifier) @font-lock-constant-face)))))))))
+            (term name: (identifier) @font-lock-constant-face))))))))
+     ((primary_null) @font-lock-constant-face))
 
    ;; Delimiters
    :language 'ada
