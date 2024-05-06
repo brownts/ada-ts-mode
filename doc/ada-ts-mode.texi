@@ -29,12 +29,16 @@ highlighting to be performed more accurately than historical methods
 (e.g., regular expressions).
 
 This major mode provides support for syntax highlighting, navigation,
-Imenu, and ``which function'' (i.e., displaying the current function
-name in the mode line).
+Imenu, ``which function'' (i.e., displaying the current function name in
+the mode line) and outlining (via @samp{outline-minor-mode}).
 
-@strong{Note}: This major mode is based on the Emacs built-in tree-sitter
-support, not to be confused with the separate Emacs tree-sitter
-package.  The two are not compatible with each other.
+@strong{Note}: This major mode is based on the Emacs 29 (or newer) built-in
+tree-sitter support, not to be confused with the separate Emacs
+tree-sitter package.  The two are not compatible with each other.
+
+@strong{Note}: Outlining is made available through Emacs 30 (or newer) built-in
+support for outlining within tree-sitter major modes, therefore it is
+required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 @end ifnottex
 
 @menu

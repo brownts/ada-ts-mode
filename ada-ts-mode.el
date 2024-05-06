@@ -1008,6 +1008,9 @@ the name of the branch given the branch node."
   ;; Imenu.
   (setq-local imenu-create-index-function #'ada-ts-mode--imenu)
 
+  ;; Outline minor mode (Emacs 30+)
+  (setq-local treesit-outline-predicate #'ada-ts-mode--defun-p)
+
   ;; Font-lock.
   (setq-local treesit-font-lock-settings ada-ts-mode--font-lock-settings)
   (setq-local treesit-font-lock-feature-list
