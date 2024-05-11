@@ -1024,7 +1024,7 @@ the name of the branch given the branch node."
 ;;;###autoload
 (progn
   (add-to-list 'auto-mode-alist
-               `(,(rx (or ".adb" ".ads" ".adc") eos) . ada-ts-mode))
+               `(,(rx (or ".ada" ".adb" ".ads" ".adc") eos) . ada-ts-mode))
   ;; Add ada-mode as an "extra" parent so ada-ts-mode can handle
   ;; directory local variables for ada-mode, etc. (Emacs 30+)
   (when (fboundp 'derived-mode-add-parents)
