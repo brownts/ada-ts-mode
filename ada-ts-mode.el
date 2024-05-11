@@ -1025,7 +1025,10 @@ the name of the branch given the branch node."
 (progn
   (add-to-list 'auto-mode-alist
                `(,(rx (or ".adb" ".ads" ".adc") eos) . ada-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(ada-mode . ada-ts-mode)))
+  ;; Prefer `major-mode-remap-defaults' if available (Emacs 30+)
+  (if (boundp 'major-mode-remap-defaults)
+      (add-to-list 'major-mode-remap-defaults '(ada-mode . ada-ts-mode))
+    (add-to-list 'major-mode-remap-alist '(ada-mode . ada-ts-mode))))
 
 (info-lookup-add-help
  :topic 'symbol
