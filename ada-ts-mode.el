@@ -1025,6 +1025,10 @@ the name of the branch given the branch node."
 (progn
   (add-to-list 'auto-mode-alist
                `(,(rx (or ".adb" ".ads" ".adc") eos) . ada-ts-mode))
+  ;; Add ada-mode as an "extra" parent so ada-ts-mode can handle
+  ;; directory local variables for ada-mode, etc. (Emacs 30+)
+  (when (fboundp 'derived-mode-add-parents)
+    (derived-mode-add-parents 'ada-ts-mode '(ada-mode)))
   ;; Prefer `major-mode-remap-defaults' if available (Emacs 30+)
   (if (boundp 'major-mode-remap-defaults)
       (add-to-list 'major-mode-remap-defaults '(ada-mode . ada-ts-mode))
