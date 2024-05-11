@@ -34,7 +34,6 @@
 
 ;;; Code:
 
-(require 'info-look)
 (require 'lisp-mnt)
 (require 'treesit)
 (eval-when-compile (require 'rx))
@@ -1034,11 +1033,14 @@ the name of the branch given the branch node."
       (add-to-list 'major-mode-remap-defaults '(ada-mode . ada-ts-mode))
     (add-to-list 'major-mode-remap-alist '(ada-mode . ada-ts-mode))))
 
-(info-lookup-add-help
- :topic 'symbol
- :mode '(emacs-lisp-mode . "ada")
- :regexp "\\bada-ts-[^][()`'‘’,\" \t\n]+"
- :doc-spec '(("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)")))
+;; Lazily register mode's info lookup help.
+(with-eval-after-load 'info-look
+  (declare-function info-lookup-add-help "info-look" (&rest args))
+  (info-lookup-add-help
+   :topic 'symbol
+   :mode '(emacs-lisp-mode . "ada")
+   :regexp "\\bada-ts-[^][()`'‘’,\" \t\n]+"
+   :doc-spec '(("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)"))))
 
 (provide 'ada-ts-mode)
 
