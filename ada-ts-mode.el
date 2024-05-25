@@ -228,7 +228,8 @@ the string property to those instances."
      (reduction_attribute_designator (identifier) @font-lock-property-use-face)
      (component_declaration (identifier) @font-lock-property-name-face)
      (component_choice_list (identifier) @font-lock-property-name-face)
-     (component_clause local_name: _ @font-lock-property-name-face))
+     (component_clause local_name: _ @font-lock-property-name-face)
+     (discriminant_association (identifier) @font-lock-property-name-face))
 
    ;; Brackets
    :language 'ada
@@ -525,13 +526,6 @@ the string property to those instances."
                                       selector_name: _ @font-lock-type-face)))
      (use_clause "type" (identifier) @font-lock-type-face)
      (use_clause "type" (selected_component
-                         selector_name: _ @font-lock-type-face))
-     (allocator "new"
-                :anchor (comment) :*
-                :anchor (identifier) @font-lock-type-face)
-     (allocator "new"
-                :anchor (comment) :*
-                :anchor (selected_component
                          selector_name: _ @font-lock-type-face))
      (qualified_expression
       subtype_name: (identifier) @font-lock-type-face)
