@@ -589,6 +589,27 @@ but it isn't an actual function call."
                  "out"
                  (treesit-node-type n))))))))
 
+;;; Commands
+
+(defun ada-ts-mode-defun-comment-box ()
+  "Create comment box for defun enclosing point, if exists."
+  (interactive)
+  (when-let* ((defun-node (treesit-defun-at-point))
+              (defun-name (treesit-defun-name defun-node))
+              (defun-start (treesit-node-start defun-node))
+              (defun-bol
+               (save-excursion
+                 (goto-char defun-start)
+                 (pos-bol)))
+              (defun-comment (make-string (length defun-name) ?-))
+              (prefix
+               (buffer-substring-no-properties defun-bol defun-start)))
+    (save-excursion
+      (goto-char defun-bol)
+      (insert prefix "---" defun-comment "---" ?\n
+              prefix "-- " defun-name    " --" ?\n
+              prefix "---" defun-comment "---" ?\n ?\n))))
+
 ;;; Imenu
 
 (defun ada-ts-mode--node-to-name (node)
@@ -1034,7 +1055,8 @@ the name of the branch given the branch node."
    :topic 'symbol
    :mode '(emacs-lisp-mode . "ada")
    :regexp "\\bada-ts-[^][()`'‘’,\" \t\n]+"
-   :doc-spec '(("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)"))))
+   :doc-spec '(("(ada-ts-mode)Command Index" nil "^ -+ .*: " "\\( \\|$\\)")
+               ("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)"))))
 
 (provide 'ada-ts-mode)
 

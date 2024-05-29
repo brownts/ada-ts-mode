@@ -1,0 +1,85 @@
+Code:
+  (lambda ()
+    (default-transform)
+    (call-interactively #'ada-ts-mode-defun-comment-box))
+
+Name: Subprogram body
+
+Point-Char: |
+
+=-=
+procedure Hello_World is
+begin
+   Put_Line ("Hello, world!");|
+end Hello_World;
+=-=
+-----------------
+-- Hello_World --
+-----------------
+
+procedure Hello_World is
+begin
+   Put_Line ("Hello, world!");|
+end Hello_World;
+=-=-=
+
+Name: Nested subprogram body
+
+=-=
+package body Test is
+   procedure Hello_World is
+   begin
+      Put_Line ("Hello, world!");|
+   end Hello_World;
+end Test;
+=-=
+package body Test is
+   -----------------
+   -- Hello_World --
+   -----------------
+
+   procedure Hello_World is
+   begin
+      Put_Line ("Hello, world!");|
+   end Hello_World;
+end Test;
+=-=-=
+
+Name: Subprogram declaration
+
+=-=
+procedure Hello_World|;
+=-=
+-----------------
+-- Hello_World --
+-----------------
+
+procedure Hello_World|;
+=-=-=
+
+Name: Nested subprogram declaration
+
+=-=
+package body Test is
+   procedure Hello_World|;
+end Test;
+=-=
+package body Test is
+   -----------------
+   -- Hello_World --
+   -----------------
+
+   procedure Hello_World|;
+end Test;
+=-=-=
+
+
+Name: Not in defun
+
+=-=
+|
+procedure Hello_World is
+begin
+   Put_Line ("Hello, world!");
+end Hello_World;
+=-=-=
