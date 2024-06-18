@@ -19,7 +19,8 @@ highlighting to be performed more accurately than historical methods
 
 This major mode provides support for syntax highlighting, navigation,
 Imenu, "which function" (i.e., displaying the current function name in
-the mode line) and outlining (via =outline-minor-mode=).
+the mode line), indentation (via LSP) and outlining (via
+=outline-minor-mode=).
 
 *Note*: This major mode is based on the Emacs 29 (or newer) built-in
 tree-sitter support, not to be confused with the separate Emacs
@@ -161,6 +162,51 @@ the different font lock levels.
   number, operator
 - Level 4 :: bracket, delimiter, error, label
 
+* Indentation
+
+Built-in tree-sitter support for indentation is not currently
+available.  However, if ~ada-ts-mode~ is used in conjunction with the
+Ada Language Server, indentation support can be provided by the
+language server itself.
+
+The following user options can be customized to modify the indentation
+as needed.
+
+- User Option: ada-ts-mode-indent-backend ::
+  Selects the backend used to provide indentation support.  The
+  "Default" setting uses the default settings for ~indent-line-function~
+  and ~indent-region-function~.  See their documentation for further
+  details, although this usually performs indentation relative to the
+  previous line.  The "LSP" setting will use the Language Server
+  indentation support when a LSP client is active for the buffer.  If
+  no LSP client is active this falls back to using the "Default"
+  indentation.
+
+- User Option: ada-ts-mode-indent-offset ::
+  Indentation used for structural visualization.
+
+** Ada Language Server Indentation
+
+Since the Ada Language Server provides code formatting, not just an
+indentation engine, it may be necessary to configure the settings of
+the code formatter to meet behavioral desires.  Under the hood, Ada LS
+uses the GNAT pretty printer engine to format the line or region of
+the buffer.  For minimal impact to the buffer, it's likely desirable
+to use the =--source-line-breaks= switch to prevent the pretty printer
+from reformatting the buffer beyond indentation.  Refer to the GNAT
+User's Guide for the full set of options available for the pretty
+printer.
+
+The value of ~ada-ts-mode-indent-offset~ is provided to the Ada Language
+Server as the LSP "tab size" parameter.  This corresponds to the main
+indentation amount (i.e., the =--indentation= switch for the pretty
+printer).
+
+The switches for the pretty printer should be configured in the
+project's GPR file.  GPR files support a =Pretty_Printer= package which
+is where the switches should reside.  The Ada LS will read the pretty
+printer switches from the project's GPR file to control formatting.
+
 * Navigation
 
 The major mode implements the normal source navigation commands which
@@ -255,6 +301,39 @@ in the example configuration section.
   end Hello_World;
   #+END_SRC
 
+* LSP Client Support
+
+In order to integrate functionality provided by the Ada Language
+Server (such as indentation), ~ada-ts-mode~ must interact with an active
+LSP client.  Since multiple LSP clients exist, this interaction must
+be configurable such that additional LSP clients can be added when
+needed.  Additionally, ~ada-ts-mode~ must be able to determine which LSP
+client is active in the buffer.  If there is no active LSP client in
+the buffer, ~ada-ts-mode~ will not be able to make use of LSP provided
+capabilities and thus falls back on providing this capability without
+it's support, which likely will be less precise.
+
+It's up to the user to configure the LSP client to be active in an
+~ada-ts-mode~ buffer, typically through the use of the ~ada-ts-mode-hook~
+to enable the LSP client minor mode, although those clients which
+utilize directory local variables for configuration (e.g., GPR project
+filename), may need to hook into the ~hack-local-variables-hook~ in
+order to initialize after the directory local variables have been
+initialized.  Refer to the documentation for the specific LSP client
+used for details.
+
+The following user option can be customized to modify the supported LSP clients.
+
+- User Option: ada-ts-mode-lsp-client-alist ::
+  Provides LSP client specific interfaces for use by ~ada-ts-mode~, such
+  that the mode does not depend directly on any specific LSP client.
+  An entry is provided in the list for each LSP client supported.
+  Each entry must provide a predicate variable or function used to
+  determine if an LSP client is active in the buffer.  Additional
+  functions may also be provided which interface with specific
+  capabilities of the LSP client, such as the region indentation API
+  for the LSP client.
+
 * Troubleshooting
 
 ** Org Mode Source Code Blocks
@@ -332,8 +411,8 @@ manager.  This checks to make sure tree-sitter support is enabled in
 Emacs before attempting to install/configure the package, thus your
 configuration will remain compatible with versions of Emacs which
 don't yet support tree-sitter, and will not install and configure this
-package in its absence.  Additionally, this also includes installation
-and configuration of recommended supporting packages and modes.
+package in its absence.  This also demonstrates how to configure
+indentation support through the Ada Language Server (assuming the user has configured an LSP client to be active in the buffer).
 
 #+BEGIN_SRC emacs-lisp
   (when (and (fboundp 'treesit-available-p)
@@ -341,6 +420,7 @@ and configuration of recommended supporting packages and modes.
     (use-package ada-ts-mode
       :ensure t
       :defer t ; autoload updates `auto-mode-alist'
+      :custom (ada-ts-mode-indent-backend 'lsp) ; Use Ada LS indentation
       :bind (:map ada-ts-mode-map
                   ("C-c C-b" . ada-ts-mode-defun-comment-box))
       :init

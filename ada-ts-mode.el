@@ -42,6 +42,8 @@
 (declare-function treesit-node-child-by-field-name "treesit.c")
 (declare-function treesit-node-type "treesit.c")
 
+;;; Customization
+
 (defgroup ada-ts nil
   "Major mode for Ada, using Tree-Sitter."
   :group 'languages
@@ -137,6 +139,33 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
   :package-version "0.5.8")
 
+(defcustom ada-ts-mode-indent-backend 'default
+  "Backend used for indentation."
+  :type '(choice (const :tag "Default" default)
+                 (const :tag "Language Server" lsp))
+  :group 'ada-ts
+  :link '(custom-manual :tag "Indentation" "(ada-ts-mode)Indentation")
+  :package-version "0.7.0")
+;;;###autoload(put 'ada-ts-mode-indent-backend 'safe-local-variable #'symbolp)
+
+(defcustom ada-ts-mode-indent-offset 3
+  "Indentation of statements."
+  :type 'integer
+  :group 'ada-ts
+  :link '(custom-manual :tag "Indentation" "(ada-ts-mode)Indentation")
+  :package-version "0.7.0")
+;;;###autoload(put 'ada-ts-mode-indent-offset 'safe-local-variable #'integerp)
+
+(defcustom ada-ts-mode-lsp-client-alist
+  '((eglot    . (:functionp eglot-managed-p :indent-region eglot-format))
+    (lsp-mode . (:symbolp   lsp-mode        :indent-region lsp-format-region)))
+  "LSP Client information."
+  :type '(repeat (plist :value-type symbol))
+  :group 'ada-ts
+  :package-version "0.7.0")
+
+;;; Syntax
+
 (defvar ada-ts-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?-  ". 12" table)
@@ -171,6 +200,8 @@ the string property to those instances."
              (end (match-end 0)))
          (put-text-property beginning (1+ beginning) 'syntax-table descriptor)
          (put-text-property (1- end) end 'syntax-table descriptor))))))
+
+;;; Font Lock
 
 (defvar ada-ts-mode--keywords
   '("abort" "abstract" "accept" "access" "aliased" "all" "and" "array" "at"
@@ -588,6 +619,109 @@ but it isn't an actual function call."
                 (string-equal
                  "out"
                  (treesit-node-type n))))))))
+
+;;; LSP Support
+
+(defun ada-ts-mode--lsp-active-client ()
+  "Determine active LSP client, if any."
+  (seq-find
+   (lambda (client)
+     (let ((predicate-function (plist-get (cdr client) :functionp))
+           (predicate-symbol (plist-get (cdr client) :symbolp)))
+       (or (and predicate-function
+                (functionp predicate-function)
+                (funcall predicate-function))
+           (and predicate-symbol
+                (local-variable-p predicate-symbol)
+                (symbol-value predicate-symbol)))))
+   ada-ts-mode-lsp-client-alist))
+
+;;; Indent Support
+
+(defun ada-ts-mode--lsp-indent-line ()
+  "Perform line indentation using LSP server.
+
+Indent relative to previous line for newlines and whenever the region
+formatting function fails."
+  (if-let* ((active-client (ada-ts-mode--lsp-active-client)))
+      (if (string-match (rx bos (zero-or-more space) eos)
+                        (buffer-substring (pos-bol) (pos-eol)))
+          ;; Handle extraneous space as well as implement a workaround
+          ;; for LSP onTypeFormatting for RET as described in
+          ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=70929
+          (progn
+            ;; Remove whitespace and reindent
+            (delete-horizontal-space)
+            (indent-relative-first-indent-point))
+        (condition-case _
+            (ada-ts-mode--lsp-indent-region (pos-bol) (pos-eol) active-client)
+          (error
+           ;; The Ada Language Server will return an error if
+           ;; attemping to indent when syntax errors exist.  Fallback
+           ;; to indenting relative to the previous line when this
+           ;; happens.
+           (let ((initial-point-column (current-column))
+                 (initial-indentation-column (current-indentation)))
+             ;; Remove leading whitespace and reindent
+             (save-excursion
+               (beginning-of-line)
+               (delete-horizontal-space)
+               (indent-relative-first-indent-point))
+
+             ;; If point was in the whitepace at the begining of the
+             ;; line, that whitespace will have been deleted by
+             ;; `delete-horizontal-space' and point will end up at the
+             ;; beginning of the line.  In this situation, attempt to
+             ;; restore point location within new whitespace (created by
+             ;; `indent-relative-first-indent-point') when possible,
+             ;; otherwise place point at the first non-whitespace
+             ;; location.
+             (when (<= initial-point-column
+                       initial-indentation-column)
+               (if (< initial-point-column (current-indentation))
+                   (move-to-column initial-point-column)
+                 (back-to-indentation)))))))
+    ;; fallback on default indentation
+    (ada-ts-mode--default-indent-line)))
+
+(defun ada-ts-mode--lsp-indent-region (beg end &optional active-client)
+  "Perform region indentation between BEG and END using LSP server.
+
+When ACTIVE-CLIENT is not nil, use it as the active LSP client."
+  (if-let* ((active-client (or active-client (ada-ts-mode--lsp-active-client)))
+            (indent-region (plist-get (cdr active-client) :indent-region)))
+      (let ((inhibit-message t)
+            (standard-indent ada-ts-mode-indent-offset)
+            (tab-width ada-ts-mode-indent-offset)) ; eglot uses `tab-width'
+        (funcall indent-region beg end))
+    ;; fallback on default indentation
+    (ada-ts-mode--default-indent-region beg end)))
+
+(defun ada-ts-mode--default-indent-line ()
+  "Perform line indentation using default implementation."
+  (if-let ((indent-line (default-value 'indent-line-function)))
+      (funcall indent-line)))
+
+(defun ada-ts-mode--default-indent-region (beg end)
+  "Perform region indentation between BEG and END using default implementation."
+  (if-let ((indent-region (default-value 'indent-region-function)))
+      (funcall indent-region beg end)))
+
+(defun ada-ts-mode--indent-line ()
+  "Perform line indentation."
+  (let ((indent-line
+         (pcase ada-ts-mode-indent-backend
+           ('lsp #'ada-ts-mode--lsp-indent-line)
+           (_    #'ada-ts-mode--default-indent-line))))
+    (funcall indent-line)))
+
+(defun ada-ts-mode--indent-region (beg end)
+  "Perform region indentation between BEG and END."
+  (let ((indent-region
+         (pcase ada-ts-mode-indent-backend
+           ('lsp #'ada-ts-mode--lsp-indent-region)
+           (_    #'ada-ts-mode--default-indent-region))))
+    (funcall indent-region beg end)))
 
 ;;; Commands
 
@@ -1021,6 +1155,11 @@ the name of the branch given the branch node."
 
   ;; Imenu.
   (setq-local imenu-create-index-function #'ada-ts-mode--imenu)
+
+  ;; Indent.
+  (setq-local indent-region-function #'ada-ts-mode--indent-region)
+  (setq-local indent-line-function   #'ada-ts-mode--indent-line)
+  (setq-local electric-indent-chars (append ";>," electric-indent-chars))
 
   ;; Outline minor mode (Emacs 30+)
   (setq-local treesit-outline-predicate #'ada-ts-mode--defun-p)
