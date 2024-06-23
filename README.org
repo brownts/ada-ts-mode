@@ -322,17 +322,30 @@ order to initialize after the directory local variables have been
 initialized.  Refer to the documentation for the specific LSP client
 used for details.
 
-The following user option can be customized to modify the supported LSP clients.
+The following user option can be customized to modify the supported
+LSP clients.
 
-- User Option: ada-ts-mode-lsp-client-alist ::
-  Provides LSP client specific interfaces for use by ~ada-ts-mode~, such
-  that the mode does not depend directly on any specific LSP client.
-  An entry is provided in the list for each LSP client supported.
-  Each entry must provide a predicate variable or function used to
-  determine if an LSP client is active in the buffer.  Additional
-  functions may also be provided which interface with specific
-  capabilities of the LSP client, such as the region indentation API
-  for the LSP client.
+- User Option: ada-ts-mode-lsp-clients ::
+  Provides a list of LSP clients for use by ~ada-ts-mode~.  This
+  prevents the mode from depending directly on a specific LSP client.
+  An entry is provided in the list for each supported LSP client.  If
+  no LSP enhanced support is desired, either don't activate an LSP
+  client in the buffer or set the list of LSP clients to nil.
+
+To add an unsupported LSP client, an entry must be added to
+~ada-ts-mode-lsp-clients~ and a set of methods must be implemented for
+that entry which provide interfacing between ~ada-ts-mode~ and the
+corresponding LSP client.  The methods must specialize on the client
+parameter such that the entry in ~ada-ts-mode-lsp-clients~ can be used
+to dispatch to the correct implementation.  The following are the list
+of required methods:
+
+- Function: ada-ts-mode-lsp-active-p client ::
+  Determines whether the LSP client is active in the current buffer.
+
+- Function: ada-ts-mode-lsp-format-region client beg end ::
+  Format using the Language Server for the specified region of the
+  current buffer.
 
 * Troubleshooting
 
@@ -435,7 +448,7 @@ indentation support through the Ada Language Server (assuming the user has confi
     :hook (ada-ts-mode . electric-pair-local-mode))
 #+END_SRC
 
-* Command Index
+* Command & Function Index
 :PROPERTIES:
 :APPENDIX: t
 :INDEX: fn

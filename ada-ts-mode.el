@@ -36,6 +36,7 @@
 
 (require 'lisp-mnt)
 (require 'treesit)
+(eval-when-compile (require 'cl-generic))
 (eval-when-compile (require 'rx))
 
 (declare-function treesit-parser-create "treesit.c")
@@ -156,12 +157,11 @@ specified.  See `treesit-language-source-alist' for full details."
   :package-version "0.7.0")
 ;;;###autoload(put 'ada-ts-mode-indent-offset 'safe-local-variable #'integerp)
 
-(defcustom ada-ts-mode-lsp-client-alist
-  '((eglot    . (:functionp eglot-managed-p :indent-region eglot-format))
-    (lsp-mode . (:symbolp   lsp-mode        :indent-region lsp-format-region)))
-  "LSP Client information."
-  :type '(repeat (plist :value-type symbol))
+(defcustom ada-ts-mode-lsp-clients '(eglot lsp-mode)
+  "LSP Clients."
+  :type '(repeat (symbol :tag "LSP Client"))
   :group 'ada-ts
+  :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
   :package-version "0.7.0")
 
 ;;; Syntax
@@ -620,21 +620,44 @@ but it isn't an actual function call."
                  "out"
                  (treesit-node-type n))))))))
 
+;;; LSP Client
+
+(cl-defgeneric ada-ts-mode-lsp-active-p (_client)
+  "Determine if CLIENT is active in current buffer.")
+
+(cl-defgeneric ada-ts-mode-lsp-format-region (_client beg end)
+  "Format region BEG to END using Language Server, via CLIENT.")
+
+;;;; LSP Client (eglot)
+
+(cl-defmethod ada-ts-mode-lsp-active-p ((_client (eql eglot)))
+  "Determine if Eglot is active in current buffer."
+  (and (functionp 'eglot-managed-p)
+       (eglot-managed-p)))
+
+(cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql eglot)) beg end)
+  "Format region BEG to END of using Language Server, via Eglot."
+  (let ((tab-width ada-ts-mode-indent-offset)) ; eglot uses `tab-width'
+    (and (functionp 'eglot-format)
+         (eglot-format beg end))))
+
+;;;; LSP Client (lsp-mode)
+
+(cl-defmethod ada-ts-mode-lsp-active-p ((_client (eql lsp-mode)))
+  "Determine if lsp-mode is active in current buffer."
+  (and (local-variable-p 'lsp-mode)
+       lsp-mode))
+
+(cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql lsp-mode)) beg end)
+  "Format region BEG to END using Language Server, via lsp-mode."
+  (and (functionp 'lsp-format-region)
+       (lsp-format-region beg end)))
+
 ;;; LSP Support
 
 (defun ada-ts-mode--lsp-active-client ()
   "Determine active LSP client, if any."
-  (seq-find
-   (lambda (client)
-     (let ((predicate-function (plist-get (cdr client) :functionp))
-           (predicate-symbol (plist-get (cdr client) :symbolp)))
-       (or (and predicate-function
-                (functionp predicate-function)
-                (funcall predicate-function))
-           (and predicate-symbol
-                (local-variable-p predicate-symbol)
-                (symbol-value predicate-symbol)))))
-   ada-ts-mode-lsp-client-alist))
+  (seq-find #'ada-ts-mode-lsp-active-p ada-ts-mode-lsp-clients))
 
 ;;; Indent Support
 
@@ -643,7 +666,7 @@ but it isn't an actual function call."
 
 Indent relative to previous line for newlines and whenever the region
 formatting function fails."
-  (if-let* ((active-client (ada-ts-mode--lsp-active-client)))
+  (if-let* ((client (ada-ts-mode--lsp-active-client)))
       (if (string-match (rx bos (zero-or-more space) eos)
                         (buffer-substring (pos-bol) (pos-eol)))
           ;; Handle extraneous space as well as implement a workaround
@@ -654,7 +677,7 @@ formatting function fails."
             (delete-horizontal-space)
             (indent-relative-first-indent-point))
         (condition-case _
-            (ada-ts-mode--lsp-indent-region (pos-bol) (pos-eol) active-client)
+            (ada-ts-mode--lsp-indent-region (pos-bol) (pos-eol) client)
           (error
            ;; The Ada Language Server will return an error if
            ;; attemping to indent when syntax errors exist.  Fallback
@@ -684,16 +707,14 @@ formatting function fails."
     ;; fallback on default indentation
     (ada-ts-mode--default-indent-line)))
 
-(defun ada-ts-mode--lsp-indent-region (beg end &optional active-client)
+(defun ada-ts-mode--lsp-indent-region (beg end &optional client)
   "Perform region indentation between BEG and END using LSP server.
 
-When ACTIVE-CLIENT is not nil, use it as the active LSP client."
-  (if-let* ((active-client (or active-client (ada-ts-mode--lsp-active-client)))
-            (indent-region (plist-get (cdr active-client) :indent-region)))
+When CLIENT is not nil, use it as the active LSP client."
+  (if-let* ((client (or client (ada-ts-mode--lsp-active-client))))
       (let ((inhibit-message t)
-            (standard-indent ada-ts-mode-indent-offset)
-            (tab-width ada-ts-mode-indent-offset)) ; eglot uses `tab-width'
-        (funcall indent-region beg end))
+            (standard-indent ada-ts-mode-indent-offset))
+        (ada-ts-mode-lsp-format-region client beg end))
     ;; fallback on default indentation
     (ada-ts-mode--default-indent-region beg end)))
 
@@ -1194,7 +1215,7 @@ the name of the branch given the branch node."
    :topic 'symbol
    :mode '(emacs-lisp-mode . "ada")
    :regexp "\\bada-ts-[^][()`'‘’,\" \t\n]+"
-   :doc-spec '(("(ada-ts-mode)Command Index" nil "^ -+ .*: " "\\( \\|$\\)")
+   :doc-spec '(("(ada-ts-mode)Command & Function Index" nil "^ -+ .*: " "\\( \\|$\\)")
                ("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)"))))
 
 (provide 'ada-ts-mode)
