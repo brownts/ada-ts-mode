@@ -164,6 +164,21 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
   :package-version "0.7.0")
 
+(defcustom ada-ts-mode-other-file-alist
+  `((,(rx   ".ads" eos) (  ".adb"))
+    (,(rx   ".adb" eos) (  ".ads"))
+    (,(rx ".1.ada" eos) (".2.ada"))
+    (,(rx ".2.ada" eos) (".1.ada"))
+    (,(rx  "_.ada" eos) (  ".ada"))
+    (,(rx   ".ada" eos) ( "_.ada")))
+  "Ada file extension mapping for \\='find other file\\='."
+  :type '(repeat (list regexp (choice (repeat string) function)))
+  :group 'ada-ts
+  :link '(custom-manual :tag "Navigation" "(ada-ts-mode)Navigation")
+  :link '(function-link ff-find-other-file)
+  :link '(variable-link ff-other-file-alist)
+  :package-version "0.7.0")
+
 ;;; Syntax
 
 (defvar ada-ts-mode-syntax-table
@@ -622,10 +637,19 @@ but it isn't an actual function call."
 
 ;;; LSP Client
 
-(cl-defgeneric ada-ts-mode-lsp-active-p (_client)
+(cl-defgeneric ada-ts-mode-lsp-active-p (client)
   "Determine if CLIENT is active in current buffer.")
 
-(cl-defgeneric ada-ts-mode-lsp-format-region (_client beg end)
+(cl-defgeneric ada-ts-mode-lsp-command-execute (client command &rest arguments)
+  "Execute COMMAND with ARGUMENTS using Language Server, via CLIENT.")
+
+(cl-defgeneric ada-ts-mode-lsp-command-supported-p (client command)
+  "Deterine if Language Server supports COMMAND, via CLIENT.")
+
+(cl-defgeneric ada-ts-mode-lsp-document-id (client)
+  "Determine document id of current buffer, via CLIENT.")
+
+(cl-defgeneric ada-ts-mode-lsp-format-region (client beg end)
   "Format region BEG to END using Language Server, via CLIENT.")
 
 ;;;; LSP Client (eglot)
@@ -634,6 +658,32 @@ but it isn't an actual function call."
   "Determine if Eglot is active in current buffer."
   (and (functionp 'eglot-managed-p)
        (eglot-managed-p)))
+
+(cl-defmethod ada-ts-mode-lsp-command-execute ((_client (eql eglot)) command &rest arguments)
+  "Execute COMMAND with ARGUMENTS using Language Server, via Eglot."
+  (cond ((and (functionp 'eglot-execute)
+              (functionp 'eglot-current-server))
+         (eglot-execute
+          (eglot-current-server)
+          `( :command   ,command
+             :arguments ,(vconcat arguments))))
+        ((and (functionp 'eglot-execute-command)
+              (functionp 'eglot-current-server))
+         (eglot-execute-command
+          (eglot-current-server)
+          command (vconcat arguments)))))
+
+(cl-defmethod ada-ts-mode-lsp-command-supported-p ((_client (eql eglot)) command)
+  "Deterine if Language Server supports COMMAND, via Eglot."
+  (when (functionp 'eglot-server-capable)
+    (when-let* ((command-provider (eglot-server-capable :executeCommandProvider))
+                (commands (plist-get command-provider :commands)))
+      (seq-contains-p commands command))))
+
+(cl-defmethod ada-ts-mode-lsp-document-id ((_client (eql eglot)))
+  "Determine document id of current buffer, via Eglot."
+  (when (functionp 'eglot--TextDocumentIdentifier)
+    (eglot--TextDocumentIdentifier)))
 
 (cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql eglot)) beg end)
   "Format region BEG to END of using Language Server, via Eglot."
@@ -648,12 +698,29 @@ but it isn't an actual function call."
   (and (local-variable-p 'lsp-mode)
        lsp-mode))
 
+(cl-defmethod ada-ts-mode-lsp-command-execute ((_client (eql lsp-mode)) command &rest arguments)
+  "Execute COMMAND with ARGUMENTS using Language Server, via lsp-mode."
+  (when (functionp 'lsp-workspace-command-execute)
+    (lsp-workspace-command-execute command (vconcat arguments))))
+
+(cl-defmethod ada-ts-mode-lsp-command-supported-p ((_client (eql lsp-mode)) command)
+  "Deterine if Language Server supports COMMAND, via lsp-mode."
+  (when (functionp 'lsp-can-execute-command?)
+    (lsp-can-execute-command? command)))
+
+(cl-defmethod ada-ts-mode-lsp-document-id ((_client (eql lsp-mode)))
+  "Determine document id of current buffer, via lsp-mode."
+  (when (functionp 'lsp-text-document-identifier)
+    (lsp-text-document-identifier)))
+
 (cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql lsp-mode)) beg end)
   "Format region BEG to END using Language Server, via lsp-mode."
   (and (functionp 'lsp-format-region)
        (lsp-format-region beg end)))
 
 ;;; LSP Support
+
+(defconst ada-ts-mode--lsp-command-other-file "als-other-file")
 
 (defun ada-ts-mode--lsp-active-client ()
   "Determine active LSP client, if any."
@@ -764,6 +831,18 @@ When CLIENT is not nil, use it as the active LSP client."
       (insert prefix "---" defun-comment "---" ?\n
               prefix "-- " defun-name    " --" ?\n
               prefix "---" defun-comment "---" ?\n ?\n))))
+
+(defun ada-ts-mode-find-other-file ()
+  "Find other Ada file."
+  (interactive)
+  (let ((client (ada-ts-mode--lsp-active-client))
+        (command ada-ts-mode--lsp-command-other-file))
+    (if (and client
+             (ada-ts-mode-lsp-command-supported-p client command))
+        (let ((document-id (ada-ts-mode-lsp-document-id client)))
+          (ada-ts-mode-lsp-command-execute client command document-id))
+      (require 'find-file)
+      (ff-find-other-file))))
 
 ;;; Imenu
 
@@ -1192,6 +1271,9 @@ the name of the branch given the branch node."
                 (keyword preprocessor string type)
                 (attribute assignment constant control function number operator)
                 (bracket delimiter error label)))
+
+  ;; Other File.
+  (setq-local ff-other-file-alist 'ada-ts-mode-other-file-alist)
 
   (treesit-major-mode-setup))
 

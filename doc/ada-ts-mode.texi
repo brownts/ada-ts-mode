@@ -307,6 +307,22 @@ should also be noted that @samp{which-function-mode} is also supported and
 will show the current package and/or subprogram in the mode line, when
 enabled.
 
+@deffn Command ada-ts-mode-find-other-file
+Locate the corresponding body or specification file related to the
+file in the current buffer.  When an LSP client is active, the Ada
+Language Server will be commanded to direct navigation to the other
+file.  This is the most accurate method as the Language Server will
+take into consideration non-standard naming conventions that are
+described in the GNAT project file.  When no LSP client is active,
+@code{ff-find-other-file} will be used to find the corresponding file.
+@end deffn
+
+@defopt ada-ts-mode-other-file-alist
+File extension mapping used to direct @code{ff-find-other-file} to find the
+corresponding file.  This customization is used to define the buffer
+local @code{ff-find-other-file-alist}.
+@end defopt
+
 @node Imenu
 @chapter Imenu
 
@@ -446,6 +462,18 @@ of required methods:
 Determines whether the LSP client is active in the current buffer.
 @end defun
 
+@defun ada-ts-mode-lsp-command-execute client command arguments
+Execute Language Server command with optional arguments.
+@end defun
+
+@defun ada-ts-mode-lsp-command-supported-p client command
+Determines if Langauge Server supports command.
+@end defun
+
+@defun ada-ts-mode-lsp-document-id client
+Determine document identifier corresponding to current buffer.
+@end defun
+
 @defun ada-ts-mode-lsp-format-region client beg end
 Format using the Language Server for the specified region of the
 current buffer.
@@ -548,7 +576,8 @@ indentation support through the Ada Language Server (assuming the user has confi
     :defer t ; autoload updates `auto-mode-alist'
     :custom (ada-ts-mode-indent-backend 'lsp) ; Use Ada LS indentation
     :bind (:map ada-ts-mode-map
-                ("C-c C-b" . ada-ts-mode-defun-comment-box))
+                (("C-c C-b" . ada-ts-mode-defun-comment-box)
+                 ("C-c C-o" . ada-ts-mode-find-other-file)))
     :init
     ;; Configure source blocks for Org Mode.
     (with-eval-after-load 'org-src
