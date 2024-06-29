@@ -229,6 +229,24 @@ enabled.
   corresponding file.  This customization is used to define the buffer
   local ~ff-find-other-file-alist~.
 
+- Command: ada-ts-mode-find-project-file ::
+  Locate the GNAT project file related to the source file of the
+  current buffer.  When an LSP client is active, the Ada Language
+  Server will be queried for the project file, otherwise Alire will be
+  queried if an =alire.toml= file exists in the directory hierarchy and
+  the Alire executable is found in the path.  If neither of these two
+  conditions occur, a single project file will be searched for in the
+  root directory of the project if one exists.  Finally, if the
+  project file still is not found, a search will look for a =defaut.gpr=
+  file somewhere in the directory hierarchy from the current buffer
+  file's directory.
+
+- User Option: ada-ts-mode-alire-program ::
+  The name of the Alire executable program that will be searched for
+  on the path, and if found, may be invoked for certain ~ada-ts-mode~
+  commands (such as to query for the name and location of the GNAT
+  project file).
+
 * Imenu
 
 With the provided Imenu support, additional options are available for
@@ -361,7 +379,7 @@ of required methods:
   Execute Language Server command with optional arguments.
 
 - Function: ada-ts-mode-lsp-command-supported-p client command ::
-  Determines if Langauge Server supports command.
+  Determines if Language Server supports command.
 
 - Function: ada-ts-mode-lsp-document-id client ::
   Determine document identifier corresponding to current buffer.
@@ -459,7 +477,8 @@ indentation support through the Ada Language Server (assuming the user has confi
       :custom (ada-ts-mode-indent-backend 'lsp) ; Use Ada LS indentation
       :bind (:map ada-ts-mode-map
                   (("C-c C-b" . ada-ts-mode-defun-comment-box)
-                   ("C-c C-o" . ada-ts-mode-find-other-file)))
+                   ("C-c C-o" . ada-ts-mode-find-other-file)
+                   ("C-c C-p" . ada-ts-mode-find-project-file)))
       :init
       ;; Configure source blocks for Org Mode.
       (with-eval-after-load 'org-src

@@ -54,6 +54,14 @@
   :link '(custom-manual "(ada-ts-mode)Top")
   :prefix "ada-ts-mode-")
 
+(defcustom ada-ts-mode-alire-program "alr"
+  "Name of Alire executable program."
+  :type 'string
+  :risky t
+  :group 'ada-ts
+  :link '(url-link :tag "Alire Website" "https://alire.ada.dev/")
+  :package-version "0.7.0")
+
 (defcustom ada-ts-mode-grammar "https://github.com/briot/tree-sitter-ada"
   "Configuration for downloading and installing the tree-sitter language grammar.
 
@@ -721,6 +729,7 @@ but it isn't an actual function call."
 ;;; LSP Support
 
 (defconst ada-ts-mode--lsp-command-other-file "als-other-file")
+(defconst ada-ts-mode--lsp-command-project-file "als-project-file")
 
 (defun ada-ts-mode--lsp-active-client ()
   "Determine active LSP client, if any."
@@ -843,6 +852,75 @@ When CLIENT is not nil, use it as the active LSP client."
           (ada-ts-mode-lsp-command-execute client command document-id))
       (require 'find-file)
       (ff-find-other-file))))
+
+(defun ada-ts-mode--alire-project-file ()
+  "Determine name of GNAT Project file, using Alire."
+  (let* ((alire-file "alire.toml")
+         (alire-path (locate-dominating-file (buffer-file-name) alire-file)))
+    (when (and alire-path
+               (file-readable-p (expand-file-name alire-file alire-path))
+               (executable-find ada-ts-mode-alire-program))
+      (let* ((default-directory (file-name-directory alire-path))
+             (lines (process-lines ada-ts-mode-alire-program
+                                   "--non-interactive" "--no-tty" "show"))
+             (file-name
+              (seq-first
+               (or
+
+                (seq-keep
+                 (lambda (line)
+                   (when (string-match (rx (+ space)
+                                           "Project_File: "
+                                           (group (+ anychar)))
+                                       line)
+                     (match-string 1 line)))
+                 lines)
+                ;; Use crate name.
+                (seq-keep
+                 (lambda (line)
+                   (when (string-match (rx bos (group (+ (not "="))) "=")
+                                       line)
+                     (concat (match-string 1 line) ".gpr")))
+                 lines)))))
+        (expand-file-name file-name)))))
+
+(defun ada-ts-mode--default-project-file ()
+  "Determine name of GNAT Project file, looking for default project."
+  (when-let* ((gpr-file "default.gpr")
+              (gpr-path (locate-dominating-file (buffer-file-name) gpr-file)))
+    (expand-file-name gpr-file gpr-path)))
+
+(defun ada-ts-mode--lsp-project-file ()
+  "Determine name of GNAT Project file, using Language Server."
+  (let ((client (ada-ts-mode--lsp-active-client))
+        (command ada-ts-mode--lsp-command-project-file))
+    (if (and client
+             (ada-ts-mode-lsp-command-supported-p client command))
+        (ada-ts-mode-lsp-command-execute client command))))
+
+(defun ada-ts-mode--root-project-file ()
+  "Determine name of GNAT Project file, looking in root directory."
+  (require 'project)
+  (declare-function project-root "project")
+  (when-let* ((project (project-current))
+              (root-dir (project-root project))
+              (files (directory-files root-dir nil (rx ".gpr" eos) 'nosort)))
+    (when (= (length files) 1)
+      (expand-file-name (car files) root-dir))))
+
+(defun ada-ts-mode--project-file ()
+  "Determine name of GNAT Project file, if exists."
+  (or (ada-ts-mode--lsp-project-file)
+      (ada-ts-mode--alire-project-file)
+      (ada-ts-mode--root-project-file)
+      (ada-ts-mode--default-project-file)))
+
+(defun ada-ts-mode-find-project-file ()
+  "Find GNAT Project file."
+  (interactive)
+  (if-let ((project-file (ada-ts-mode--project-file)))
+      (find-file project-file)
+    (message "Project file unknown or non-existent.")))
 
 ;;; Imenu
 
