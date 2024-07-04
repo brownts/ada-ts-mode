@@ -459,45 +459,21 @@ order to initialize after the directory local variables have been
 initialized.  Refer to the documentation for the specific LSP client
 used for details.
 
-The following user option can be customized to modify the supported
-LSP clients.
+A generic interface is used to support different LSP clients.  This
+interface is described in @samp{ada-ts-mode-lspclient.el}.  There are
+separate files for each supported LSP client which implement those
+interfaces.  These separate files are configured to automatically load
+when both @code{ada-ts-mode} and the corresponding LSP client package have
+been loaded.
 
-@defopt ada-ts-mode-lsp-clients
-Provides a list of LSP clients for use by @code{ada-ts-mode}.  This
-prevents the mode from depending directly on a specific LSP client.
-An entry is provided in the list for each supported LSP client.  If
-no LSP enhanced support is desired, either don't activate an LSP
-client in the buffer or set the list of LSP clients to nil.
-@end defopt
-
-To add an unsupported LSP client, an entry must be added to
-@code{ada-ts-mode-lsp-clients} and a set of methods must be implemented for
-that entry which provide interfacing between @code{ada-ts-mode} and the
-corresponding LSP client.  The methods must specialize on the client
-parameter such that the entry in @code{ada-ts-mode-lsp-clients} can be used
-to dispatch to the correct implementation.  The following are the list
-of required methods:
-
-@defun ada-ts-mode-lsp-active-p client
-Determines whether the LSP client is active in the current buffer.
-@end defun
-
-@defun ada-ts-mode-lsp-command-execute client command arguments
-Execute Language Server command with optional arguments.
-@end defun
-
-@defun ada-ts-mode-lsp-command-supported-p client command
-Determines if Language Server supports command.
-@end defun
-
-@defun ada-ts-mode-lsp-document-id client
-Determine document identifier corresponding to current buffer.
-@end defun
-
-@defun ada-ts-mode-lsp-format-region client beg end
-Format using the Language Server for the specified region of the
-current buffer.
-@end defun
+To add an unsupported LSP client, add client-specific methods for all
+of the interfaces described in @samp{ada-ts-mode-lspclient.el}.  In addition,
+a parameterless function for that client should be added to the
+@code{ada-ts-mode-lspclient-find-functions} hook variable (via @code{add-hook}).
+That function, when invoked, should determine if the LSP client is
+active in the current buffer, and when active, return an LSP client
+instance (which can be used to dispatch on the client-specific
+methods), else return @code{nil}.
 
 @node Troubleshooting
 @chapter Troubleshooting

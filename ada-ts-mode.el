@@ -34,9 +34,9 @@
 
 ;;; Code:
 
+(require 'ada-ts-mode-lspclient)
 (require 'lisp-mnt)
 (require 'treesit)
-(eval-when-compile (require 'cl-generic))
 (eval-when-compile (require 'rx))
 
 (declare-function treesit-parser-create "treesit.c")
@@ -164,13 +164,6 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "Indentation" "(ada-ts-mode)Indentation")
   :package-version "0.7.0")
 ;;;###autoload(put 'ada-ts-mode-indent-offset 'safe-local-variable #'integerp)
-
-(defcustom ada-ts-mode-lsp-clients '(eglot lsp-mode)
-  "LSP Clients."
-  :type '(repeat (symbol :tag "LSP Client"))
-  :group 'ada-ts
-  :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
-  :package-version "0.7.0")
 
 (defcustom ada-ts-mode-other-file-alist
   `((,(rx   ".ads" eos) (  ".adb"))
@@ -643,98 +636,6 @@ but it isn't an actual function call."
                  "out"
                  (treesit-node-type n))))))))
 
-;;; LSP Client
-
-(cl-defgeneric ada-ts-mode-lsp-active-p (client)
-  "Determine if CLIENT is active in current buffer.")
-
-(cl-defgeneric ada-ts-mode-lsp-command-execute (client command &rest arguments)
-  "Execute COMMAND with ARGUMENTS using Language Server, via CLIENT.")
-
-(cl-defgeneric ada-ts-mode-lsp-command-supported-p (client command)
-  "Deterine if Language Server supports COMMAND, via CLIENT.")
-
-(cl-defgeneric ada-ts-mode-lsp-document-id (client)
-  "Determine document id of current buffer, via CLIENT.")
-
-(cl-defgeneric ada-ts-mode-lsp-format-region (client beg end)
-  "Format region BEG to END using Language Server, via CLIENT.")
-
-;;;; LSP Client (eglot)
-
-(cl-defmethod ada-ts-mode-lsp-active-p ((_client (eql eglot)))
-  "Determine if Eglot is active in current buffer."
-  (and (functionp 'eglot-managed-p)
-       (eglot-managed-p)))
-
-(cl-defmethod ada-ts-mode-lsp-command-execute ((_client (eql eglot)) command &rest arguments)
-  "Execute COMMAND with ARGUMENTS using Language Server, via Eglot."
-  (cond ((and (functionp 'eglot-execute)
-              (functionp 'eglot-current-server))
-         (eglot-execute
-          (eglot-current-server)
-          `( :command   ,command
-             :arguments ,(vconcat arguments))))
-        ((and (functionp 'eglot-execute-command)
-              (functionp 'eglot-current-server))
-         (eglot-execute-command
-          (eglot-current-server)
-          command (vconcat arguments)))))
-
-(cl-defmethod ada-ts-mode-lsp-command-supported-p ((_client (eql eglot)) command)
-  "Deterine if Language Server supports COMMAND, via Eglot."
-  (when (functionp 'eglot-server-capable)
-    (when-let* ((command-provider (eglot-server-capable :executeCommandProvider))
-                (commands (plist-get command-provider :commands)))
-      (seq-contains-p commands command))))
-
-(cl-defmethod ada-ts-mode-lsp-document-id ((_client (eql eglot)))
-  "Determine document id of current buffer, via Eglot."
-  (when (functionp 'eglot--TextDocumentIdentifier)
-    (eglot--TextDocumentIdentifier)))
-
-(cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql eglot)) beg end)
-  "Format region BEG to END of using Language Server, via Eglot."
-  (let ((tab-width ada-ts-mode-indent-offset)) ; eglot uses `tab-width'
-    (and (functionp 'eglot-format)
-         (eglot-format beg end))))
-
-;;;; LSP Client (lsp-mode)
-
-(cl-defmethod ada-ts-mode-lsp-active-p ((_client (eql lsp-mode)))
-  "Determine if lsp-mode is active in current buffer."
-  (and (local-variable-p 'lsp-mode)
-       lsp-mode))
-
-(cl-defmethod ada-ts-mode-lsp-command-execute ((_client (eql lsp-mode)) command &rest arguments)
-  "Execute COMMAND with ARGUMENTS using Language Server, via lsp-mode."
-  (when (functionp 'lsp-workspace-command-execute)
-    (lsp-workspace-command-execute command (vconcat arguments))))
-
-(cl-defmethod ada-ts-mode-lsp-command-supported-p ((_client (eql lsp-mode)) command)
-  "Deterine if Language Server supports COMMAND, via lsp-mode."
-  (when (functionp 'lsp-can-execute-command?)
-    (lsp-can-execute-command? command)))
-
-(cl-defmethod ada-ts-mode-lsp-document-id ((_client (eql lsp-mode)))
-  "Determine document id of current buffer, via lsp-mode."
-  (when (functionp 'lsp-text-document-identifier)
-    (lsp-text-document-identifier)))
-
-(cl-defmethod ada-ts-mode-lsp-format-region ((_client (eql lsp-mode)) beg end)
-  "Format region BEG to END using Language Server, via lsp-mode."
-  (and (functionp 'lsp-format-region)
-       (lsp-format-region beg end)))
-
-;;; LSP Support
-
-(defconst ada-ts-mode--lsp-command-other-file "als-other-file")
-(defconst ada-ts-mode--lsp-command-project-file "als-project-file")
-
-(defun ada-ts-mode--lsp-active-client ()
-  "Determine active LSP client, if any."
-  (seq-find #'ada-ts-mode-lsp-active-p ada-ts-mode-lsp-clients))
-
 ;;; Indent Support
 
 (defun ada-ts-mode--lsp-indent-line ()
@@ -742,7 +643,7 @@ but it isn't an actual function call."
 
 Indent relative to previous line for newlines and whenever the region
 formatting function fails."
-  (if-let* ((client (ada-ts-mode--lsp-active-client)))
+  (if-let* ((client (ada-ts-mode-lspclient-current)))
       (if (string-match (rx bos (zero-or-more space) eos)
                         (buffer-substring (pos-bol) (pos-eol)))
           ;; Handle extraneous space as well as implement a workaround
@@ -787,10 +688,10 @@ formatting function fails."
   "Perform region indentation between BEG and END using LSP server.
 
 When CLIENT is not nil, use it as the active LSP client."
-  (if-let* ((client (or client (ada-ts-mode--lsp-active-client))))
+  (if-let* ((client (or client (ada-ts-mode-lspclient-current))))
       (let ((inhibit-message t)
             (standard-indent ada-ts-mode-indent-offset))
-        (ada-ts-mode-lsp-format-region client beg end))
+        (ada-ts-mode-lspclient-format-region client beg end))
     ;; fallback on default indentation
     (ada-ts-mode--default-indent-region beg end)))
 
@@ -844,12 +745,12 @@ When CLIENT is not nil, use it as the active LSP client."
 (defun ada-ts-mode-find-other-file ()
   "Find other Ada file."
   (interactive)
-  (let ((client (ada-ts-mode--lsp-active-client))
-        (command ada-ts-mode--lsp-command-other-file))
+  (let ((client (ada-ts-mode-lspclient-current))
+        (command "als-other-file"))
     (if (and client
-             (ada-ts-mode-lsp-command-supported-p client command))
-        (let ((document-id (ada-ts-mode-lsp-document-id client)))
-          (ada-ts-mode-lsp-command-execute client command document-id))
+             (ada-ts-mode-lspclient-command-supported-p client command))
+        (let ((document-id (ada-ts-mode-lspclient-document-id client)))
+          (ada-ts-mode-lspclient-command-execute client command document-id))
       (require 'find-file)
       (ff-find-other-file))))
 
@@ -892,11 +793,22 @@ When CLIENT is not nil, use it as the active LSP client."
 
 (defun ada-ts-mode--lsp-project-file ()
   "Determine name of GNAT Project file, using Language Server."
-  (let ((client (ada-ts-mode--lsp-active-client))
-        (command ada-ts-mode--lsp-command-project-file))
-    (if (and client
-             (ada-ts-mode-lsp-command-supported-p client command))
-        (ada-ts-mode-lsp-command-execute client command))))
+
+  ;; First, check the workspace configuration.  This is preferred if
+  ;; the actual project file cannot be found since the Language Server
+  ;; will return a default project file name (when queried for the
+  ;; project file) when it can't find the configured project file.  In
+  ;; this situation we prefer the non-existent user configured project
+  ;; file over a non-existent Language Server project file.
+  (when-let*
+      ((client (ada-ts-mode-lspclient-current))
+       (project-file
+        (or (ada-ts-mode-lspclient-workspace-configuration client "ada.projectFile")
+            (let ((command "als-project-file"))
+              (and (ada-ts-mode-lspclient-command-supported-p client command)
+                   (ada-ts-mode-lspclient-command-execute client command))))))
+    (let ((root (ada-ts-mode-lspclient-workspace-root client (buffer-file-name))))
+      (expand-file-name project-file root))))
 
 (defun ada-ts-mode--root-project-file ()
   "Determine name of GNAT Project file, looking in root directory."
