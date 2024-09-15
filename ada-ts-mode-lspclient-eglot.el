@@ -58,10 +58,7 @@
 
 (cl-defmethod ada-ts-mode-lspclient-format-region ((_client (eql eglot)) beg end)
   "Format region BEG to END of using Language Server."
-  (let ((tab-width ; eglot uses `tab-width' to specify indentation
-         (cond ((local-variable-p 'standard-indent) standard-indent)
-               (t tab-width))))
-    (eglot-format beg end)))
+  (eglot-format beg end))
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope)
   "Retrieve workspace configuration for SCOPE."

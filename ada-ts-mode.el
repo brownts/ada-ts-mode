@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.7.0
+;; Version: 0.7.1
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -690,6 +690,7 @@ formatting function fails."
 When CLIENT is not nil, use it as the active LSP client."
   (if-let* ((client (or client (ada-ts-mode-lspclient-current))))
       (let ((inhibit-message t)
+            (tab-width ada-ts-mode-indent-offset)
             (standard-indent ada-ts-mode-indent-offset))
         (ada-ts-mode-lspclient-format-region client beg end))
     ;; fallback on default indentation
