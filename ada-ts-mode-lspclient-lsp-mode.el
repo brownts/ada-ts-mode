@@ -1,6 +1,6 @@
 ;;; ada-ts-mode-lspclient-lsp-mode.el -- LSP client interface for lsp-mode -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 Troy Brown
+;; Copyright (C) 2024-2025 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 

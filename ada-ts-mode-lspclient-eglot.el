@@ -1,7 +1,6 @@
 ;;; ada-ts-mode-lspclient-eglot.el -- LSP client interface for Eglot -*- lexical-binding: t; -*-
 
-
-;; Copyright (C) 2024 Troy Brown
+;; Copyright (C) 2024-2025 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 

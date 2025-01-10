@@ -1,6 +1,6 @@
 ;;; ada-ts-mode-tests.el --- Tests for Tree-sitter-based Ada mode -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 Troy Brown
+;; Copyright (C) 2023-2025 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 

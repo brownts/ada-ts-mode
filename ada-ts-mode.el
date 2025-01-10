@@ -1,6 +1,6 @@
 ;;; ada-ts-mode.el --- Major mode for Ada using Tree-sitter  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 Troy Brown
+;; Copyright (C) 2023-2025 Troy Brown
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
