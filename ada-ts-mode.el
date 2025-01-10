@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.7.2
+;; Version: 0.7.3
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -37,6 +37,8 @@
 (require 'ada-ts-mode-lspclient)
 (require 'lisp-mnt)
 (require 'treesit)
+(require 'url-parse)
+(require 'url-util)
 (eval-when-compile (require 'rx))
 
 (declare-function treesit-parser-create "treesit.c")
@@ -801,15 +803,34 @@ When CLIENT is not nil, use it as the active LSP client."
   ;; project file) when it can't find the configured project file.  In
   ;; this situation we prefer the non-existent user configured project
   ;; file over a non-existent Language Server project file.
+
+  ;; NOTE: Older versions of the Ada Language Server returned a file
+  ;; path for the als-project-file command, but newer versions return
+  ;; a URI instead.
+
   (when-let*
       ((client (ada-ts-mode-lspclient-current))
-       (project-file
+       (project-file-path-or-uri
         (or (ada-ts-mode-lspclient-workspace-configuration client "ada.projectFile")
             (let ((command "als-project-file"))
               (and (ada-ts-mode-lspclient-command-supported-p client command)
-                   (ada-ts-mode-lspclient-command-execute client command))))))
-    (let ((root (ada-ts-mode-lspclient-workspace-root client (buffer-file-name))))
-      (expand-file-name project-file root))))
+                   (ada-ts-mode-lspclient-command-execute client command)))))
+       (project-file
+        (let* ((obj (url-generic-parse-url (url-unhex-string project-file-path-or-uri)))
+               (type (url-type obj)))
+          (if (and type (string-equal type "file"))
+              (let ((path (url-filename obj)))
+                (if (and (eq system-type 'windows-nt)
+                         (string-equal (substring path 0 1) "/"))
+                    (substring path 1) ; Strip leading separator on Windows
+                  path))
+            ;; Doesn't appear to be a URI, treat as path
+            project-file-path-or-uri)))
+       (root (ada-ts-mode-lspclient-workspace-root client (buffer-file-name))))
+    ;; The Ada Language Server can return an empty string when it
+    ;; can't find the project file.
+    (unless (string-empty-p project-file)
+      (directory-file-name (expand-file-name project-file root)))))
 
 (defun ada-ts-mode--root-project-file ()
   "Determine name of GNAT Project file, looking in root directory."
