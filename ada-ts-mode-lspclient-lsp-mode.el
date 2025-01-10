@@ -88,7 +88,7 @@
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-root ((_client (eql lsp-mode)) path)
   "Determine workspace root for PATH."
-  (when-let ((root (lsp-workspace-root path)))
+  (when-let* ((root (lsp-workspace-root path)))
     (file-name-as-directory (expand-file-name root))))
 
 (add-hook 'ada-ts-mode-lspclient-find-functions #'ada-ts-mode-lspclient-lsp-mode)

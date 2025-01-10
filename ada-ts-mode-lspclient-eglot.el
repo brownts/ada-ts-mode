@@ -50,9 +50,9 @@
 
 (cl-defmethod ada-ts-mode-lspclient-document-id ((_client (eql eglot)))
   "Determine document identifier of current buffer."
-  (when-let ((path-to-uri
-              (cond ((functionp 'eglot-path-to-uri)  #'eglot-path-to-uri)
-                    ((functionp 'eglot--path-to-uri) #'eglot--path-to-uri))))
+  (when-let* ((path-to-uri
+               (cond ((functionp 'eglot-path-to-uri)  #'eglot-path-to-uri)
+                     ((functionp 'eglot--path-to-uri) #'eglot--path-to-uri))))
     `(:uri ,(funcall path-to-uri (buffer-file-name)))))
 
 (cl-defmethod ada-ts-mode-lspclient-format-region ((_client (eql eglot)) beg end)
@@ -61,8 +61,8 @@
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope)
   "Retrieve workspace configuration for SCOPE."
-  (when-let ((namespaces (string-split scope "\\."))
-             (plist (eglot--workspace-configuration-plist (eglot-current-server))))
+  (when-let* ((namespaces (string-split scope "\\."))
+              (plist (eglot--workspace-configuration-plist (eglot-current-server))))
     ;; Remove scope namespaces
     (seq-do
      (lambda (namespace)
@@ -72,13 +72,13 @@
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-root ((_client (eql eglot)) path)
   "Determine workspace root for PATH."
-  (when-let ((expanded-path (expand-file-name path))
-             (workspace-folders
-              (seq-map
-               (lambda (folder)
-                 (file-name-as-directory
-                  (expand-file-name (plist-get folder :name))))
-               (eglot-workspace-folders (eglot-current-server)))))
+  (when-let* ((expanded-path (expand-file-name path))
+              (workspace-folders
+               (seq-map
+                (lambda (folder)
+                  (file-name-as-directory
+                   (expand-file-name (plist-get folder :name))))
+                (eglot-workspace-folders (eglot-current-server)))))
     (seq-find
      (lambda (folder)
        (string-prefix-p folder expanded-path))

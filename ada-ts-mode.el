@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.7.1
+;; Version: 0.7.2
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -698,12 +698,12 @@ When CLIENT is not nil, use it as the active LSP client."
 
 (defun ada-ts-mode--default-indent-line ()
   "Perform line indentation using default implementation."
-  (if-let ((indent-line (default-value 'indent-line-function)))
+  (if-let* ((indent-line (default-value 'indent-line-function)))
       (funcall indent-line)))
 
 (defun ada-ts-mode--default-indent-region (beg end)
   "Perform region indentation between BEG and END using default implementation."
-  (if-let ((indent-region (default-value 'indent-region-function)))
+  (if-let* ((indent-region (default-value 'indent-region-function)))
       (funcall indent-region beg end)))
 
 (defun ada-ts-mode--indent-line ()
@@ -831,7 +831,7 @@ When CLIENT is not nil, use it as the active LSP client."
 (defun ada-ts-mode-find-project-file ()
   "Find GNAT Project file."
   (interactive)
-  (if-let ((project-file (ada-ts-mode--project-file)))
+  (if-let* ((project-file (ada-ts-mode--project-file)))
       (find-file project-file)
     (message "Project file unknown or non-existent.")))
 
