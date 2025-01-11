@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.7.3
+;; Version: 0.7.4
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -62,7 +62,7 @@
   :risky t
   :group 'ada-ts
   :link '(url-link :tag "Alire Website" "https://alire.ada.dev/")
-  :package-version "0.7.0")
+  :package-version '(ada-ts-mode . "0.7.0"))
 
 (defcustom ada-ts-mode-grammar "https://github.com/briot/tree-sitter-ada"
   "Configuration for downloading and installing the tree-sitter language grammar.
@@ -78,7 +78,7 @@ specified.  See `treesit-language-source-alist' for full details."
                        (choice :tag "C++ Compiler" (const :tag "Default" nil) string)))
   :group 'ada-ts
   :link '(custom-manual :tag "Grammar Installation" "(ada-ts-mode)Grammar Installation")
-  :package-version "0.5.0")
+  :package-version '(ada-ts-mode . "0.5.0"))
 
 (defcustom ada-ts-mode-grammar-install 'prompt
   "Configuration for installation of tree-sitter language grammar library."
@@ -87,7 +87,7 @@ specified.  See `treesit-language-source-alist' for full details."
                  (const :tag "Do not install" nil))
   :group 'ada-ts
   :link '(custom-manual :tag "Grammar Installation" "(ada-ts-mode)Grammar Installation")
-  :package-version "0.5.0")
+  :package-version '(ada-ts-mode . "0.5.0"))
 
 (defcustom ada-ts-mode-imenu-categories
   '(package
@@ -107,7 +107,7 @@ specified.  See `treesit-language-source-alist' for full details."
                          (const :tag "With Clause" with-clause)))
   :group 'ada-ts
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
-  :package-version "0.6.0")
+  :package-version '(ada-ts-mode . "0.6.0"))
 
 (defcustom ada-ts-mode-imenu-category-name-alist
   '((package          . "Package")
@@ -120,7 +120,7 @@ specified.  See `treesit-language-source-alist' for full details."
   :type '(alist :key-type symbol :value-type string)
   :group 'ada-ts
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
-  :package-version "0.6.0")
+  :package-version '(ada-ts-mode . "0.6.0"))
 
 (defcustom ada-ts-mode-imenu-nesting-strategy-function
   #'ada-ts-mode-imenu-nesting-strategy-before
@@ -132,14 +132,14 @@ specified.  See `treesit-language-source-alist' for full details."
                  (function :tag "Custom function"))
   :group 'ada-ts
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
-  :package-version "0.5.8")
+  :package-version '(ada-ts-mode . "0.5.8"))
 
 (defcustom ada-ts-mode-imenu-nesting-strategy-placeholder "<<parent>>"
   "Placeholder for an item used in some Imenu nesting strategies."
   :type 'string
   :group 'ada-ts
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
-  :package-version "0.5.8")
+  :package-version '(ada-ts-mode . "0.5.8"))
 
 (defcustom ada-ts-mode-imenu-sort-function #'identity
   "Configuration for Imenu sorting function."
@@ -148,7 +148,7 @@ specified.  See `treesit-language-source-alist' for full details."
                  (function :tag "Custom function"))
   :group 'ada-ts
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
-  :package-version "0.5.8")
+  :package-version '(ada-ts-mode . "0.5.8"))
 
 (defcustom ada-ts-mode-indent-backend 'default
   "Backend used for indentation."
@@ -156,7 +156,7 @@ specified.  See `treesit-language-source-alist' for full details."
                  (const :tag "Language Server" lsp))
   :group 'ada-ts
   :link '(custom-manual :tag "Indentation" "(ada-ts-mode)Indentation")
-  :package-version "0.7.0")
+  :package-version '(ada-ts-mode . "0.7.0"))
 ;;;###autoload(put 'ada-ts-mode-indent-backend 'safe-local-variable #'symbolp)
 
 (defcustom ada-ts-mode-indent-offset 3
@@ -164,7 +164,7 @@ specified.  See `treesit-language-source-alist' for full details."
   :type 'integer
   :group 'ada-ts
   :link '(custom-manual :tag "Indentation" "(ada-ts-mode)Indentation")
-  :package-version "0.7.0")
+  :package-version '(ada-ts-mode . "0.7.0"))
 ;;;###autoload(put 'ada-ts-mode-indent-offset 'safe-local-variable #'integerp)
 
 (defcustom ada-ts-mode-other-file-alist
@@ -180,7 +180,7 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "Navigation" "(ada-ts-mode)Navigation")
   :link '(function-link ff-find-other-file)
   :link '(variable-link ff-other-file-alist)
-  :package-version "0.7.0")
+  :package-version '(ada-ts-mode . "0.7.0"))
 
 ;;; Syntax
 
