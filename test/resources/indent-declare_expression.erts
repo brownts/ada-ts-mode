@@ -13,7 +13,7 @@ package body Test is
          Z : constant Integer := X + Y;
       begin
          Z +
-           3);
+         3);
 end Test;
 =-=-=
 
@@ -34,6 +34,6 @@ package body Test is
          Z : constant Integer := X + Y;
       begin
          Z +
-           3);
+         3);
 end Test;
 =-=-=
