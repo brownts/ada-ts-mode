@@ -22,16 +22,16 @@
 ;;; Code:
 
 (require 'cl-generic)
-(eval-when-compile
-  ;; Needed for cl-labels
-  (require 'cl-lib))
 
 (declare-function lsp-can-execute-command?      "ext:lsp-mode" (command-name))
 (declare-function lsp-configuration-section     "ext:lsp-mode" (section))
 (declare-function lsp-format-region             "ext:lsp-mode" (s e))
 (declare-function lsp-text-document-identifier  "ext:lsp-mode" ())
+(declare-function lsp-workspaces                "ext:lsp-mode" ())
 (declare-function lsp-workspace-command-execute "ext:lsp-mode" (command &optional args))
 (declare-function lsp-workspace-root            "ext:lsp-mode" (&optional path))
+(declare-function lsp--workspace-buffers        "ext:lsp-mode" (workspace))
+(defvar lsp-clients nil)
 
 (defun ada-ts-mode-lspclient-lsp-mode ()
   "Return lsp-mode client."
@@ -41,7 +41,8 @@
 
 (cl-defmethod ada-ts-mode-lspclient-command-execute ((_client (eql lsp-mode)) command &rest arguments)
   "Execute COMMAND with ARGUMENTS using Language Server."
-  (lsp-workspace-command-execute command (vconcat arguments)))
+  (ada-ts-mode-lspclient--lsp-mode-normalize
+   (lsp-workspace-command-execute command (vconcat arguments))))
 
 (cl-defmethod ada-ts-mode-lspclient-command-supported-p ((_client (eql lsp-mode)) command)
   "Determine if Language Server supports COMMAND."
@@ -57,41 +58,85 @@
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql lsp-mode)) scope)
   "Retrieve workspace configuration for SCOPE."
-  (cl-labels
-      ((htable-to-plist (htable)
-         (let ((plist))
-           (maphash
-            (lambda (key value)
-              (setq value
-                    (cond ((hash-table-p value)
-                           (htable-to-plist value))
-                          ((vectorp value)
-                           (append value nil))
-                          ((eq value :json-false)
-                           nil)
-                          (t value)))
-              (when value
-                (setq plist (plist-put plist
-                                       (intern (concat ":" key))
-                                       value))))
-            htable)
-           plist)))
-    (when-let* ((namespaces (string-split scope "\\."))
-                (htable (lsp-configuration-section (car namespaces)))
-                (plist (htable-to-plist htable)))
-      ;; Remove scope namespaces
-      (seq-do
-       (lambda (namespace)
-         (setq plist (plist-get plist (intern (concat ":" namespace)))))
-       namespaces)
-      plist)))
+  (when-let* ((namespaces (string-split scope "\\."))
+              (htable (lsp-configuration-section (car namespaces)))
+              (plist (ada-ts-mode-lspclient--lsp-mode-normalize htable)))
+    ;; Remove scope namespaces
+    (seq-do
+     (lambda (namespace)
+       (setq plist (plist-get plist (intern (concat ":" namespace)))))
+     namespaces)
+    plist))
+
+(defvar ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist nil)
+
+(cl-defmethod ada-ts-mode-lspclient-workspace-dirs-add ((_client (eql lsp-mode)) dirs)
+  "Add workspace DIRS to session."
+  (when-let* ((root (ada-ts-mode-lspclient-workspace-root 'lsp-mode (buffer-file-name))))
+    (setq dirs (seq-filter
+                (lambda (dir)
+                  (not (string-prefix-p root dir)))
+                dirs))
+    (setq ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist
+          (assoc-delete-all root ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist))
+    (when dirs
+      (push (cons root dirs) ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist))))
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-root ((_client (eql lsp-mode)) path)
   "Determine workspace root for PATH."
   (when-let* ((root (lsp-workspace-root path)))
     (file-name-as-directory (expand-file-name root))))
 
+(defun ada-ts-mode-lspclient--lsp-mode-normalize (value)
+  "Normalize VALUE using lists, property lists, etc."
+  (cond ((hash-table-p value)
+         (let ((plist))
+           (maphash
+            (lambda (key value)
+              (setq value (ada-ts-mode-lspclient--lsp-mode-normalize value))
+              (when value
+                (setq plist (plist-put plist
+                                       (intern (concat ":" key))
+                                       value))))
+            value)
+           plist))
+        ((listp value)
+         (seq-map #'ada-ts-mode-lspclient--lsp-mode-normalize value))
+        ((vectorp value)
+         (append (seq-map #'ada-ts-mode-lspclient--lsp-mode-normalize value) nil))
+        ((eq value :json-false) nil)
+        (t value)))
+
+(defun ada-ts-mode-lspclient--lsp-mode-initialized ()
+  "Notify registered hooks of LSP session establishment."
+  (when-let* ((workspace (car (lsp-workspaces)))
+              (buffer (car (lsp--workspace-buffers workspace))))
+    (with-current-buffer  buffer
+      (run-hooks 'ada-ts-mode-lspclient-session-hook))))
+
 (add-hook 'ada-ts-mode-lspclient-find-functions #'ada-ts-mode-lspclient-lsp-mode)
+(add-hook 'lsp-after-initialize-hook #'ada-ts-mode-lspclient--lsp-mode-initialized)
+
+(defvar ada-ts-mode-lspclient--lsp-library-folders-fn nil)
+
+(defun ada-ts-mode-lspclient--lsp-extra-folders (workspace)
+  "Find extra folders for WORKSPACE."
+  (let (folders)
+    (when ada-ts-mode-lspclient--lsp-library-folders-fn
+      (setq folders (funcall ada-ts-mode-lspclient--lsp-library-folders-fn workspace)))
+    (if-let* ((buffer (car (lsp--workspace-buffers workspace)))
+              (root (ada-ts-mode-lspclient-workspace-root 'lsp-mode (buffer-file-name buffer))))
+        (append folders
+                (cdr (assoc-string root ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist)))
+      folders)))
+
+(with-eval-after-load 'lsp-ada
+  (eval
+   '(when-let* ((client (gethash 'ada-ls lsp-clients)))
+      (setq ada-ts-mode-lspclient--lsp-library-folders-fn
+            (lsp--client-library-folders-fn client))
+      (setf (lsp--client-library-folders-fn client)
+            #'ada-ts-mode-lspclient--lsp-extra-folders))))
 
 (provide 'ada-ts-mode-lspclient-lsp-mode)
 

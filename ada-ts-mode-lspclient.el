@@ -32,6 +32,9 @@ form of the client instance is up to each respective function; the only
 practical limitation is to use values that `cl-defmethod' can dispatch
 on.")
 
+(defvar ada-ts-mode-lspclient-session-hook nil
+  "Hook called when an LSP session is established.")
+
 (defun ada-ts-mode-lspclient-current ()
   "Return the client instance for the current buffer."
   (run-hook-with-args-until-success
@@ -59,6 +62,9 @@ returned as a property list, whose keys are case-preserved keywords.
 When scope's final element is a field, the value of the field is
 returned.  When scope does not represent an existing section or field in
 the configuration, nil is returned.")
+
+(cl-defgeneric ada-ts-mode-lspclient-workspace-dirs-add (_client dirs)
+  "Add workspace DIRS to session.")
 
 (cl-defgeneric ada-ts-mode-lspclient-workspace-root (_client path)
   "Determine workspace root for PATH.")
