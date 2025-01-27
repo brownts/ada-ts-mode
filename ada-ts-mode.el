@@ -4,7 +4,7 @@
 
 ;; Author: Troy Brown <brownts@troybrown.dev>
 ;; Created: February 2023
-;; Version: 0.7.4
+;; Version: 0.7.5
 ;; Keywords: ada languages tree-sitter
 ;; URL: https://github.com/brownts/ada-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -856,6 +856,32 @@ When CLIENT is not nil, use it as the active LSP client."
       (find-file project-file)
     (message "Project file unknown or non-existent.")))
 
+;;; Language Server
+
+(defun ada-ts-mode--uri-to-path (uri)
+  "Convert URI to file path."
+  (let* ((obj (url-generic-parse-url (url-unhex-string uri)))
+         (path (url-filename obj)))
+    (when (and (eq system-type 'windows-nt)
+               (string-equal (substring path 0 1) "/"))
+      ;; Strip leading separator on Windows
+      (setq path (substring path 1)))
+    (directory-file-name path)))
+
+(defun ada-ts-mode--lsp-session-setup ()
+  "Perform LSP session setup."
+  (when-let* (((derived-mode-p 'ada-ts-mode))
+              (client (ada-ts-mode-lspclient-current))
+              (command "als-source-dirs")
+              ((ada-ts-mode-lspclient-command-supported-p client command))
+              (result (ada-ts-mode-lspclient-command-execute client command))
+              (source-dirs
+               (seq-map
+                (lambda (dir-info)
+                  (ada-ts-mode--uri-to-path (plist-get dir-info :uri)))
+                result)))
+    (ada-ts-mode-lspclient-workspace-dirs-add client source-dirs)))
+
 ;;; Imenu
 
 (defun ada-ts-mode--node-to-name (node)
@@ -1286,6 +1312,9 @@ the name of the branch given the branch node."
 
   ;; Other File.
   (setq-local ff-other-file-alist 'ada-ts-mode-other-file-alist)
+
+  ;; Language Server.
+  (add-hook 'ada-ts-mode-lspclient-session-hook #'ada-ts-mode--lsp-session-setup)
 
   (treesit-major-mode-setup))
 
