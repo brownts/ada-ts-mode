@@ -31,6 +31,7 @@
 (declare-function lsp-workspace-command-execute "ext:lsp-mode" (command &optional args))
 (declare-function lsp-workspace-root            "ext:lsp-mode" (&optional path))
 (declare-function lsp--workspace-buffers        "ext:lsp-mode" (workspace))
+(declare-function lsp--workspace-root           "ext:lsp-mode" (workspace))
 (defvar lsp-clients nil)
 
 (defun ada-ts-mode-lspclient-lsp-mode ()
@@ -72,7 +73,7 @@
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-dirs-add ((_client (eql lsp-mode)) dirs)
   "Add workspace DIRS to session."
-  (when-let* ((root (ada-ts-mode-lspclient-workspace-root 'lsp-mode (buffer-file-name))))
+  (when-let* ((root (lsp--workspace-root (car (lsp-workspaces)))))
     (setq dirs (seq-filter
                 (lambda (dir)
                   (not (string-prefix-p root dir)))
@@ -111,7 +112,7 @@
   "Notify registered hooks of LSP session establishment."
   (when-let* ((workspace (car (lsp-workspaces)))
               (buffer (car (lsp--workspace-buffers workspace))))
-    (with-current-buffer  buffer
+    (with-current-buffer buffer
       (run-hooks 'ada-ts-mode-lspclient-session-hook))))
 
 (add-hook 'ada-ts-mode-lspclient-find-functions #'ada-ts-mode-lspclient-lsp-mode)
@@ -124,8 +125,7 @@
   (let (folders)
     (when ada-ts-mode-lspclient--lsp-library-folders-fn
       (setq folders (funcall ada-ts-mode-lspclient--lsp-library-folders-fn workspace)))
-    (if-let* ((buffer (car (lsp--workspace-buffers workspace)))
-              (root (ada-ts-mode-lspclient-workspace-root 'lsp-mode (buffer-file-name buffer))))
+    (if-let* ((root (lsp--workspace-root workspace)))
         (append folders
                 (cdr (assoc-string root ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist)))
       folders)))
