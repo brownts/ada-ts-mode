@@ -1212,6 +1212,8 @@ the name of the branch given the branch node."
     ;; Remove empty categories
     (seq-filter (lambda (i) (cdr i)) imenu-alist)))
 
+(require 'ada-ts-casing)
+
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"
   "Major mode for editing Ada, powered by tree-sitter."

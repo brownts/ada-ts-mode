@@ -30,8 +30,8 @@ highlighting to be performed more accurately than historical methods
 
 This major mode provides support for syntax highlighting, navigation,
 Imenu, ``which function'' (i.e., displaying the current function name in
-the mode line), indentation (via LSP) and outlining (via
-@samp{outline-minor-mode}).
+the mode line), indentation (via LSP), outlining (via
+@samp{outline-minor-mode}) and casing.
 
 @strong{Note}: This major mode is based on the Emacs 29 (or newer) built-in
 tree-sitter support, not to be confused with the separate Emacs
@@ -52,6 +52,7 @@ required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 * Indentation::
 * Navigation::
 * Imenu::
+* Casing::
 * Miscellaneous Commands::
 * LSP Client Support::
 * Troubleshooting::
@@ -404,6 +405,63 @@ before any ``sorted'' items in order to put the placeholder at the top
 of the list.
 @end defopt
 
+@node Casing
+@chapter Casing
+
+Functionality is provided to manage casing within an Ada buffer.  This
+includes a number of commands to apply casing rules to point, to a
+region or to the entire buffer.  The commands can be used
+interactively, but may also be useful in other ways (such as calling
+the buffer casing command from the @samp{buffer-save-hook}).  An auto-casing
+minor mode is also provided which performs case formatting as you
+type.
+
+@defopt ada-ts-mode-case-formatting
+A set of casing rules, used by the casing commands and modes, which
+apply category specific formatting and dictionaries.
+@end defopt
+
+@deffn Command ada-ts-auto-case-mode
+A minor mode which applies casing corrections as you type at each
+word or subword boundary.
+@end deffn
+
+@deffn Command ada-ts-mode-case-format-region
+Applies formatting to the specified region for all items in the
+region which match the case formatting categories specified in
+@samp{ada-ts-mode-case-formatting}.  When the region doesn't start or stop
+exactly on a category boundary, the range is expanded to the
+category boundary.
+@end deffn
+
+@deffn Command ada-ts-mode-case-format-at-point
+Applies formatting to point, assuming the item at point matches a
+case formatting category specified in @samp{ada-ts-mode-case-formatting}.
+When no category is matched, no formatting is applied.
+@end deffn
+
+@deffn Command ada-ts-mode-case-format-buffer
+Applies formatting to the entire buffer for all items in the buffer
+which match the case formatting categories specified in
+@samp{ada-ts-mode-case-formatting}.
+@end deffn
+
+@deffn Command ada-ts-mode-case-format-dwim
+A convenience command which will select between ``region'' and ``at
+point'' formatting depending on whether a region is active in the
+buffer.
+@end deffn
+
+If none of the existing casing categories are sufficient, or an
+additional category is desired, a custom category can be created and
+used.  In order to create a category, a new category symbol should be
+added to @samp{ada-ts-mode-case-formatting} along with the corresponding
+formatter and optional dictionary properties.  Additionally, an
+implementation of @samp{ada-ts-mode-case-category-p} should be created,
+specializing on the new category symbol name.  Refer to existing
+instances of this predicate function to understand how current
+category functions are implemented.
+
 @node Miscellaneous Commands
 @chapter Miscellaneous Commands
 
@@ -578,7 +636,9 @@ indentation support through the Ada Language Server (assuming the user has confi
     :init
     ;; Configure source blocks for Org Mode.
     (with-eval-after-load 'org-src
-      (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))))
+      (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))
+    ;; Enable auto-casing
+    :hook (ada-ts-mode . ada-ts-auto-case-mode)))
 
 ;; Configure Electric Pair
 
