@@ -1,0 +1,115 @@
+Code: (lambda () (default-transform) (ada-ts-mode-case-format-buffer))
+
+Name: Buffer Formatting
+
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+BEGIN
+   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
+END HELLO_WORLD;
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");
+end Hello_World;
+=-=-=
+
+Name: Keyword Attribute Formatting
+
+=-=
+declare
+   x : ACCESS integer := y'access;
+begin
+   null;
+end;
+=-=
+declare
+   X : access Integer := Y'Access;
+begin
+   null;
+end;
+=-=-=
+
+Name: Keyword ".all" Formatting
+
+=-=
+declare
+   Y : Integer := X.ALL;
+begin
+   null;
+end;
+=-=
+declare
+   Y : Integer := X.all;
+begin
+   null;
+end;
+=-=-=
+
+Code: (lambda () (default-transform) (ada-ts-mode-case-format-region 46 60))
+
+Name: Region Formatting
+
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+BEGIN
+   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
+END HELLO_WORLD;
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+begin
+   Ada.Text_IO.PUT_LINE ("Hello, world!");
+END HELLO_WORLD;
+=-=-=
+
+Name: Point Formatting (keyword)
+
+Code: (lambda () (default-transform) (ada-ts-mode-case-format-at-point))
+
+Point-Char: |
+
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+BEG|IN
+   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
+END HELLO_WORLD;
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+beg|in
+   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
+END HELLO_WORLD;
+=-=-=
+
+Name: Point Formatting (identifier)
+
+Code: (lambda () (default-transform) (ada-ts-mode-case-format-at-point))
+
+Point-Char: |
+
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+BEGIN
+   ADA.TEXT_IO.PUT_LI|NE ("Hello, world!");
+END HELLO_WORLD;
+=-=
+WITH ADA.TEXT_IO;
+
+PROCEDURE HELLO_WORLD IS
+BEGIN
+   ADA.TEXT_IO.Put_Li|ne ("Hello, world!");
+END HELLO_WORLD;
+=-=-=
