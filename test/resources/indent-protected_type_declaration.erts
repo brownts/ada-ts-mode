@@ -3,6 +3,18 @@ Name: Nominal
 =-=
 package Test is
    protected type Test_Type is
+   end Test_Type;
+
+   protected type Test_Type is
+   private
+   end Test_Type;
+
+   protected type Test_Type is
+   private
+      X : Integer := 0;
+   end Test_Type;
+
+   protected type Test_Type is
       procedure Increment;
       procedure Decrement;
       function Value return Integer;

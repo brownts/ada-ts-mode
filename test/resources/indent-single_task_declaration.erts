@@ -5,6 +5,18 @@ package Test is
    task Test_Object;
 
    task Test_Object is
+   end Test_Object;
+
+   task Test_Object is
+   private
+   end Test_Object;
+
+   task Test_Object is
+   private
+      entry Write (X: in Item);
+   end Test_Object;
+
+   task Test_Object is
       entry Start;
       entry Stop;
    end Test_Object;

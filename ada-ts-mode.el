@@ -1170,7 +1170,7 @@ the name of the branch given the branch node."
 
   ;; Indent.
   (setq-local treesit-simple-indent-rules ada-ts-mode--indent-rules)
-  (setq-local electric-indent-chars (append ";>,)" electric-indent-chars))
+  (setq-local electric-indent-chars (append ";>," electric-indent-chars))
 
   ;; Outline minor mode (Emacs 30+)
   (setq-local treesit-outline-predicate #'ada-ts-mode--defun-p)

@@ -1,0 +1,55 @@
+Name: Broken Indent
+
+=-=
+procedure Test is
+  abstract;
+
+procedure Test
+  is
+  abstract;
+
+procedure Test
+  is
+  abstract
+;
+
+procedure
+  Test
+  is
+  abstract
+;
+
+not overriding procedure Test is
+  abstract;
+
+not overriding procedure Test
+  is
+  abstract;
+
+not overriding procedure Test
+  is
+  abstract
+;
+
+not overriding procedure
+  Test
+  is
+  abstract
+;
+=-=-=
+
+Name: Custom "subprogram is" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+       (setq-local ada-ts-mode-indent-subprogram-is-offset 8))))
+
+=-=
+not overriding procedure
+  Test
+        is
+  abstract
+;
+=-=-=

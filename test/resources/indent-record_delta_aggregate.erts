@@ -2,8 +2,7 @@ Name: Nominal
 
 =-=
 package Test is
-   type RGB_Record is
-   record
+   type RGB_Record is record
       Red   : Integer;
       Green : Integer;
       Blue  : Integer;
