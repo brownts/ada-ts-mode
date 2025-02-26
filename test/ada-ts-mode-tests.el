@@ -81,7 +81,13 @@ SETUP can be used to perform custom initialization."
             (insert-char ?\s)))
       (forward-line 1)
       (beginning-of-line)))
-  (indent-region (point-min) (point-max)))
+  (cl-letf (((symbol-function 'ada-ts-mode--anchor-catch-all)
+             (lambda ()
+               (lambda (node parent bol &rest _)
+                 (let ((prefix "Indentation using catch-all rule: ")
+                       (suffix (format "[NODE: %s, PARENT: %s, BOL: %s" node parent bol)))
+                   (ert-fail (concat prefix suffix)))))))
+    (indent-region (point-min) (point-max))))
 
 (defun newline-transform ()
   "Newline transform function for test."
