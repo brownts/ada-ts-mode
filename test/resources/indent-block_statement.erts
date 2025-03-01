@@ -8,10 +8,14 @@ begin
       X := X + 1;
    end;
 
-   BLOCK_LABEL:
-   begin
+   BLOCK_LABEL: begin
       X := X + 1;
    end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      begin
+         X := X + 1;
+      end BLOCK_LABEL;
 
    begin
       X := X + 1;
@@ -20,20 +24,40 @@ begin
          null;
    end;
 
+   BLOCK_LABEL: begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   end;
+
+   BLOCK_LABEL:
+      begin
+         X := X + 1;
+      exception
+         when others =>
+            null;
+      end;
+
    declare
       X : Integer := 0;
    begin
       X := X + 1;
    end;
 
-   BLOCK_LABEL:
-   declare
+   BLOCK_LABEL: declare
       X : Integer := 0;
    begin
       X := X + 1;
    end BLOCK_LABEL;
 
    BLOCK_LABEL:
+      declare
+         X : Integer := 0;
+      begin
+         X := X + 1;
+      end BLOCK_LABEL;
+
    declare
       X : Integer := 0;
    begin
@@ -41,20 +65,85 @@ begin
    exception
       when others =>
          null;
+   end;
+
+   BLOCK_LABEL: declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
    end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      declare
+         X : Integer := 0;
+      begin
+         X := X + 1;
+      exception
+         when others =>
+            null;
+      end BLOCK_LABEL;
 
    BLOCK_LABEL
    :
-   declare
+      declare
+         X : Integer := 0;
+      begin
+         X := X + 1;
+      exception
+         when others =>
+            null;
+      end
+        BLOCK_LABEL
+      ;
+end Test;
+=-=-=
+
+Name: Custom "label" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+     (setq-local ada-ts-mode-indent-label-offset 8))))
+
+=-=
+package body Test is
+begin
+   BLOCK_LABEL: begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   end;
+
+   BLOCK_LABEL:
+           begin
+              X := X + 1;
+           exception
+              when others =>
+                 null;
+           end;
+
+   BLOCK_LABEL: declare
       X : Integer := 0;
    begin
       X := X + 1;
    exception
       when others =>
          null;
-   end
-     BLOCK_LABEL
-   ;
+   end BLOCK_LABEL;
 
+   BLOCK_LABEL:
+           declare
+              X : Integer := 0;
+           begin
+              X := X + 1;
+           exception
+              when others =>
+                 null;
+           end BLOCK_LABEL;
 end Test;
 =-=-=

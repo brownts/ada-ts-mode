@@ -1,0 +1,39 @@
+Name: Nominal
+
+=-=
+package Test is
+   for Record_Type use record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end record;
+
+   for Record_Type use
+      record
+         X at 0 range 0 .. 31;
+         Y at 4 range 0 .. 31;
+      end record;
+end Test;
+=-=-=
+
+Name: Custom "record" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+     (setq-local ada-ts-mode-indent-record-offset 8))))
+
+=-=
+package Test is
+   for Record_Type use record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end record;
+
+   for Record_Type use
+           record
+              X at 0 range 0 .. 31;
+              Y at 4 range 0 .. 31;
+           end record;
+end Test;
+=-=-=
