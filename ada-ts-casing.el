@@ -360,10 +360,14 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   inserted."
   (when-let* ((type (treesit-node-type node)))
     (if (null last-input)
-        (and (string-equal type "identifier")
-             (not (string-match-p
-                   ada-ts-mode--casing-identifier-keywords-regex
-                   (downcase (treesit-node-text node 'no-property)))))
+        (or (and (string-match-p ada-ts-mode--casing-keyword-keywords-regex type)
+                 ;; An attribute name (e.g., "'Access").
+                 (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+                   (string-equal (treesit-node-type prev) "tick")))
+            (and (string-equal type "identifier")
+                 (not (string-match-p
+                       ada-ts-mode--casing-identifier-keywords-regex
+                       (downcase (treesit-node-text node 'no-property))))))
       (let ((text (downcase
                    (buffer-substring-no-properties
                     (treesit-node-start node)
