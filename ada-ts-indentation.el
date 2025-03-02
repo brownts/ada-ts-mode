@@ -26,7 +26,6 @@
 (require 'treesit)
 (eval-when-compile (require 'rx))
 
-(defvar ada-ts-mode--keywords nil) ; definition in ada-ts-mode.el
 (declare-function ada-ts-mode--defun-name   "ada-ts-mode" (node))
 (declare-function ada-ts-mode--node-to-name "ada-ts-mode" (node))
 
@@ -137,336 +136,341 @@ SYMBOL, else the default value is updated instead."
 
 ;;; Formal Indentation Rules
 
-(defvar ada-ts-mode--indent-rules
-  `((ada
-
-     ((or (query ((ERROR) @node))
-          (query ((ERROR _ @node)))
-          (query ((_ (ERROR) _ @node)))
-          no-node) ; newline
-      (anchor/best-effort)
-      (offset/best-effort))
-
-     ;; top-level
-     ((query ([(compilation      _ @node)
-               (compilation_unit _ @node)]))
-      column-0 0)
-
-     ;; with_clause / use_clause
-     ((query ([(with_clause [(identifier) (selected_component)]
-                            [(identifier) (selected_component) ","] @node)
-               (use_clause [(identifier) (selected_component)]
-                           [(identifier) (selected_component) ","] @node)]))
-      (anchor/first-sibling "identifier" "selected_component")
-      0)
-
-     ;; subunit
-     ((query ((subunit [(subprogram_body) (package_body) (task_body) (protected_body)] @node))) column-0                   0)
-     ((query ((subunit [(identifier) (selected_component)] @node)))                             (anchor/first-sibling "(") 1)
-
-     ;; aspect_mark_list / aspect_association
-     ((query ((aspect_specification) @node))      parent-bol ada-ts-mode-indent-broken-offset)
-     ((query ((aspect_mark_list) @node))          parent     ada-ts-mode-indent-broken-offset)
-     ((query ((aspect_mark_list _ @node)))        parent     0)
-     ((query ((aspect_association _ @node "=>"))) parent     0)
-
-     ;; expression
-     ((query ([(array_delta_aggregate (expression) @node)
-               (record_delta_aggregate (expression) @node)]))
-      parent
-      1)
-     ((query ((expression_function_declaration (expression) @node)))
-      (anchor/first-sibling "(")
-      1)
-     ((query ([(case_expression_alternative  (expression) @node)
-               (declare_expression           (expression) @node)
-               (if_expression         "then" (expression) @node)
-               (elsif_expression_item "then" (expression) @node)]))
-      parent
-      ada-ts-mode-indent-offset)
-
-     ((query ((expression) @node))   parent ada-ts-mode-indent-broken-offset)
-     ((query ((expression _ @node))) parent ada-ts-mode-indent-exp-item-offset)
-
-     ;; discrete_choice_list
-     ((query ((discrete_choice_list _ @node))) parent 0)
-     ((query ((discrete_choice_list) @node))   parent ada-ts-mode-indent-broken-offset)
-
-     ;; case_statement / case_statement_alternative
-     ((query ((case_statement_alternative) @node))          parent ada-ts-mode-indent-when-offset)
-     ((query ((case_statement_alternative "=>" _ @node)))   parent ada-ts-mode-indent-offset)
-     ((query ((case_statement "is" (comment) @node "end"))) parent ada-ts-mode-indent-when-offset)
-
-     ;; case_expression_alternative
-     ((query ((case_expression_alternative) @node)) parent ada-ts-mode-indent-when-offset)
-
-     ;; if_expression / case_expression / declare_expression / quantified_expression
-     ((query ([(if_expression)
-               (case_expression)
-               (declare_expression)
-               (quantified_expression)]
-              @node))
-      (anchor/prev-sibling "(")
-      1)
-
-     ;; variant_part / variant_list / component_list / record_definition
-     ((query ((component_list _ @node)))          parent 0)
-     ((query ((variant_part "is" _ @node "end"))) parent ada-ts-mode-indent-when-offset)
-     ((query ((variant_list _ @node)))            parent 0)
-     ((query ((variant "=>" _ @node)))            parent ada-ts-mode-indent-offset)
-
-     ;; parameter_specification
-     ((query ((_ (parameter_specification) (parameter_specification) @node)))
-      (anchor/first-sibling "parameter_specification")
-      0)
-     ((query ((parameter_specification) @node)) parent-bol ada-ts-mode-indent-broken-offset)
-
-     ;; result_profile
-     ((query ((result_profile) @node))   parent-bol ada-ts-mode-indent-broken-offset)
-     ((query ((result_profile _ @node))) parent     ada-ts-mode-indent-broken-offset)
-
-     ;; access_definition
-     ((query ((access_definition subtype_mark: _ @node))) parent 0)
-
-     ;; parameter_association
-     ((query ((_ (parameter_association) (parameter_association) @node)))
-      (anchor/first-sibling "parameter_association")
-      0)
-     ((query ((parameter_association) @node)) parent-bol ada-ts-mode-indent-broken-offset)
-
-     ;; named_array_aggregate / array_delta_aggregate
-     ((query ([(named_array_aggregate (array_component_association)
-                                      [(array_component_association) ","] @node)
-               (array_delta_aggregate (array_component_association)
-                                      [(array_component_association) ","] @node)]))
-      (anchor/first-sibling "array_component_association")
-      0)
-     ((query ((named_array_aggregate (array_component_association) @node))) parent 1)
-     ((query ((array_delta_aggregate ["with" "delta" (array_component_association)] @node)))
-      (anchor/prev-sibling "expression")
-      ada-ts-mode-indent-broken-offset)
-
-     ;; record_component_association_list
-     ((query ((record_component_association_list _ @node))) parent 0)
-
-     ;; record_delta_aggregate
-     ((query ((record_delta_aggregate ["with" "delta" (record_component_association_list)] @node)))
-      (anchor/prev-sibling "expression")
-      ada-ts-mode-indent-broken-offset)
-
-     ;; enumeration_type_definition
-     ((query ((enumeration_type_definition
-               [(identifier) (character_literal)]
-               [(identifier) (character_literal) ","] @node)))
-      (anchor/first-sibling "identifier" "character_literal")
-      0)
-     ((query ((enumeration_type_definition [(identifier) (character_literal)] @node)))
-      (anchor/first-sibling "(")
-      1)
-
-     ;; pragma_argument_association
-     ((query ((_ (pragma_argument_association)
-                 (pragma_argument_association) @node)))
-      (anchor/first-sibling "pragma_argument_association")
-      0)
-     ((query ((pragma_argument_association) @node)) parent ada-ts-mode-indent-broken-offset)
-
-
-     ;; exception_declaration
-     ((query ((exception_declaration _ @node))) parent 0)
-
-     ;; extended_return_object_declaration
-     ((query ((extended_return_object_declaration) @node)) parent ada-ts-mode-indent-broken-offset)
-
-     ;; protected_definition
-     ((and (query ((protected_definition ["private" "end"] @node)))
-           (n-p-gp nil nil "ERROR"))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((and (query ((protected_definition "end" (identifier) @node)))
-           (n-p-gp nil nil "ERROR"))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((query ((protected_definition :anchor ["private" "end"]) @node)) parent       0)
-     ((query ((protected_definition) @node))                           parent       ada-ts-mode-indent-offset)
-     ((query ((protected_definition ["private" "end"] @node)))         grand-parent 0)
-     ((query ((protected_definition "end" (identifier) @node)))        grand-parent ada-ts-mode-indent-broken-offset)
-     ((query ((protected_definition :anchor "private" (_) @node)))     parent       ada-ts-mode-indent-offset)
-     ((query ((protected_definition (_) @node)))                       parent       0)
-
-     ;; task_definition
-     ((and (query ((task_definition ["private" "end"] @node)))
-           (n-p-gp nil nil "ERROR"))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((and (query ((task_definition "end" (identifier) @node)))
-           (n-p-gp nil nil "ERROR"))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((query ((task_definition :anchor ["private" "end"]) @node)) parent       0)
-     ((query ((task_definition) @node))                           parent       ada-ts-mode-indent-offset)
-     ((query ((task_definition ["private" "end"] @node)))         grand-parent 0)
-     ((query ((task_definition "end" (identifier) @node)))        grand-parent ada-ts-mode-indent-broken-offset)
-     ((query ((task_definition :anchor "private" (_) @node)))     parent       ada-ts-mode-indent-offset)
-     ((query ((task_definition (_) @node)))                       parent       0)
-
-     ;; generic_instantiation
-     ((query ((generic_instantiation generic_name: _ @node))) parent ada-ts-mode-indent-broken-offset)
-
-     ;; discriminant_specification_list / discriminant_specification
-     ((query ((_ (discriminant_specification) [(discriminant_specification) ";"] @node)))
-      (anchor/first-sibling "discriminant_specification")
-      0)
-     ((query ((discriminant_specification_list) @node)) (anchor/first-sibling "(") 1)
-
-     ;; null_procedure_declaration / expression_function_declaration / abstract subprogram_declaration
-     ((query ([(expression_function_declaration "is" @node)
-               (null_procedure_declaration      "is" @node)
-               (subprogram_declaration          "is" @node "abstract")]))
-      parent-bol
-      ada-ts-mode-indent-subprogram-is-offset)
-     ((query ([(null_procedure_declaration "null" @node)
-               (subprogram_declaration "abstract" @node)]))
-      parent-bol
-      ada-ts-mode-indent-broken-offset)
-
-     ;; handled_sequence_of_statements
-     ((and (query ((handled_sequence_of_statements "exception" @node)))
-           (n-p-gp nil nil "ERROR"))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((query ((handled_sequence_of_statements "exception" @node)))           (anchor/gp-skip-label-bol)                 0)
-     ((query ((handled_sequence_of_statements (exception_handler) _ @node))) (anchor/first-sibling "exception_handler") 0)
-     ((query ((handled_sequence_of_statements _ @node)))                     parent-bol                                 0)
-     ((query ((exception_handler "=>" _ @node)))                             parent                                     ada-ts-mode-indent-offset)
-     ((query ((exception_handler _ @node)))                                  parent                                     ada-ts-mode-indent-broken-offset)
-     ((query ((exception_choice_list (exception_choice) _ @node)))           (anchor/first-sibling "exception_choice")  0)
-
-     ;; non_empty_declarative_part
-     ((query ((non_empty_declarative_part _ @node))) parent-bol 0)
-
-     ;; prevent keywords from aligning to parent BOL.
-     ((query ([(if_expression ["then" "else" (elsif_expression_item)] @node)
-               (case_expression "is" @node)
-               (declare_expression "begin" @node)]))
-      parent
-      0)
-     ((query ((declare_expression (_) @node "begin"))) parent ada-ts-mode-indent-offset)
-     ((query ((quantifier) @node))                     parent ada-ts-mode-indent-broken-offset)
-
-     ;; Handle special record type indentation.
-     ((query ([(record_definition) (record_type_definition) (record_representation_clause)] @node))
-      (anchor/best-effort)
-      (offset/best-effort))
-     ((query ([(record_type_definition       _ @node)
-               (record_definition            _ @node)
-               (record_representation_clause _ @node)]))
-      (anchor/best-effort)
-      (offset/best-effort))
-
-     ;; loop_statement
-     ((query ((loop_statement (loop_label) (iteration_scheme) @node)))       parent                                        ada-ts-mode-indent-label-offset)
-     ((query ((loop_statement (iteration_scheme) "loop" _ @node "end")))     (anchor/first-sibling-bol "iteration_scheme") ada-ts-mode-indent-offset)
-     ((query ((loop_statement (iteration_scheme) ["loop" "end" ";"] @node))) (anchor/first-sibling-bol "iteration_scheme") 0)
-     ((query ((loop_statement (iteration_scheme) (identifier) @node)))       (anchor/first-sibling-bol "iteration_scheme") ada-ts-mode-indent-broken-offset)
-     ((query ((loop_statement (loop_label) "loop" @node)))                   parent                                        ada-ts-mode-indent-label-offset)
-     ((query ((loop_statement "loop" _ @node "end")))                        (anchor/first-sibling-bol "loop")             ada-ts-mode-indent-offset)
-     ((query ((loop_statement "loop" ["loop" "end" ";"] @node)))             (anchor/first-sibling-bol "loop")             0)
-     ((query ((loop_statement "loop" (identifier) @node)))                   (anchor/first-sibling-bol "loop")             ada-ts-mode-indent-broken-offset)
-     ((query ((loop_parameter_specification) @node))                         parent                                        ada-ts-mode-indent-broken-offset)
-     ((query ((loop_parameter_specification _ @node)))                       parent                                        0)
-     ((query ((iterator_specification) @node))                               parent                                        ada-ts-mode-indent-broken-offset)
-     ((query ((iterator_specification _ @node)))                             parent                                        0)
-
-     ;; block_statement
-     ((query ((block_statement (loop_label) "declare" @node)))        parent                               ada-ts-mode-indent-label-offset)
-     ((query ((block_statement "declare" ["begin" "end" ";"] @node))) (anchor/first-sibling-bol "declare") 0)
-     ((query ((block_statement "declare" _ @node "begin")))           (anchor/first-sibling-bol "declare") ada-ts-mode-indent-offset)
-     ((query ((block_statement "declare" "begin" _ @node "end")))     (anchor/first-sibling-bol "declare") ada-ts-mode-indent-offset)
-     ((query ((block_statement "declare" (identifier) @node)))        (anchor/first-sibling-bol "declare") ada-ts-mode-indent-broken-offset)
-     ((query ((block_statement (loop_label) "begin" @node)))          parent                               ada-ts-mode-indent-label-offset)
-     ((query ((block_statement "begin" ["end" ";"] @node)))           (anchor/first-sibling-bol "begin")   0)
-     ((query ((block_statement "begin" _ @node "end")))               (anchor/first-sibling-bol "begin")   ada-ts-mode-indent-offset)
-     ((query ((block_statement "begin" (identifier) @node)))          (anchor/first-sibling-bol "begin")   ada-ts-mode-indent-broken-offset)
-
-     ;; keywords / semicolon
-     ((query ([ ,@ada-ts-mode--keywords ";"
-                (elsif_statement_item)
-                (aspect_specification)
-                (null_exclusion)
-                (access_to_object_definition)
-                (access_to_subprogram_definition)
-                (procedure_specification)
-                (function_specification)
-                (allocator)]
-              @node))
-      parent-bol
-      0)
-
-     ;; select_statement
-     ((query ((_ (guard) :anchor (comment) :* :anchor [(select_alternative) (comment)] @node)))
-      (anchor/prev-sibling "guard")
-      ada-ts-mode-indent-offset)
-     ((query ((selective_accept       _ @node))) parent ada-ts-mode-indent-offset)
-     ((query ((timed_entry_call       _ @node))) parent ada-ts-mode-indent-offset)
-     ((query ((conditional_entry_call _ @node))) parent ada-ts-mode-indent-offset)
-     ((query ((asynchronous_select    _ @node))) parent ada-ts-mode-indent-offset)
-     ((query ((accept_alternative     _ @node))) parent 0)
-     ((query ((delay_alternative      _ @node))) parent 0)
-     ((query ((entry_call_alternative _ @node))) parent 0)
-     ((query ((triggering_alternative _ @node))) parent 0)
-
-     ((query ([(subprogram_body           "is"   _ @node "end")
-               (package_body              "is"   _ @node "end")
-               (package_declaration       "is"   _ @node "end")
-               (task_body                 "is"   _ @node "end")
-               (entry_body                "is"   _ @node "end")
-               (protected_body            "is"   _ @node "end")
-               (extended_return_statement "do"   _ @node "end")
-               (if_statement              "then" _ @node "end")
-               (elsif_statement_item      "then" _ @node)]))
-      parent-bol
-      ada-ts-mode-indent-offset)
-
-     ;; general indentation for comments.
-     ;;
-     ;; NOTE: Indent to where next non-comment sibling would be
-     ;; indented.  This may not be aligned to sibling if sibling isn't
-     ;; properly indented, however it prevents a two-pass indentation
-     ;; when region is indented, since comments won't have to be
-     ;; reindented once sibling becomes properly aligned.
-     ((and (node-is "comment")
-           (ada-ts-mode--next-sibling-not-matching-exists-p "comment"))
-      (anchor/next-sibling-not-matching "comment")
-      (offset/next-sibling-not-matching "comment"))
-
-     ;; identifier / selected_component
-     ((query ([(identifier) (selected_component)] @node)) parent-bol ada-ts-mode-indent-broken-offset)
-     ((query ((selected_component _ @node)))              parent-bol ada-ts-mode-indent-broken-offset)
-
-     ;; non-expression opening parenthesis
-     ((query ([(formal_part)
-               (enumeration_aggregate)
-               (enumeration_type_definition)
-               (actual_parameter_part)
-               (known_discriminant_part)
-               (unknown_discriminant_part)
-               "("]
-              @node))
-      parent-bol
-      ada-ts-mode-indent-broken-offset)
-
-     ;; closing parenthesis (including expression)
-     ((query ((_ "(" ")" @node))) (anchor/first-sibling "(") 0)
-     ((query ((_ "[" "]" @node))) (anchor/first-sibling "[") 0)
-
-     ;; miscellaneous punctuation
-     ((query ([":" ":="] @node)) parent 0)
-     ((query ("=>" @node))       parent ada-ts-mode-indent-broken-offset)
-
-     ;; If rule set is complete, this rule should never be matched.
-     (catch-all (anchor/catch-all) (offset/catch-all))))
+(defvar ada-ts-mode--indent-rules nil
   "Tree-sitter indent rules for `ada-ts-mode'.")
+
+(with-eval-after-load 'ada-ts-mode
+  (defvar ada-ts-mode--keywords nil) ; definition in ada-ts-mode.el
+
+  (setq ada-ts-mode--indent-rules
+        `((ada
+
+           ((or (query ((ERROR) @node))
+                (query ((ERROR _ @node)))
+                (query ((_ (ERROR) _ @node)))
+                no-node) ; newline
+            (anchor/best-effort)
+            (offset/best-effort))
+
+           ;; top-level
+           ((query ([(compilation      _ @node)
+                     (compilation_unit _ @node)]))
+            column-0 0)
+
+           ;; with_clause / use_clause
+           ((query ([(with_clause [(identifier) (selected_component)]
+                                  [(identifier) (selected_component) ","] @node)
+                     (use_clause [(identifier) (selected_component)]
+                                 [(identifier) (selected_component) ","] @node)]))
+            (anchor/first-sibling "identifier" "selected_component")
+            0)
+
+           ;; subunit
+           ((query ((subunit [(subprogram_body) (package_body) (task_body) (protected_body)] @node))) column-0                   0)
+           ((query ((subunit [(identifier) (selected_component)] @node)))                             (anchor/first-sibling "(") 1)
+
+           ;; aspect_mark_list / aspect_association
+           ((query ((aspect_specification) @node))      parent-bol ada-ts-mode-indent-broken-offset)
+           ((query ((aspect_mark_list) @node))          parent     ada-ts-mode-indent-broken-offset)
+           ((query ((aspect_mark_list _ @node)))        parent     0)
+           ((query ((aspect_association _ @node "=>"))) parent     0)
+
+           ;; expression
+           ((query ([(array_delta_aggregate (expression) @node)
+                     (record_delta_aggregate (expression) @node)]))
+            parent
+            1)
+           ((query ((expression_function_declaration (expression) @node)))
+            (anchor/first-sibling "(")
+            1)
+           ((query ([(case_expression_alternative  (expression) @node)
+                     (declare_expression           (expression) @node)
+                     (if_expression         "then" (expression) @node)
+                     (elsif_expression_item "then" (expression) @node)]))
+            parent
+            ada-ts-mode-indent-offset)
+
+           ((query ((expression) @node))   parent ada-ts-mode-indent-broken-offset)
+           ((query ((expression _ @node))) parent ada-ts-mode-indent-exp-item-offset)
+
+           ;; discrete_choice_list
+           ((query ((discrete_choice_list _ @node))) parent 0)
+           ((query ((discrete_choice_list) @node))   parent ada-ts-mode-indent-broken-offset)
+
+           ;; case_statement / case_statement_alternative
+           ((query ((case_statement_alternative) @node))          parent ada-ts-mode-indent-when-offset)
+           ((query ((case_statement_alternative "=>" _ @node)))   parent ada-ts-mode-indent-offset)
+           ((query ((case_statement "is" (comment) @node "end"))) parent ada-ts-mode-indent-when-offset)
+
+           ;; case_expression_alternative
+           ((query ((case_expression_alternative) @node)) parent ada-ts-mode-indent-when-offset)
+
+           ;; if_expression / case_expression / declare_expression / quantified_expression
+           ((query ([(if_expression)
+                     (case_expression)
+                     (declare_expression)
+                     (quantified_expression)]
+                    @node))
+            (anchor/prev-sibling "(")
+            1)
+
+           ;; variant_part / variant_list / component_list / record_definition
+           ((query ((component_list _ @node)))          parent 0)
+           ((query ((variant_part "is" _ @node "end"))) parent ada-ts-mode-indent-when-offset)
+           ((query ((variant_list _ @node)))            parent 0)
+           ((query ((variant "=>" _ @node)))            parent ada-ts-mode-indent-offset)
+
+           ;; parameter_specification
+           ((query ((_ (parameter_specification) (parameter_specification) @node)))
+            (anchor/first-sibling "parameter_specification")
+            0)
+           ((query ((parameter_specification) @node)) parent-bol ada-ts-mode-indent-broken-offset)
+
+           ;; result_profile
+           ((query ((result_profile) @node))   parent-bol ada-ts-mode-indent-broken-offset)
+           ((query ((result_profile _ @node))) parent     ada-ts-mode-indent-broken-offset)
+
+           ;; access_definition
+           ((query ((access_definition subtype_mark: _ @node))) parent 0)
+
+           ;; parameter_association
+           ((query ((_ (parameter_association) (parameter_association) @node)))
+            (anchor/first-sibling "parameter_association")
+            0)
+           ((query ((parameter_association) @node)) parent-bol ada-ts-mode-indent-broken-offset)
+
+           ;; named_array_aggregate / array_delta_aggregate
+           ((query ([(named_array_aggregate (array_component_association)
+                                            [(array_component_association) ","] @node)
+                     (array_delta_aggregate (array_component_association)
+                                            [(array_component_association) ","] @node)]))
+            (anchor/first-sibling "array_component_association")
+            0)
+           ((query ((named_array_aggregate (array_component_association) @node))) parent 1)
+           ((query ((array_delta_aggregate ["with" "delta" (array_component_association)] @node)))
+            (anchor/prev-sibling "expression")
+            ada-ts-mode-indent-broken-offset)
+
+           ;; record_component_association_list
+           ((query ((record_component_association_list _ @node))) parent 0)
+
+           ;; record_delta_aggregate
+           ((query ((record_delta_aggregate ["with" "delta" (record_component_association_list)] @node)))
+            (anchor/prev-sibling "expression")
+            ada-ts-mode-indent-broken-offset)
+
+           ;; enumeration_type_definition
+           ((query ((enumeration_type_definition
+                     [(identifier) (character_literal)]
+                     [(identifier) (character_literal) ","] @node)))
+            (anchor/first-sibling "identifier" "character_literal")
+            0)
+           ((query ((enumeration_type_definition [(identifier) (character_literal)] @node)))
+            (anchor/first-sibling "(")
+            1)
+
+           ;; pragma_argument_association
+           ((query ((_ (pragma_argument_association)
+                       (pragma_argument_association) @node)))
+            (anchor/first-sibling "pragma_argument_association")
+            0)
+           ((query ((pragma_argument_association) @node)) parent ada-ts-mode-indent-broken-offset)
+
+
+           ;; exception_declaration
+           ((query ((exception_declaration _ @node))) parent 0)
+
+           ;; extended_return_object_declaration
+           ((query ((extended_return_object_declaration) @node)) parent ada-ts-mode-indent-broken-offset)
+
+           ;; protected_definition
+           ((and (query ((protected_definition ["private" "end"] @node)))
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((and (query ((protected_definition "end" (identifier) @node)))
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((query ((protected_definition :anchor ["private" "end"]) @node)) parent       0)
+           ((query ((protected_definition) @node))                           parent       ada-ts-mode-indent-offset)
+           ((query ((protected_definition ["private" "end"] @node)))         grand-parent 0)
+           ((query ((protected_definition "end" (identifier) @node)))        grand-parent ada-ts-mode-indent-broken-offset)
+           ((query ((protected_definition :anchor "private" (_) @node)))     parent       ada-ts-mode-indent-offset)
+           ((query ((protected_definition (_) @node)))                       parent       0)
+
+           ;; task_definition
+           ((and (query ((task_definition ["private" "end"] @node)))
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((and (query ((task_definition "end" (identifier) @node)))
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((query ((task_definition :anchor ["private" "end"]) @node)) parent       0)
+           ((query ((task_definition) @node))                           parent       ada-ts-mode-indent-offset)
+           ((query ((task_definition ["private" "end"] @node)))         grand-parent 0)
+           ((query ((task_definition "end" (identifier) @node)))        grand-parent ada-ts-mode-indent-broken-offset)
+           ((query ((task_definition :anchor "private" (_) @node)))     parent       ada-ts-mode-indent-offset)
+           ((query ((task_definition (_) @node)))                       parent       0)
+
+           ;; generic_instantiation
+           ((query ((generic_instantiation generic_name: _ @node))) parent ada-ts-mode-indent-broken-offset)
+
+           ;; discriminant_specification_list / discriminant_specification
+           ((query ((_ (discriminant_specification) [(discriminant_specification) ";"] @node)))
+            (anchor/first-sibling "discriminant_specification")
+            0)
+           ((query ((discriminant_specification_list) @node)) (anchor/first-sibling "(") 1)
+
+           ;; null_procedure_declaration / expression_function_declaration / abstract subprogram_declaration
+           ((query ([(expression_function_declaration "is" @node)
+                     (null_procedure_declaration      "is" @node)
+                     (subprogram_declaration          "is" @node "abstract")]))
+            parent-bol
+            ada-ts-mode-indent-subprogram-is-offset)
+           ((query ([(null_procedure_declaration "null" @node)
+                     (subprogram_declaration "abstract" @node)]))
+            parent-bol
+            ada-ts-mode-indent-broken-offset)
+
+           ;; handled_sequence_of_statements
+           ((and (query ((handled_sequence_of_statements "exception" @node)))
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((query ((handled_sequence_of_statements "exception" @node)))           (anchor/gp-skip-label-bol)                 0)
+           ((query ((handled_sequence_of_statements (exception_handler) _ @node))) (anchor/first-sibling "exception_handler") 0)
+           ((query ((handled_sequence_of_statements _ @node)))                     parent-bol                                 0)
+           ((query ((exception_handler "=>" _ @node)))                             parent                                     ada-ts-mode-indent-offset)
+           ((query ((exception_handler _ @node)))                                  parent                                     ada-ts-mode-indent-broken-offset)
+           ((query ((exception_choice_list (exception_choice) _ @node)))           (anchor/first-sibling "exception_choice")  0)
+
+           ;; non_empty_declarative_part
+           ((query ((non_empty_declarative_part _ @node))) parent-bol 0)
+
+           ;; prevent keywords from aligning to parent BOL.
+           ((query ([(if_expression ["then" "else" (elsif_expression_item)] @node)
+                     (case_expression "is" @node)
+                     (declare_expression "begin" @node)]))
+            parent
+            0)
+           ((query ((declare_expression (_) @node "begin"))) parent ada-ts-mode-indent-offset)
+           ((query ((quantifier) @node))                     parent ada-ts-mode-indent-broken-offset)
+
+           ;; Handle special record type indentation.
+           ((query ([(record_definition) (record_type_definition) (record_representation_clause)] @node))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((query ([(record_type_definition       _ @node)
+                     (record_definition            _ @node)
+                     (record_representation_clause _ @node)]))
+            (anchor/best-effort)
+            (offset/best-effort))
+
+           ;; loop_statement
+           ((query ((loop_statement (loop_label) (iteration_scheme) @node)))       parent                                        ada-ts-mode-indent-label-offset)
+           ((query ((loop_statement (iteration_scheme) "loop" _ @node "end")))     (anchor/first-sibling-bol "iteration_scheme") ada-ts-mode-indent-offset)
+           ((query ((loop_statement (iteration_scheme) ["loop" "end" ";"] @node))) (anchor/first-sibling-bol "iteration_scheme") 0)
+           ((query ((loop_statement (iteration_scheme) (identifier) @node)))       (anchor/first-sibling-bol "iteration_scheme") ada-ts-mode-indent-broken-offset)
+           ((query ((loop_statement (loop_label) "loop" @node)))                   parent                                        ada-ts-mode-indent-label-offset)
+           ((query ((loop_statement "loop" _ @node "end")))                        (anchor/first-sibling-bol "loop")             ada-ts-mode-indent-offset)
+           ((query ((loop_statement "loop" ["loop" "end" ";"] @node)))             (anchor/first-sibling-bol "loop")             0)
+           ((query ((loop_statement "loop" (identifier) @node)))                   (anchor/first-sibling-bol "loop")             ada-ts-mode-indent-broken-offset)
+           ((query ((loop_parameter_specification) @node))                         parent                                        ada-ts-mode-indent-broken-offset)
+           ((query ((loop_parameter_specification _ @node)))                       parent                                        0)
+           ((query ((iterator_specification) @node))                               parent                                        ada-ts-mode-indent-broken-offset)
+           ((query ((iterator_specification _ @node)))                             parent                                        0)
+
+           ;; block_statement
+           ((query ((block_statement (loop_label) "declare" @node)))        parent                               ada-ts-mode-indent-label-offset)
+           ((query ((block_statement "declare" ["begin" "end" ";"] @node))) (anchor/first-sibling-bol "declare") 0)
+           ((query ((block_statement "declare" _ @node "begin")))           (anchor/first-sibling-bol "declare") ada-ts-mode-indent-offset)
+           ((query ((block_statement "declare" "begin" _ @node "end")))     (anchor/first-sibling-bol "declare") ada-ts-mode-indent-offset)
+           ((query ((block_statement "declare" (identifier) @node)))        (anchor/first-sibling-bol "declare") ada-ts-mode-indent-broken-offset)
+           ((query ((block_statement (loop_label) "begin" @node)))          parent                               ada-ts-mode-indent-label-offset)
+           ((query ((block_statement "begin" ["end" ";"] @node)))           (anchor/first-sibling-bol "begin")   0)
+           ((query ((block_statement "begin" _ @node "end")))               (anchor/first-sibling-bol "begin")   ada-ts-mode-indent-offset)
+           ((query ((block_statement "begin" (identifier) @node)))          (anchor/first-sibling-bol "begin")   ada-ts-mode-indent-broken-offset)
+
+           ;; keywords / semicolon
+           ((query ([ ,@ada-ts-mode--keywords ";"
+                      (elsif_statement_item)
+                      (aspect_specification)
+                      (null_exclusion)
+                      (access_to_object_definition)
+                      (access_to_subprogram_definition)
+                      (procedure_specification)
+                      (function_specification)
+                      (allocator)]
+                    @node))
+            parent-bol
+            0)
+
+           ;; select_statement
+           ((query ((_ (guard) :anchor (comment) :* :anchor [(select_alternative) (comment)] @node)))
+            (anchor/prev-sibling "guard")
+            ada-ts-mode-indent-offset)
+           ((query ((selective_accept       _ @node))) parent ada-ts-mode-indent-offset)
+           ((query ((timed_entry_call       _ @node))) parent ada-ts-mode-indent-offset)
+           ((query ((conditional_entry_call _ @node))) parent ada-ts-mode-indent-offset)
+           ((query ((asynchronous_select    _ @node))) parent ada-ts-mode-indent-offset)
+           ((query ((accept_alternative     _ @node))) parent 0)
+           ((query ((delay_alternative      _ @node))) parent 0)
+           ((query ((entry_call_alternative _ @node))) parent 0)
+           ((query ((triggering_alternative _ @node))) parent 0)
+
+           ((query ([(subprogram_body           "is"   _ @node "end")
+                     (package_body              "is"   _ @node "end")
+                     (package_declaration       "is"   _ @node "end")
+                     (task_body                 "is"   _ @node "end")
+                     (entry_body                "is"   _ @node "end")
+                     (protected_body            "is"   _ @node "end")
+                     (extended_return_statement "do"   _ @node "end")
+                     (if_statement              "then" _ @node "end")
+                     (elsif_statement_item      "then" _ @node)]))
+            parent-bol
+            ada-ts-mode-indent-offset)
+
+           ;; general indentation for comments.
+           ;;
+           ;; NOTE: Indent to where next non-comment sibling would be
+           ;; indented.  This may not be aligned to sibling if sibling isn't
+           ;; properly indented, however it prevents a two-pass indentation
+           ;; when region is indented, since comments won't have to be
+           ;; reindented once sibling becomes properly aligned.
+           ((and (node-is "comment")
+                 (ada-ts-mode--next-sibling-not-matching-exists-p "comment"))
+            (anchor/next-sibling-not-matching "comment")
+            (offset/next-sibling-not-matching "comment"))
+
+           ;; identifier / selected_component
+           ((query ([(identifier) (selected_component)] @node)) parent-bol ada-ts-mode-indent-broken-offset)
+           ((query ((selected_component _ @node)))              parent-bol ada-ts-mode-indent-broken-offset)
+
+           ;; non-expression opening parenthesis
+           ((query ([(formal_part)
+                     (enumeration_aggregate)
+                     (enumeration_type_definition)
+                     (actual_parameter_part)
+                     (known_discriminant_part)
+                     (unknown_discriminant_part)
+                     "("]
+                    @node))
+            parent-bol
+            ada-ts-mode-indent-broken-offset)
+
+           ;; closing parenthesis (including expression)
+           ((query ((_ "(" ")" @node))) (anchor/first-sibling "(") 0)
+           ((query ((_ "[" "]" @node))) (anchor/first-sibling "[") 0)
+
+           ;; miscellaneous punctuation
+           ((query ([":" ":="] @node)) parent 0)
+           ((query ("=>" @node))       parent ada-ts-mode-indent-broken-offset)
+
+           ;; If rule set is complete, this rule should never be matched.
+           (catch-all (anchor/catch-all) (offset/catch-all))))))
 
 ;;; Indentation Verbosity
 
@@ -1125,7 +1129,7 @@ any of the types in TYPE or TYPES."
 
 (defun ada-ts-mode--next-sibling-not-matching (type &rest types)
   "Locate next sibling not matching TYPE or TYPES."
-  (lambda (node parent bol &rest _)
+  (lambda (node _parent _bol &rest _)
     (let ((all-types (cons type types))
           (sibling-node (treesit-node-next-sibling node)))
       (while (and sibling-node
