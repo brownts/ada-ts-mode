@@ -1201,6 +1201,13 @@ the name of the branch given the branch node."
   ;; Outline minor mode (Emacs 30+)
   (setq-local treesit-outline-predicate #'ada-ts-mode--defun-p)
 
+  ;; EditorConfig (Emacs 30+)
+  (setq-local editorconfig-indent-size-vars '(ada-ts-mode-indent-offset))
+
+  ;; Eglot (Emacs 29+)
+  (setq-local eglot-server-programs
+              '((ada-ts-mode . ("ada_language_server"))))
+
   ;; Font-lock.
   (setq-local treesit-font-lock-settings ada-ts-mode--font-lock-settings)
   (setq-local treesit-font-lock-feature-list
