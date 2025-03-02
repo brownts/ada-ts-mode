@@ -625,7 +625,7 @@ but it isn't an actual function call."
 
 (defun ada-ts-mode-defun-comment-box ()
   "Create comment box for defun enclosing point, if exists."
-  (interactive)
+  (interactive nil ada-ts-mode)
   (when-let* ((defun-node (treesit-defun-at-point))
               (defun-name (treesit-defun-name defun-node))
               (defun-start (treesit-node-start defun-node))
@@ -644,7 +644,7 @@ but it isn't an actual function call."
 
 (defun ada-ts-mode-find-other-file ()
   "Find other Ada file."
-  (interactive)
+  (interactive nil ada-ts-mode)
   (let ((client (ada-ts-mode-lspclient-current))
         (command "als-other-file"))
     (if (and client
@@ -748,7 +748,7 @@ but it isn't an actual function call."
 
 (defun ada-ts-mode-find-project-file ()
   "Find GNAT Project file."
-  (interactive)
+  (interactive nil ada-ts-mode)
   (if-let* ((project-file (ada-ts-mode--project-file)))
       (find-file project-file)
     (message "Project file unknown or non-existent.")))
