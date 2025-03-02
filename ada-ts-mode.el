@@ -642,6 +642,26 @@ but it isn't an actual function call."
               prefix "-- " defun-name    " --" ?\n
               prefix "---" defun-comment "---" ?\n ?\n))))
 
+(defun ada-ts-mode-fill-reindent-defun (&optional argument)
+  "Refill or re-indent the paragraph or defun containing point.
+
+If the point is in a comment, fill the paragraph that contains point or
+follows point.  Otherwise, re-indent the function definition that
+contains point.
+
+If ARGUMENT is specified, it is used to specify the column when filling
+a paragraph."
+  (interactive "P" ada-ts-mode)
+  (save-excursion
+    (if-let* ((node (treesit-node-at (point)))
+              (node-t (treesit-node-type node))
+              ((string-equal node-t "comment")))
+        (fill-paragraph argument (region-active-p))
+      (when-let* ((node (treesit-defun-at-point))
+                  (start (treesit-node-start node))
+                  (end (treesit-node-end node)))
+        (indent-region start end nil)))))
+
 (defun ada-ts-mode-find-other-file ()
   "Find other Ada file."
   (interactive nil ada-ts-mode)

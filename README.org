@@ -265,6 +265,14 @@ strategy, a new strategy symbol should be specified in
 symbol name.  Refer to existing instances of this function to
 understand how current strategy functions are implemented.
 
+- Command: ada-ts-mode-fill-reindent-defun ::
+  Applies formatting to the comment at point or the defun (i.e.,
+  subprogram, package, task, etc.) containing point.  For a comment,
+  the comment is refilled according to ~fill-paragraph~.  When a prefix
+  argument is supplied, the filled paragraph is justified.  Otherwise,
+  the defun containing point is re-indented using the configured
+  indentation back-end.
+
 ** Ada Language Server Indentation
 
 Since the Ada Language Server provides code formatting, not just an
