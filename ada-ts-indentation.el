@@ -26,6 +26,22 @@
 (require 'treesit)
 (eval-when-compile (require 'rx))
 
+(declare-function treesit-compiled-query-p         "treesit.c" (object))
+(declare-function treesit-node-check               "treesit.c" (node property))
+(declare-function treesit-node-child               "treesit.c" (node n &optional named))
+(declare-function treesit-node-child-by-field-name "treesit.c" (node field-name))
+(declare-function treesit-node-end                 "treesit.c" (node))
+(declare-function treesit-node-eq                  "treesit.c" (node1 node2))
+(declare-function treesit-node-next-sibling        "treesit.c" (node &optional named))
+(declare-function treesit-node-p                   "treesit.c" (object))
+(declare-function treesit-node-parent              "treesit.c" (node))
+(declare-function treesit-node-start               "treesit.c" (node))
+(declare-function treesit-node-type                "treesit.c" (node))
+(declare-function treesit-query-expand             "treesit.c" (query))
+(declare-function treesit-query-compile            "treesit.c" (language query &optional eager))
+(declare-function treesit-search-subtree           "treesit.c" (node predicate &optional backward all depth))
+
+(defvar ada-ts-mode--keywords)
 (declare-function ada-ts-mode--defun-name   "ada-ts-mode" (node))
 (declare-function ada-ts-mode--node-to-name "ada-ts-mode" (node))
 
@@ -111,8 +127,10 @@ SYMBOL, else the default value is updated instead."
              (eq operation 'set))
     (dolist (indent-symbol '(ada-ts-mode-indent-when-offset
                              ada-ts-mode-indent-broken-offset
+                             ada-ts-mode-indent-exp-item-offset
                              ada-ts-mode-indent-subprogram-is-offset
-                             ada-ts-mode-indent-exp-item-offset))
+                             ada-ts-mode-indent-record-offset
+                             ada-ts-mode-indent-label-offset))
       (let* ((valspec (or (custom-variable-theme-value indent-symbol)
                           (get indent-symbol 'standard-value)))
              (cur-custom-value (eval (car valspec)))
@@ -140,7 +158,6 @@ SYMBOL, else the default value is updated instead."
   "Tree-sitter indent rules for `ada-ts-mode'.")
 
 (with-eval-after-load 'ada-ts-mode
-  (defvar ada-ts-mode--keywords nil) ; definition in ada-ts-mode.el
 
   (setq ada-ts-mode--indent-rules
         `((ada
