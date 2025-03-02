@@ -89,6 +89,23 @@ SETUP can be used to perform custom initialization."
                    (ert-fail (concat prefix suffix)))))))
     (indent-region (point-min) (point-max))))
 
+(defun mode-transform (&optional version)
+  "Mode transform function for test.
+
+If VERSION is nil, the expected mode is \\='ada-ts-mode\\='.  If VERSION
+is not nil, for an Emacs major version at or above VERSION, the expected
+mode is \\='ada-ts-mode\\=', otherwise the expected mode is
+\\='fundamental-mode\\='."
+  (let ((inhibit-message t) ; Suppress 'Ignoring unknown mode ...'.
+        (expected-mode
+         (cond (version
+                (if (>= emacs-major-version version)
+                    'ada-ts-mode
+                  'fundamental-mode))
+               (t 'ada-ts-mode))))
+    (set-auto-mode)
+    (should (eq major-mode expected-mode))))
+
 (defun newline-transform ()
   "Newline transform function for test."
   (default-transform)

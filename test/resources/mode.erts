@@ -1,0 +1,47 @@
+Code: mode-transform
+
+Name: Mode on first line (ada-ts)
+
+=-=
+-- -*- mode: ada-ts -*-
+procedure Test is
+begin
+   null;
+end Test;
+=-=-=
+
+Name: Mode in local variable (ada-ts)
+
+=-=
+procedure Test is
+begin
+   null;
+end Test;
+-- Local Variables:
+-- mode: ada-ts
+-- End:
+=-=-=
+
+Code: (lambda () (mode-transform 30))
+
+Name: Mode on first line (ada)
+
+=-=
+-- -*- mode: ada -*-
+procedure Test is
+begin
+   null;
+end Test;
+=-=-=
+
+Name: Mode in local variable (ada)
+
+=-=
+procedure Test is
+begin
+   null;
+end Test;
+-- Local Variables:
+-- mode: ada
+-- End:
+=-=-=
