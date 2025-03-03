@@ -150,6 +150,13 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(custom-manual :tag "Imenu" "(ada-ts-mode)Imenu")
   :package-version '(ada-ts-mode . "0.5.8"))
 
+(defcustom ada-ts-mode-keymap-prefix "C-c"
+  "Keymap prefix for `ada-ts-mode'."
+  :type 'string
+  :group 'ada-ts
+  :link '(custom-manual :tag "Miscellaneous" "(ada-ts-mode)Miscellaneous")
+  :package-version '(ada-ts-mode . "0.8.0"))
+
 (defcustom ada-ts-mode-other-file-alist
   `((,(rx   ".ads" eos) (  ".adb"))
     (,(rx   ".adb" eos) (  ".ads"))
@@ -1131,6 +1138,37 @@ the name of the branch given the branch node."
 
 (require 'ada-ts-casing)
 (require 'ada-ts-indentation)
+
+(defvar ada-ts-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-q") #'ada-ts-mode-fill-reindent-defun)
+    (when ada-ts-mode-keymap-prefix
+      (define-key map
+                  (kbd ada-ts-mode-keymap-prefix)
+                  (define-keymap
+                    "C-b" #'ada-ts-mode-defun-comment-box
+                    "C-o" #'ada-ts-mode-find-other-file
+                    "C-p" #'ada-ts-mode-find-project-file)))
+    map)
+  "Keymap for `ada-ts-mode'.")
+
+(easy-menu-define ada-ts-mode-menu ada-ts-mode-map
+  "Menu keymap for `ada-ts-mode'."
+  '("Ada"
+    ["Find Other File"              ada-ts-mode-find-other-file             t]
+    ["Find Project File"            ada-ts-mode-find-project-file           t]
+    ["-----"                        nil                                     nil]
+    ["Toggle Auto-Casing"           ada-ts-auto-case-mode                   t]
+    ["Case Format Buffer"           ada-ts-mode-case-format-buffer          t]
+    ["Case Format Point/Region"     ada-ts-mode-case-format-dwim            t]
+    ["-----"                        nil                                     nil]
+    ["Indent Defun / Fill Comment"  ada-ts-mode-fill-reindent-defun         t]
+    ["Indent Buffer"                (indent-region (point-min) (point-max)) t]
+    ["-----"                        nil                                     nil]
+    ["Add Comment Box"              ada-ts-mode-defun-comment-box           t]
+    ["-----"                        nil                                     nil]
+    ["Manual"                       (info "(ada-ts-mode)Top")               t]
+    ["Customize"                    (customize-group 'ada-ts)               t]))
 
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"

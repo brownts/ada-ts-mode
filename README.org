@@ -448,14 +448,16 @@ specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.
 
-* Miscellaneous Commands
+* Miscellaneous
 
-This section identifies mode-specific commands which are provided to
-the user.  The expectation is that if the user finds these commands
-useful, they will bind them into the local mode map.  The commands are
-not bound by default as it would be presumptuous to assume where the
-user would want these bound, if at all.  Binding examples are provided
-in the example configuration section.
+This section covers miscellaneous mode-specific commands and user
+options which don't fit elsewhere.
+
+- User Option: ada-ts-mode-keymap-prefix ::
+  Prefix key used to activate the mode's keymap.  This can be
+  configured as desired to change the prefix while still preserving
+  the rest of the mode map.  If the keymap prefix is set to nil, then
+  the mode commands won't be mapped at all.
 
 - Command: ada-ts-mode-defun-comment-box ::
   Creates a comment box above the defun enclosing point.  A comment
@@ -605,10 +607,6 @@ that is preferred over the intrinsic indentation support.
       :ensure t
       :defer t ; autoload updates `auto-mode-alist'
       :custom (ada-ts-mode-indent-backend 'lsp) ; Use Ada LS indentation
-      :bind (:map ada-ts-mode-map
-                  (("C-c C-b" . ada-ts-mode-defun-comment-box)
-                   ("C-c C-o" . ada-ts-mode-find-other-file)
-                   ("C-c C-p" . ada-ts-mode-find-project-file)))
       :init
       ;; Configure source blocks for Org Mode.
       (with-eval-after-load 'org-src
