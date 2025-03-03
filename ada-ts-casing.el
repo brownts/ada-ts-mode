@@ -31,7 +31,7 @@
 (declare-function treesit-node-type  "treesit.c" (node))
 
 (defcustom ada-ts-mode-case-formatting
-  '((identifier :formatter capitalize
+  '((identifier :formatter upcase-initials
                 :dictionary ("ASCII" "GNAT" "IO"))
     (keyword    :formatter downcase))
   "Case formatting rules for casing commands and modes.

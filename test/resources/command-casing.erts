@@ -3,12 +3,12 @@ Code: (lambda () (default-transform) (ada-ts-mode-case-format-buffer))
 Name: Buffer Formatting
 
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
+PROCEDURE hello_world IS
 BEGIN
-   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
-END HELLO_WORLD;
+   ada.text_io.put_line ("Hello, world!");
+END hello_world;
 =-=
 with Ada.Text_IO;
 
@@ -55,19 +55,19 @@ Code: (lambda () (default-transform) (ada-ts-mode-case-format-region 46 60))
 Name: Region Formatting
 
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
+PROCEDURE hello_world IS
 BEGIN
-   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
-END HELLO_WORLD;
+   ada.text_io.put_line ("Hello, world!");
+END hello_world;
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
+PROCEDURE hello_world IS
 begin
-   Ada.Text_IO.PUT_LINE ("Hello, world!");
-END HELLO_WORLD;
+   Ada.Text_IO.put_line ("Hello, world!");
+END hello_world;
 =-=-=
 
 Name: Point Formatting (keyword)
@@ -77,19 +77,19 @@ Code: (lambda () (default-transform) (ada-ts-mode-case-format-at-point))
 Point-Char: |
 
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
-BEG|IN
-   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
-END HELLO_WORLD;
+PROCEDURE hello_world IS
+BE|GIN
+   ada.text_io.put_line ("Hello, world!");
+END hello_world;
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
-beg|in
-   ADA.TEXT_IO.PUT_LINE ("Hello, world!");
-END HELLO_WORLD;
+PROCEDURE hello_world IS
+begin
+   ada.text_io.put_line ("Hello, world!");
+END hello_world;
 =-=-=
 
 Name: Point Formatting (identifier)
@@ -99,17 +99,17 @@ Code: (lambda () (default-transform) (ada-ts-mode-case-format-at-point))
 Point-Char: |
 
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
+PROCEDURE hello_world IS
 BEGIN
-   ADA.TEXT_IO.PUT_LI|NE ("Hello, world!");
-END HELLO_WORLD;
+   ada.text_io.put_li|ne ("Hello, world!");
+END hello_world;
 =-=
-WITH ADA.TEXT_IO;
+WITH ada.text_io;
 
-PROCEDURE HELLO_WORLD IS
+PROCEDURE hello_world IS
 BEGIN
-   ADA.TEXT_IO.Put_Li|ne ("Hello, world!");
-END HELLO_WORLD;
+   ada.text_io.Put_Li|ne ("Hello, world!");
+END hello_world;
 =-=-=
