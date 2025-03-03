@@ -546,6 +546,7 @@ the string property to those instances."
    :language 'ada
    :feature 'type
    '((full_type_declaration (identifier) @font-lock-type-face)
+     (record_definition (identifier) @font-lock-type-face) ; Ada 2022
      (incomplete_type_declaration (identifier) @font-lock-type-face)
      (private_type_declaration (identifier) @font-lock-type-face)
      (private_extension_declaration (identifier) @font-lock-type-face)
@@ -577,6 +578,7 @@ the string property to those instances."
                        selector_name: _ @font-lock-type-face))
      (enumeration_representation_clause local_name: _ @font-lock-type-face)
      (record_representation_clause local_name: _ @font-lock-type-face)
+     (record_representation_clause end_local_name: _ @font-lock-type-face) ; Ada 2022
      (formal_complete_type_declaration (identifier) @font-lock-type-face)
      (formal_incomplete_type_declaration (identifier) @font-lock-type-face))
 
