@@ -595,8 +595,8 @@ START is either a node or a position."
               prev-node-s (treesit-node-start prev-node))))
     prev-node))
 
-(defun ada-ts-mode--next-node (start)
-  "Find node after START.
+(defun ada-ts-mode--next-node (start &optional include-comments)
+  "Find node after START, and possibly INCLUDE-COMMENTS.
 
 START is either a node or a position."
   (let* ((next-node-e
@@ -608,6 +608,7 @@ START is either a node or a position."
     (save-excursion
       (while (or first-pass
                  (and next-node-t
+                      (not include-comments)
                       (string-equal next-node-t "comment")))
         (setq first-pass nil)
         (goto-char next-node-e)
@@ -1260,28 +1261,53 @@ When CLIENT is not nil, use it as the active LSP client."
            (skip-chars-forward " \t")
            (unless (looking-at (rx (* whitespace) eol) t)
              (let* ((node (treesit-node-at (point)))
-                    (root (treesit-buffer-root-node))
-                    (candidate
-                     (treesit-parent-until
-                      node
-                      (lambda (node)
-                        (or (treesit-node-eq node root)
-                            (string-equal (treesit-node-type node) "ERROR")
-                            (ada-ts-mode--compilation-unit-p node)))
-                      'include-node)))
-               (when (and (ada-ts-mode--compilation-unit-p candidate)
-                          (not (treesit-search-subtree
-                                candidate
-                                (lambda (n)
-                                  (let ((type (treesit-node-type n)))
-                                    (or (string-equal type "ERROR")
-                                        (treesit-node-check n 'missing)
-                                        (treesit-node-check n 'has-error)))))))
-                 (unless (ada-ts-mode--mismatched-names-p candidate)
-                   (when ada-ts-mode--indent-verbose
-                     (message "Aggressive indent triggered for: %s" candidate))
-                   (cons (treesit-node-start candidate)
-                         (treesit-node-end candidate)))))))))
+                    (node-t (treesit-node-type node)))
+               (if (string-equal node-t "comment")
+                   ;; Expand to adjacent comment blocks
+                   (let ((prev-node node)
+                         (prev-node-t node-t)
+                         (next-node node)
+                         (next-node-t node-t)
+                         start-node end-node)
+                     (while (and prev-node-t (string-equal prev-node-t "comment")
+                                 ;; Don't expand to include trailing comments
+                                 (save-excursion
+                                   (goto-char (treesit-node-start prev-node))
+                                   (back-to-indentation)
+                                   (treesit-node-eq (treesit-node-at (point)) prev-node)))
+                       (setq start-node prev-node
+                             prev-node (ada-ts-mode--prev-node start-node 'include-comments)
+                             prev-node-t (treesit-node-type prev-node)))
+                     (while (and next-node-t (string-equal next-node-t "comment"))
+                       (setq end-node next-node
+                             next-node (ada-ts-mode--next-node end-node 'include-comments)
+                             next-node-t (treesit-node-type next-node)))
+                     (when ada-ts-mode--indent-verbose
+                       (message "Aggressive indent triggered for: (%s %s)" start-node end-node))
+                     (cons (treesit-node-start start-node)
+                           (treesit-node-end end-node)))
+                 (let* ((root (treesit-buffer-root-node))
+                        (candidate
+                         (treesit-parent-until
+                          node
+                          (lambda (node)
+                            (or (treesit-node-eq node root)
+                                (string-equal (treesit-node-type node) "ERROR")
+                                (ada-ts-mode--compilation-unit-p node)))
+                          'include-node)))
+                   (when (and (ada-ts-mode--compilation-unit-p candidate)
+                              (not (treesit-search-subtree
+                                    candidate
+                                    (lambda (n)
+                                      (let ((type (treesit-node-type n)))
+                                        (or (string-equal type "ERROR")
+                                            (treesit-node-check n 'missing)
+                                            (treesit-node-check n 'has-error)))))))
+                     (unless (ada-ts-mode--mismatched-names-p candidate)
+                       (when ada-ts-mode--indent-verbose
+                         (message "Aggressive indent triggered for: %s" candidate))
+                       (cons (treesit-node-start candidate)
+                             (treesit-node-end candidate)))))))))))
     (if region
         (progn
           (treesit-indent-region (car region) (cdr region))
