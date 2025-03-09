@@ -980,7 +980,12 @@ START is either a node or a position."
                   (lambda (node)
                     (ada-ts-mode--statement-p node))
                   'include-node)))
-      (setq anchor (treesit-node-start statement-node)
+      ;; Anchor to beginning of line to handle multiple items per line
+      ;; (e.g., "null; null;")
+      (setq anchor (save-excursion
+                     (goto-char (treesit-node-start statement-node))
+                     (back-to-indentation)
+                     (point))
             offset 0
             scenario "Scenario [Newline after handled_sequence_of_statements]"))
     ;; After Punctuation: ":="
@@ -1040,6 +1045,18 @@ START is either a node or a position."
       (setq anchor (treesit-node-start prev-node)
             offset 0
             scenario "Scenario [After Goto Label]"))
+    ;; After Compilation Unit / Declaration / Statement
+    (when-let* (((not anchor))
+                ((or (string-equal prev-node-t "compilation_unit")
+                     (ada-ts-mode--compilation-unit-p prev-node))))
+      ;; Anchor to beginning of line to handle multiple items per line
+      ;; (e.g., "with System; use System;")
+      (setq anchor (save-excursion
+                     (goto-char (treesit-node-start prev-node))
+                     (back-to-indentation)
+                     (point))
+            offset 0
+            scenario "Scenario [After Compilation Unit / Declaration / Statement]"))
     ;; Fallback
     (unless anchor
       (setq scenario "Scenario [fallback]")

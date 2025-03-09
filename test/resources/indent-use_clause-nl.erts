@@ -1,0 +1,10 @@
+Name: Trailing use_clause
+
+Point-Char: |
+
+=-=
+with System; use System;|
+=-=
+with System; use System;
+|
+=-=-=
