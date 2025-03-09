@@ -1140,6 +1140,7 @@ the name of the branch given the branch node."
 
 (require 'ada-ts-casing)
 (require 'ada-ts-indentation)
+(require 'ada-ts-align)
 
 (defvar ada-ts-mode-map
   (let ((map (make-sparse-keymap)))
@@ -1148,6 +1149,7 @@ the name of the branch given the branch node."
       (define-key map
                   (kbd ada-ts-mode-keymap-prefix)
                   (define-keymap
+                    "C-a" #'ada-ts-align
                     "C-b" #'ada-ts-mode-defun-comment-box
                     "C-o" #'ada-ts-mode-find-other-file
                     "C-p" #'ada-ts-mode-find-project-file)))
@@ -1164,6 +1166,7 @@ the name of the branch given the branch node."
     ["Case Format Buffer"           ada-ts-mode-case-format-buffer          t]
     ["Case Format Point/Region"     ada-ts-mode-case-format-dwim            t]
     ["-----"                        nil                                     nil]
+    ["Align"                        ada-ts-align                            t]
     ["Indent Defun / Fill Comment"  ada-ts-mode-fill-reindent-defun         t]
     ["Indent Buffer"                (indent-region (point-min) (point-max)) t]
     ["-----"                        nil                                     nil]
@@ -1281,6 +1284,9 @@ the name of the branch given the branch node."
 
   ;; Language Server.
   (add-hook 'ada-ts-mode-lspclient-session-hook #'ada-ts-mode--lsp-session-setup)
+
+  ;; Align.
+  (ada-ts-align--setup)
 
   (treesit-major-mode-setup)
 

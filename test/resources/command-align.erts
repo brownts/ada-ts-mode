@@ -1,0 +1,184 @@
+Code: (lambda () (default-transform) (ada-ts-align))
+
+Point-Char: |
+
+Name: Parameter Association
+
+=-=
+package body Test is
+   My_Value : constant Integer :=
+     My_Func
+       (Param_12 => 17, -- Param_12 comment
+        Param_1 => "My_String", -- Param_1 comment
+        Param_1234 => Value); -- Param_1234 comment|
+end Test;
+=-=
+package body Test is
+   My_Value : constant Integer :=
+     My_Func
+       (Param_12   => 17,          -- Param_12 comment
+        Param_1    => "My_String", -- Param_1 comment
+        Param_1234 => Value);      -- Param_1234 comment|
+end Test;
+=-=-=
+
+Name: Case Expression
+
+=-=
+package body Test is
+   type Color is (Red, Green, Blue);
+
+   The_Color : Color := Red;
+
+   Color_Image : constant String :=
+     (case The_Color is
+         when Red => "Red", -- red comment
+         when Green => "Green", -- green comment
+         when Blue => "Blue"); -- blue comment|
+end Test;
+=-=
+package body Test is
+   type Color is (Red, Green, Blue);
+
+   The_Color : Color := Red;
+
+   Color_Image : constant String :=
+     (case The_Color is
+         when Red   => "Red",   -- red comment
+         when Green => "Green", -- green comment
+         when Blue  => "Blue"); -- blue comment|
+end Test;
+=-=-=
+
+Name: Component Clause
+
+=-=
+package body Test is
+   for Record_Type use record
+      Field_12 at 0 range 0 .. 31;     -- Field_12 comment
+      Field_1 at 4 range 0 .. 31;  -- Field_1 comment
+      Field_1234 at 8 range 0 .. 7; -- Field_1234 comment|
+   end record;
+end Test;
+=-=
+package body Test is
+   for Record_Type use record
+      Field_12   at 0 range 0 .. 31; -- Field_12 comment
+      Field_1    at 4 range 0 .. 31; -- Field_1 comment
+      Field_1234 at 8 range 0 .. 7;  -- Field_1234 comment|
+   end record;
+end Test;
+=-=-=
+
+Name: Trailing Use Clause
+
+=-=
+use Ada.Command_Line; use Ada.Command_Line; -- Command_Line comment
+use Ada.Text_IO; use Ada.Text_IO; -- Text_IO comment|
+=-=
+use Ada.Command_Line; use Ada.Command_Line; -- Command_Line comment
+use Ada.Text_IO;      use Ada.Text_IO;      -- Text_IO comment|
+=-=-=
+
+Name: Declaration
+
+=-=
+package body Test is
+   X : Float := 7.0; -- X comment
+   Foo : Boolean := False; -- Foo comment
+   W, Z : Integer := 99; -- W, Z comment|
+end Test;
+=-=
+package body Test is
+   X    : Float   := 7.0;   -- X comment
+   Foo  : Boolean := False; -- Foo comment
+   W, Z : Integer := 99;    -- W, Z comment|
+end Test;
+=-=-=
+
+Name: Assignment
+
+=-=
+package body Test is
+begin
+   X := 7.0; -- X comment
+   Foo := False; -- Foo comment|
+end Test;
+=-=
+package body Test is
+begin
+   X   := 7.0;   -- X comment
+   Foo := False; -- Foo comment|
+end Test;
+=-=-=
+
+Name: Empty Line Separator
+
+=-=
+package body Test is
+   X : Float := 7.0; -- X comment
+   Foo : Boolean := False; -- Foo comment
+   W, Z : Integer := 99; -- W, Z comment|
+
+   X1 : Float := 7.0; -- X1 comment
+   Foo1 : Boolean := False; -- Foo1 comment
+   W1, Z1 : Integer := 99; -- W1, Z1 comment
+end Test;
+=-=
+package body Test is
+   X    : Float   := 7.0;   -- X comment
+   Foo  : Boolean := False; -- Foo comment
+   W, Z : Integer := 99;    -- W, Z comment|
+
+   X1 : Float := 7.0; -- X1 comment
+   Foo1 : Boolean := False; -- Foo1 comment
+   W1, Z1 : Integer := 99; -- W1, Z1 comment
+end Test;
+=-=-=
+
+Name: Align Region
+
+Code: (lambda ()
+        (default-transform)
+        (set-mark (point-min))
+        (goto-char (point-max))
+        (activate-mark)
+        (ada-ts-align))
+
+=-=
+package body Test is
+   type Color is (Red, Green, Blue);
+
+   The_Color : Color := Red;
+
+   Color_Image : constant String :=
+     (case The_Color is
+         when Red => "Red", -- red comment
+         when Green => "Green", -- green comment
+         when Blue => "Blue"); -- blue comment
+
+   My_Value : constant Integer :=
+     My_Func
+       (Param_12 => 17, -- Param_12 comment
+        Param_1 => "My_String", -- Param_1 comment
+        Param_1234 => Value); -- Param_1234 comment
+end Test;
+=-=
+package body Test is
+   type Color is (Red, Green, Blue);
+
+   The_Color : Color := Red;
+
+   Color_Image : constant String :=
+     (case The_Color is
+         when Red   => "Red",   -- red comment
+         when Green => "Green", -- green comment
+         when Blue  => "Blue"); -- blue comment
+
+   My_Value : constant Integer :=
+     My_Func
+       (Param_12   => 17,          -- Param_12 comment
+        Param_1    => "My_String", -- Param_1 comment
+        Param_1234 => Value);      -- Param_1234 comment
+end Test;
+=-=-=
