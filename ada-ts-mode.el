@@ -34,11 +34,9 @@
 
 ;;; Code:
 
-(require 'ada-ts-mode-lspclient)
+(require 'ada-ts-als)
 (require 'lisp-mnt)
 (require 'treesit)
-(require 'url-parse)
-(require 'url-util)
 (eval-when-compile (require 'rx))
 
 (declare-function treesit-parser-create "treesit.c")
@@ -696,14 +694,9 @@ a paragraph."
 (defun ada-ts-mode-find-other-file ()
   "Find other Ada file."
   (interactive nil ada-ts-mode)
-  (let ((client (ada-ts-mode-lspclient-current))
-        (command "als-other-file"))
-    (if (and client
-             (ada-ts-mode-lspclient-command-supported-p client command))
-        (let ((document-id (ada-ts-mode-lspclient-document-id client)))
-          (ada-ts-mode-lspclient-command-execute client command document-id))
-      (require 'find-file)
-      (ff-find-other-file))))
+  (unless (als/other-file)
+    (require 'find-file)
+    (ff-find-other-file)))
 
 (defun ada-ts-mode--alire-project-file ()
   "Determine name of GNAT Project file, using Alire."
@@ -742,44 +735,6 @@ a paragraph."
               (gpr-path (locate-dominating-file (buffer-file-name) gpr-file)))
     (expand-file-name gpr-file gpr-path)))
 
-(defun ada-ts-mode--lsp-project-file ()
-  "Determine name of GNAT Project file, using Language Server."
-
-  ;; First, check the workspace configuration.  This is preferred if
-  ;; the actual project file cannot be found since the Language Server
-  ;; will return a default project file name (when queried for the
-  ;; project file) when it can't find the configured project file.  In
-  ;; this situation we prefer the non-existent user configured project
-  ;; file over a non-existent Language Server project file.
-
-  ;; NOTE: Older versions of the Ada Language Server returned a file
-  ;; path for the als-project-file command, but newer versions return
-  ;; a URI instead.
-
-  (when-let*
-      ((client (ada-ts-mode-lspclient-current))
-       (project-file-path-or-uri
-        (or (ada-ts-mode-lspclient-workspace-configuration client "ada.projectFile")
-            (let ((command "als-project-file"))
-              (and (ada-ts-mode-lspclient-command-supported-p client command)
-                   (ada-ts-mode-lspclient-command-execute client command)))))
-       (project-file
-        (let* ((obj (url-generic-parse-url (url-unhex-string project-file-path-or-uri)))
-               (type (url-type obj)))
-          (if (and type (string-equal type "file"))
-              (let ((path (url-filename obj)))
-                (if (and (eq system-type 'windows-nt)
-                         (string-equal (substring path 0 1) "/"))
-                    (substring path 1) ; Strip leading separator on Windows
-                  path))
-            ;; Doesn't appear to be a URI, treat as path
-            project-file-path-or-uri)))
-       (root (ada-ts-mode-lspclient-workspace-root client (buffer-file-name))))
-    ;; The Ada Language Server can return an empty string when it
-    ;; can't find the project file.
-    (unless (string-empty-p project-file)
-      (directory-file-name (expand-file-name project-file root)))))
-
 (defun ada-ts-mode--root-project-file ()
   "Determine name of GNAT Project file, looking in root directory."
   (require 'project)
@@ -792,7 +747,7 @@ a paragraph."
 
 (defun ada-ts-mode--project-file ()
   "Determine name of GNAT Project file, if exists."
-  (or (ada-ts-mode--lsp-project-file)
+  (or (als/project-file)
       (ada-ts-mode--alire-project-file)
       (ada-ts-mode--root-project-file)
       (ada-ts-mode--default-project-file)))
@@ -803,32 +758,6 @@ a paragraph."
   (if-let* ((project-file (ada-ts-mode--project-file)))
       (find-file project-file)
     (message "Project file unknown or non-existent.")))
-
-;;; Language Server
-
-(defun ada-ts-mode--uri-to-path (uri)
-  "Convert URI to file path."
-  (let* ((obj (url-generic-parse-url (url-unhex-string uri)))
-         (path (url-filename obj)))
-    (when (and (eq system-type 'windows-nt)
-               (string-equal (substring path 0 1) "/"))
-      ;; Strip leading separator on Windows
-      (setq path (substring path 1)))
-    (directory-file-name path)))
-
-(defun ada-ts-mode--lsp-session-setup ()
-  "Perform LSP session setup."
-  (when-let* (((derived-mode-p 'ada-ts-mode))
-              (client (ada-ts-mode-lspclient-current))
-              (command "als-source-dirs")
-              ((ada-ts-mode-lspclient-command-supported-p client command))
-              (result (ada-ts-mode-lspclient-command-execute client command))
-              (source-dirs
-               (seq-map
-                (lambda (dir-info)
-                  (ada-ts-mode--uri-to-path (plist-get dir-info :uri)))
-                result)))
-    (ada-ts-mode-lspclient-workspace-dirs-add client source-dirs)))
 
 ;;; Imenu
 
@@ -1191,6 +1120,11 @@ the name of the branch given the branch node."
     ["-----"                        nil                                     nil]
     ["Add Comment Box"              ada-ts-mode-defun-comment-box           t]
     ["-----"                        nil                                     nil]
+    ("Language Server"
+     ["Find Workspace Configuration File" als/find-workspace-config-file t]
+     ["Find User Configuration File"      als/find-user-config-file      t]
+     ["Show Composite Configuration"      als/show-composite-config      t])
+    ["-----"                        nil                                     nil]
     ["Manual"                       (info "(ada-ts-mode)Top")               t]
     ["Customize"                    (customize-group 'ada-ts)               t]))
 
@@ -1293,9 +1227,6 @@ the name of the branch given the branch node."
   ;; Other File.
   (setq-local ff-other-file-alist 'ada-ts-mode-other-file-alist)
 
-  ;; Language Server.
-  (add-hook 'ada-ts-mode-lspclient-session-hook #'ada-ts-mode--lsp-session-setup)
-
   (treesit-major-mode-setup)
 
   ;; Override `treesit-major-mode-setup' settings.
@@ -1333,3 +1264,6 @@ the name of the branch given the branch node."
 (provide 'ada-ts-mode)
 
 ;;; ada-ts-mode.el ends here
+;; Local Variables:
+;; read-symbol-shorthands: (("als/" . "ada-ts-als-"))
+;; End:

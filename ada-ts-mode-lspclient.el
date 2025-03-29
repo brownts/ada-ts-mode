@@ -52,7 +52,7 @@ on.")
 (cl-defgeneric ada-ts-mode-lspclient-format-region (_client beg end)
   "Format region BEG to END using Language Server.")
 
-(cl-defgeneric ada-ts-mode-lspclient-workspace-configuration (_client scope)
+(cl-defgeneric ada-ts-mode-lspclient-workspace-configuration (_client scope &optional false)
   "Retrieve workspace configuration for SCOPE.
 
 SCOPE may represent a section name (or \\='.\\=' separated nested
@@ -61,7 +61,10 @@ field name.  When scope's final element is a section, the section is
 returned as a property list, whose keys are case-preserved keywords.
 When scope's final element is a field, the value of the field is
 returned.  When scope does not represent an existing section or field in
-the configuration, nil is returned.")
+the configuration, nil is returned.
+
+If FALSE is provided, it represents the JSON false value in Emacs Lisp.
+When omitted, it is represented as nil.")
 
 (cl-defgeneric ada-ts-mode-lspclient-workspace-dirs-add (_client dirs)
   "Add workspace DIRS to session.")

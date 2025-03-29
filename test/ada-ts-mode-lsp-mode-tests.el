@@ -25,6 +25,71 @@
 (require 'ert)
 (require 'ert-x)
 
+(ert-deftest ada-ts-mode-test-lsp-mode-als-executables ()
+  "Test ALS command 'als-executables'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (let ((execs (ada-ts-als-executables)))
+        (should (listp execs))
+        (should (= (length execs) 1))
+        (should (string-equal
+                 (car execs)
+                 (expand-file-name (concat "hello_world"
+                                           (if (eq system-type 'windows-nt) ".exe" ""))
+                                   (project-root (project-current)))))))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-als-get-project-attribute-value ()
+  "Test ALS command 'als-get-project-attribute-value'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (let ((dirs (ada-ts-als-get-project-attribute-value "Source_Dirs")))
+        (should (listp dirs))
+        (should (= (length dirs) 1))
+        (should (string-equal (car dirs) "."))))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-als-mains ()
+  "Test ALS command 'als-mains'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (let ((mains (ada-ts-als-mains)))
+        (should (listp mains))
+        (should (= (length mains) 1))
+        (should (string-equal
+                 (car mains)
+                 (expand-file-name "hello_world.adb"
+                                   (project-root (project-current)))))))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-als-object-dir ()
+  "Test ALS command 'als-object-dir'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (let ((object-dir (ada-ts-als-object-dir)))
+        (should (stringp object-dir))
+        (should (string-equal
+                 object-dir
+                 (directory-file-name
+                  (expand-file-name (project-root (project-current))))))))))
+
 (ert-deftest ada-ts-mode-test-lsp-mode-als-other-file ()
   "Test ALS command 'als-other-file'."
   (skip-unless (and (executable-find "ada_language_server")
@@ -61,9 +126,48 @@
       "hello_world.gpr"
     (with-language-server lsp-mode
       (should (string-equal
-               (ada-ts-mode--lsp-project-file)
+               (ada-ts-als-project-file)
                (expand-file-name "hello_world.gpr"
                                  (project-root (project-current))))))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-als-source-dirs ()
+  "Test ALS command 'als-source-dirs'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (let* ((source-dirs (ada-ts-als-source-dirs))
+             (source-dir (car source-dirs)))
+        (should (= (length source-dirs) 1))
+        (should (stringp source-dir))
+        (should (string-equal
+                 source-dir
+                 (directory-file-name
+                  (expand-file-name (project-root (project-current))))))))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-config-exists ()
+  "Tests that `lsp-mode' contains a server configuration for `ada-ts-mode'."
+  (skip-unless (featurep 'lsp-mode))
+  (require 'lsp-ada)
+  (let ((client (gethash 'ada-ls lsp-clients)))
+    (should (lsp--client-p client))
+    (should (memq 'ada-ts-mode (lsp--client-major-modes client)))))
+
+(ert-deftest ada-ts-mode-test-lsp-mode-config-language ()
+  "Tests that `lsp-mode' correctly determines language for `ada-ts-mode'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.adb"
+    (with-language-server lsp-mode
+      (let ((language (lsp-buffer-language)))
+        (should (stringp language))
+        (should (string-equal language "ada"))))))
 
 (ert-deftest ada-ts-mode-test-lsp-mode-formatting ()
   "Test LSP request 'textDocument/formatting'."
@@ -76,8 +180,7 @@
     (with-language-server lsp-mode
       (setq-local ada-ts-mode-indent-backend 'lsp)
       (setq-local indent-tabs-mode nil)
-      (let ((inhibit-message t))
-        (ada-ts-mode-tests--check-indentation)))))
+      (ada-ts-mode-tests--check-indentation))))
 
 (ert-deftest ada-ts-mode-test-lsp-mode-range-formatting ()
   "Test LSP request 'textDocument/rangeFormatting'."
@@ -90,8 +193,7 @@
     (with-language-server lsp-mode
       (setq-local ada-ts-mode-indent-backend 'lsp)
       (setq-local indent-tabs-mode nil)
-      (let ((inhibit-message t))
-        (ada-ts-mode-tests--check-line-indentation)))))
+      (ada-ts-mode-tests--check-line-indentation))))
 
 (provide 'ada-ts-mode-lsp-mode-tests)
 
