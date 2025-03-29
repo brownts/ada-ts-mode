@@ -21,7 +21,7 @@
 
 ;;; Code:
 
-(require 'ada-ts-mode-lspclient)
+(require 'ada-ts-als)
 (require 'cl-generic)
 (require 'treesit)
 (eval-when-compile (require 'rx))
@@ -1448,47 +1448,16 @@ any of the types in TYPE or TYPES."
 (cl-defmethod ada-ts-mode-indent-line ((_backend (eql lsp)))
   "Indent line using LSP server BACKEND.
 
-If an LSP client is not active, or the line to indent is empty, or if
-the LSP region formatting function fails, fallback to tree-sitter based
-indentation.
-
-The Ada Language Server does not indent empty lines and will fail to
-indent when syntax errors exist, therefore the need to fallback on
-tree-sitter indentation in these scenarios."
-  (if-let* ((client (lspclient/current)))
-      (if (save-excursion
-            (forward-line 0)
-            (looking-at-p (rx (* whitespace) eol)))
-          ;; Handle extraneous space as well as implement a workaround
-          ;; for LSP onTypeFormatting for RET as described in
-          ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=70929
-          (ada-ts-mode-indent-line 'tree-sitter)
-        (condition-case _
-            (let ((initial-point-column (current-column))
-                  (initial-indentation-column (current-indentation)))
-              (ada-ts-mode-indent-region 'lsp (pos-bol) (pos-eol))
-              ;; For consistency with built-in indentation behavior,
-              ;; if point was in the white-space at the beginning of
-              ;; the line, move point to the current indentation.
-              (when (<= initial-point-column
-                        initial-indentation-column)
-                (back-to-indentation)))
-          (error
-           (ada-ts-mode-indent-line 'tree-sitter))))
-    ;; fallback on tree-sitter indentation
-    (ada-ts-mode-indent-line 'tree-sitter)))
+If LSP line formatting fails, fallback on tree-sitter indentation."
+  (or (als/format-line ada-ts-mode-indent-offset)
+      (ada-ts-mode-indent-line 'tree-sitter)))
 
 (cl-defmethod ada-ts-mode-indent-region ((_backend (eql lsp)) beg end)
   "Indent the region between BEG and END using LSP server BACKEND.
 
-When CLIENT is not nil, use it as the active LSP client."
-  (if-let* ((client (lspclient/current)))
-      (let ((inhibit-message t)
-            (tab-width ada-ts-mode-indent-offset)
-            (standard-indent ada-ts-mode-indent-offset))
-        (lspclient/format-region client beg end))
-    ;; fallback on tree-sitter indentation
-    (ada-ts-mode-indent-region 'tree-sitter beg end)))
+If LSP region formatting fails, fallback on tree-sitter indentation."
+  (or (als/format-region beg end ada-ts-mode-indent-offset)
+      (ada-ts-mode-indent-region 'tree-sitter beg end)))
 
 ;;;; Tree-sitter
 
@@ -1862,8 +1831,8 @@ following electric punctuation or electric keywords."
 
 ;;; ada-ts-indentation.el ends here
 ;; Local Variables:
-;; read-symbol-shorthands: (("lspclient/" . "ada-ts-mode-lspclient-")
-;;                          ("advice/"    . "ada-ts-mode--advice-")
-;;                          ("anchor/"    . "ada-ts-mode--anchor-")
-;;                          ("offset/"    . "ada-ts-mode--offset-"))
+;; read-symbol-shorthands: (("als/"    . "ada-ts-als-")
+;;                          ("advice/" . "ada-ts-mode--advice-")
+;;                          ("anchor/" . "ada-ts-mode--anchor-")
+;;                          ("offset/" . "ada-ts-mode--offset-"))
 ;; End:

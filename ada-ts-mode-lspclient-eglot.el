@@ -23,6 +23,7 @@
 
 (require 'cl-generic)
 (require 'eglot)
+(require 'json)
 
 (defun ada-ts-mode-lspclient-eglot ()
   "Return Eglot client."
@@ -31,13 +32,14 @@
 
 (cl-defmethod ada-ts-mode-lspclient-command-execute ((_client (eql eglot)) command &rest arguments)
   "Execute COMMAND with ARGUMENTS using Language Server."
-  (cond ((functionp 'eglot-execute-command)
-         (eglot-execute-command (eglot-current-server)
-                                command (vconcat arguments)))
-        ((functionp 'eglot-execute)
-         (eglot-execute (eglot-current-server)
-                        `( :command   ,command
-                           :arguments ,(vconcat arguments))))))
+  (ada-ts-mode-lspclient-eglot--normalize
+   (cond ((functionp 'eglot-execute-command)
+          (eglot-execute-command (eglot-current-server)
+                                 command (vconcat arguments)))
+         ((functionp 'eglot-execute)
+          (eglot-execute (eglot-current-server)
+                         `( :command   ,command
+                            :arguments ,(vconcat arguments)))))))
 
 (cl-defmethod ada-ts-mode-lspclient-command-supported-p ((_client (eql eglot)) command)
   "Determine if Language Server supports COMMAND."
@@ -61,16 +63,30 @@
       (eglot-format-buffer)
     (eglot-format beg end)))
 
-(cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope)
-  "Retrieve workspace configuration for SCOPE."
+(cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope &optional false)
+  "Retrieve workspace configuration for SCOPE.
+
+FALSE specifies the representation to use for JSON false values."
+
+  ;; Since Eglot's property list configuration may not contain the
+  ;; desired FALSE encoding, convert the configuration to JSON, then
+  ;; convert back controlling the desired encoding.
+
   (when-let* ((namespaces (string-split scope "\\."))
-              (plist (eglot--workspace-configuration-plist (eglot-current-server))))
+              (config-json
+               (let ((json-false :json-false))
+                 (json-encode
+                  (eglot--workspace-configuration-plist (eglot-current-server)))))
+              (config-plist
+               (let ((json-object-type 'plist)
+                     (json-key-type 'keyword)
+                     (json-false false))
+                 (json-read-from-string config-json))))
     ;; Remove scope namespaces
-    (seq-do
-     (lambda (namespace)
-       (setq plist (plist-get plist (intern (concat ":" namespace)))))
-     namespaces)
-    plist))
+    (map-nested-elt config-plist
+                    (seq-map (lambda (n)
+                               (intern (concat ":" n)))
+                             namespaces))))
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-root ((_client (eql eglot)) path)
   "Determine workspace root for PATH."
@@ -85,6 +101,15 @@
      (lambda (folder)
        (string-prefix-p folder expanded-path))
      workspace-folders)))
+
+(defun ada-ts-mode-lspclient-eglot--normalize (value)
+  "Normalize VALUE using lists, property lists, etc."
+  (cond ((listp value)
+         (seq-map #'ada-ts-mode-lspclient-eglot--normalize value))
+        ((vectorp value)
+         (append (seq-map #'ada-ts-mode-lspclient-eglot--normalize value) nil))
+        ((eq value :json-false) nil)
+        (t value)))
 
 (defun ada-ts-mode-lspclient-eglot--find-mode-config (mode-to-find)
   "Find Eglot server configuration for MODE-TO-FIND."

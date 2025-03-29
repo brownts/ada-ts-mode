@@ -53,6 +53,7 @@ required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 * Navigation::
 * Imenu::
 * Casing::
+* Ada Language Server::
 * Miscellaneous::
 * LSP Client Support::
 * Troubleshooting::
@@ -566,6 +567,48 @@ implementation of @samp{ada-ts-mode-case-category-p} should be created,
 specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.
+
+@node Ada Language Server
+@chapter Ada Language Server
+
+Functionality provided by the Ada Language Server is seamlessly
+integrated into the corresponding functional areas as appropriate
+(i.e., indentation, cross-references, etc.).  However, there is other
+support @samp{ada-ts-mode} provides which is specific to managing the Ada
+Language Server itself, not the functionality it provides.
+
+@deffn Command ada-ts-als-find-user-config-file
+Find Ada Language Server user configuration file.  If the variable
+@code{$XDG_CONFIG_HOME} exists, the user configuration file is
+@code{$XDG_CONFIG_HOME/als/config.json}.  Otherwise, the user configuration
+file is @code{~/.config/als/config.json}.  If the file does not exist, a
+new file will be visited.
+@end deffn
+
+@deffn Command ada-ts-als-find-workspace-config-file
+Find Ada Language Server workspace configuration file.  The file is
+found in the root of the LSP client defined workspace root
+directory, when an LSP client is active, otherwise the file is found
+relative to the project root as determined by project.el.  If the
+file does not exist, a new file will be visited.
+@end deffn
+
+@deffn Command ada-ts-als-show-composite-config
+Show the composite JSON-formatted configuration for the Ada Language
+Server combining the user configuration file (when exists), the
+workspace configuration file (when exists) and the LSP client
+specific configuration (when an LSP client is active).  This
+provides a holistic view of the separate parts that comprise the
+configuration, which can be helpful when troubleshooting
+configuration problems.  Overlapping configuration from these
+sources are combined based on priority, such that the LSP client
+configuration is higher priority than the workspace configuration,
+which is higher priority than the user configuration.  This is
+consistent with how the Language Server resolves overlapping
+configuration.  Note that the Ada Language Server has a default
+configuration, when not specified by any of these sources.  Refer to
+the Ada Language Server documentation for full details.
+@end deffn
 
 @node Miscellaneous
 @chapter Miscellaneous

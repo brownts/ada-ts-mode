@@ -25,6 +25,67 @@
 (require 'ert)
 (require 'ert-x)
 
+(ert-deftest ada-ts-mode-test-eglot-als-executables ()
+  "Test ALS command 'als-executables'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (let ((execs (ada-ts-als-executables)))
+        (should (listp execs))
+        (should (= (length execs) 1))
+        (should (string-equal
+                 (car execs)
+                 (expand-file-name (concat "hello_world"
+                                           (if (eq system-type 'windows-nt) ".exe" ""))
+                                   (project-root (project-current)))))))))
+
+(ert-deftest ada-ts-mode-test-eglot-als-get-project-attribute-value ()
+  "Test ALS command 'als-get-project-attribute-value'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (let ((dirs (ada-ts-als-get-project-attribute-value "Source_Dirs")))
+        (should (listp dirs))
+        (should (= (length dirs) 1))
+        (should (string-equal (car dirs) "."))))))
+
+(ert-deftest ada-ts-mode-test-eglot-als-mains ()
+  "Test ALS command 'als-mains'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (let ((mains (ada-ts-als-mains)))
+        (should (listp mains))
+        (should (= (length mains) 1))
+        (should (string-equal
+                 (car mains)
+                 (expand-file-name "hello_world.adb"
+                                   (project-root (project-current)))))))))
+
+(ert-deftest ada-ts-mode-test-eglot-als-object-dir ()
+  "Test ALS command 'als-object-dir'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (let ((object-dir (ada-ts-als-object-dir)))
+        (should (stringp object-dir))
+        (should (string-equal
+                 object-dir
+                 (directory-file-name
+                  (expand-file-name (project-root (project-current))))))))))
+
 (ert-deftest ada-ts-mode-test-eglot-als-other-file ()
   "Test ALS command 'als-other-file'.
 
@@ -64,9 +125,26 @@ Emacs 29) did not support it."
       "hello_world.gpr"
     (with-language-server eglot
       (should (string-equal
-               (ada-ts-mode--lsp-project-file)
+               (ada-ts-als-project-file)
                (expand-file-name "hello_world.gpr"
                                  (project-root (project-current))))))))
+
+(ert-deftest ada-ts-mode-test-eglot-als-source-dirs ()
+  "Test ALS command 'als-source-dirs'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (let* ((source-dirs (ada-ts-als-source-dirs))
+             (source-dir (car source-dirs)))
+        (should (= (length source-dirs) 1))
+        (should (stringp source-dir))
+        (should (string-equal
+                 source-dir
+                 (directory-file-name
+                  (expand-file-name (project-root (project-current))))))))))
 
 (ert-deftest ada-ts-mode-test-eglot-config-exists ()
   "Tests that Eglot contains a server configuration for `ada-ts-mode'."
@@ -100,8 +178,7 @@ Emacs 29) did not support it."
     (with-language-server eglot
       (setq-local ada-ts-mode-indent-backend 'lsp)
       (setq-local indent-tabs-mode nil)
-      (let ((inhibit-message t))
-        (ada-ts-mode-tests--check-indentation)))))
+      (ada-ts-mode-tests--check-indentation))))
 
 (ert-deftest ada-ts-mode-test-eglot-range-formatting ()
   "Test LSP request 'textDocument/rangeFormatting'."
@@ -113,8 +190,7 @@ Emacs 29) did not support it."
     (with-language-server eglot
       (setq-local ada-ts-mode-indent-backend 'lsp)
       (setq-local indent-tabs-mode nil)
-      (let ((inhibit-message t))
-        (ada-ts-mode-tests--check-line-indentation)))))
+      (ada-ts-mode-tests--check-line-indentation))))
 
 (provide 'ada-ts-mode-eglot-tests)
 
