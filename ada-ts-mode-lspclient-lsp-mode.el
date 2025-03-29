@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'cl-generic)
+(require 'json)
 
 (declare-function lsp-can-execute-command?      "ext:lsp-mode" (command-name))
 (declare-function lsp-configuration-section     "ext:lsp-mode" (section))
@@ -57,17 +58,28 @@
   "Format region BEG to END using Language Server."
   (lsp-format-region beg end))
 
-(cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql lsp-mode)) scope)
-  "Retrieve workspace configuration for SCOPE."
+(cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql lsp-mode)) scope &optional false)
+  "Retrieve workspace configuration for SCOPE.
+
+FALSE specifies the representation to use for JSON false values."
+
+  ;; Since the LSP configuration can contain multiple formats (e.g.,
+  ;; hash table, property list and/or attribute list), first convert
+  ;; it to JSON to normalize it, then convert it to a property list.
   (when-let* ((namespaces (string-split scope "\\."))
-              (htable (lsp-configuration-section (car namespaces)))
-              (plist (ada-ts-mode-lspclient--lsp-mode-normalize htable)))
+              (config-json
+               (let ((json-false :json-false))
+                 (json-encode (lsp-configuration-section (car namespaces)))))
+              (config-plist
+               (let ((json-object-type 'plist)
+                     (json-key-type 'keyword)
+                     (json-false false))
+                 (json-read-from-string config-json))))
     ;; Remove scope namespaces
-    (seq-do
-     (lambda (namespace)
-       (setq plist (plist-get plist (intern (concat ":" namespace)))))
-     namespaces)
-    plist))
+    (map-nested-elt config-plist
+                    (seq-map (lambda (n)
+                               (intern (concat ":" n)))
+                             namespaces))))
 
 (defvar ada-ts-mode-lspclient--lsp-workspace-extra-dirs-alist nil)
 
