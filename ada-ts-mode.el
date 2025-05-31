@@ -1140,6 +1140,7 @@ the name of the branch given the branch node."
 
 (require 'ada-ts-casing)
 (require 'ada-ts-indentation)
+(require 'ada-ts-tags)
 
 (defvar ada-ts-mode-map
   (let ((map (make-sparse-keymap)))
@@ -1282,6 +1283,9 @@ the name of the branch given the branch node."
   ;; Language Server.
   (add-hook 'ada-ts-mode-lspclient-session-hook #'ada-ts-mode--lsp-session-setup)
 
+  ;; TAGS.
+  (ada-ts-tags--setup)
+
   (treesit-major-mode-setup)
 
   ;; Override `treesit-major-mode-setup' settings.
@@ -1290,8 +1294,16 @@ the name of the branch given the branch node."
 
 ;;;###autoload
 (progn
-  (add-to-list 'auto-mode-alist
-               `(,(rx (or ".ada" ".adb" ".ads" ".adc") eos) . ada-ts-mode))
+  ;; Use multiple entries for the supported file extensions, so the
+  ;; regular expressions conform to the "simple pattern" expected by
+  ;; `semantic-symref-derived-find-filepatterns', used indirectly by
+  ;; the default `xref-backend-references' implementation.  This
+  ;; default implementation is used by the etags backend for
+  ;; `xref-find-references'.
+  (add-to-list 'auto-mode-alist `(,(rx ".ada" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".adb" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".adc" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".ads" eos) . ada-ts-mode))
   ;; Add ada-mode as an "extra" parent so ada-ts-mode can handle
   ;; directory local variables for ada-mode, etc. (Emacs 30+)
   (when (fboundp 'derived-mode-add-parents)

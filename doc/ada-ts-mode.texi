@@ -30,8 +30,8 @@ highlighting to be performed more accurately than historical methods
 
 This major mode provides support for syntax highlighting, indentation,
 navigation, Imenu, ``which function'' (i.e., displaying the current
-function name in the mode line), outlining (via @samp{outline-minor-mode})
-and casing.
+function name in the mode line), outlining (via @samp{outline-minor-mode}),
+casing, completion and cross-referencing.
 
 @strong{Note}: This major mode is based on the Emacs 29 (or newer) built-in
 tree-sitter support, not to be confused with the separate Emacs
@@ -53,6 +53,7 @@ required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 * Navigation::
 * Imenu::
 * Casing::
+* Completion and Cross-Reference Navigation::
 * Miscellaneous::
 * LSP Client Support::
 * Troubleshooting::
@@ -566,6 +567,31 @@ implementation of @samp{ada-ts-mode-case-category-p} should be created,
 specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.
+
+@node Completion and Cross-Reference Navigation
+@chapter Completion and Cross-Reference Navigation
+
+Symbol completion and cross-reference navigation are supported in @code{ada-ts-mode}, either intrinsically or via an activated LSP client.  When an LSP client is active for the buffer, the client takes care of handling completion and cross-referencing commands by interfacing with the language server.  Through use of the built-in Emacs commands (e.g., @samp{completion-at-point}, @samp{xref-find-definitions}, etc.) or more likely, the corresponding key bindings for these commands (@samp{C-M-i}, @samp{M-.}, etc.), the LSP client interfaces with the language server to obtain this information and perform the corresponding command.  Therefore, these capabilities should ``just work'' in an LSP-powered environment.
+
+Without an active LSP client, invoking a cross-reference command, such as @samp{xref-find-definitions}, will prompt for a TAGS file.  Tags are a light-weight method for supplying the editor with locations of symbols, such as package names, subroutines names, type names, etc. for use in completion and cross-reference navigation.  While not nearly as full-featured as using an LSP client, tags can still provide many of the benefits.  When use of a language server is not possible or not desired, tags provide a useful alternative.
+
+If a TAGS file doesn't currently exist, one can quickly be created through use of the @samp{etags} executable, which ships with Emacs.  Using @samp{etags} can be as simple as invoking it with the list of source files (or glob pattern) to use as input for the generated TAGS file.  For Ada, the command may be as simple as @samp{etags *.ad*} which generates tags for all Ada sources in the current directory.  By default, @samp{etags} does not support traversing a directory tree looking for files.  Therefore, you may need to combine the command with another command (such as @samp{find}) capable of traversing a directory tree, to provide a set of source files for your project.  Refer to the Emacs manual for additional details on how to invoke @samp{etags} for your needs.
+
+For completion support, attempting completion without having a TAGS file loaded will fail to provide any completions, without prompting to load one.  The reason for this is to avoid triggering the tags completion back-end unless explicitly requested (since other back-ends may also be active).  Thus, you will either need to trigger a cross-reference command first (to force loading of the TAGS file), or force loading the TAGS file (via @code{M-x visit-tags-table RET TAGS RET}) before triggering completion.
+
+While tag files can tolerate modifications to the source file and still find existing symbols, when symbols are moved, added, etc. the TAGS file should be regenerated, otherwise Emacs won't be able to locate those new or moved symbols.  Simply re-running the command used to originally create the TAGS file should be sufficient to update it to represent the current state of your tags.  If you're trying to use completion or cross-referencing and it isn't working as expected, make sure the TAGS file is up-to-date.
+
+Starting with Emacs 30, a new global minor mode (@samp{etags-regen-mode}) is available which can alleviate the burden of creating and maintaining a TAGS file for your project.  If you primarily use tags to manage your project and have access to Emacs 30 or newer, this minor mode is highly recommended.  It provides many benefits:
+@itemize
+@item
+You will no longer be prompted for a TAGS file, it will automatically be loaded, or created if non-existent.
+@item
+You no longer need to force load the TAGS file to use completion before cross-referencing.
+@item
+You no longer need to regenerate the TAGS file to keep it up-to-date.  It will be updated after saving an edited source file.  If attempting to use completion or cross-referencing for new symbols in the file you're editing, make sure to save before attempting completion or cross-referencing commands, since the TAGS file is only triggered to be updated after the file has been saved.  Otherwise, your new symbols, not included in the saved file, won't be locatable.
+@end itemize
+
+When using @samp{etags-regen-mode}, the TAGS file is expected to be located in the root directory of your project (although this can be overridden through the @code{etags-regen-tags-file} user option).  Under the hood, @code{project.el} is used to locate the root directory.  You'll want to make sure Emacs can determine the root of your project, which if using non-standard roots might require you to provide additional root detection in @code{project-vc-extra-root-markers}.  To verify what Emacs thinks the root of your project is, use: @samp{M-: (project-current) RET}.  For further details on @samp{etags-regen-mode} refer to the Emacs manual.
 
 @node Miscellaneous
 @chapter Miscellaneous
