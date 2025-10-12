@@ -46,7 +46,7 @@ jobs:
         shell: cmd
         run: |
           echo @echo off>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
-          echo perl ${{runner.temp}}\msys64\usr\bin\makeinfo %%*>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
+          echo ${{runner.temp}}\msys64\usr\bin\perl ${{runner.temp}}\msys64\usr\bin\makeinfo %%*>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
           echo ${{runner.temp}}\msys64\mingw64\bin>> %GITHUB_PATH%
 
       - name: Setup Emacs
