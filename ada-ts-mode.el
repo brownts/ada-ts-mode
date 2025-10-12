@@ -1169,7 +1169,19 @@ the name of the branch given the branch node."
     ["-----"                        nil                                     nil]
     ["Add Comment Box"              ada-ts-mode-defun-comment-box           t]
     ["-----"                        nil                                     nil]
-    ["Manual"                       (info "(ada-ts-mode)Top")               t]
+    ("Help"
+     ["Ada Mode Manual"             (info "(ada-ts-mode)Top")               t]
+     ["Example Configuration"       (browse-url "https://github.com/brownts/dotemacs-ada") t]
+     ["Report An Issue"             (browse-url "https://github.com/brownts/ada-ts-mode/issues") t]
+     ["-----"                       nil                                     nil]
+     ["Ada Community"               (browse-url "https://ada-lang.io/")     t]
+     ["Ada Library Repository"      (browse-url "https://alire.ada.dev/")   t]
+     ["-----"                       nil                                     nil]
+     ["Ada 2022 Reference Manual"   (browse-url "https://ada-rapporteur-group.github.io/ARM/Ada_2022/RM-TOC.html") t]
+     ["Ada 2012 Reference Manual"   (browse-url "https://ada-rapporteur-group.github.io/ARM/Ada_2012/RM-TOC.html") t]
+     ["Ada 2005 Reference Manual"   (browse-url "https://www.adaic.org/resources/add_content/standards/05rm/html/RM-TOC.html") t]
+     ["Ada 95 Reference Manual"     (browse-url "https://www.adaic.org/resources/add_content/standards/95lrm/ARM_HTML/RM-TOC.html") t]
+     ["Ada 83 Reference Manual"     (browse-url "http://archive.adaic.com/standards/83lrm/html/lrm-TOC.html") t])
     ["Customize"                    (customize-group 'ada-ts)               t]))
 
 ;;;###autoload
