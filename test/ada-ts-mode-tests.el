@@ -26,12 +26,67 @@
 (require 'treesit)
 (require 'which-func)
 
-(defun default-transform ()
-  "Default transform function for test."
+;;;; Utilities
+
+(defun ada-ts-mode-tests--modify-and-reindent ()
+  "Modify each line and reindent buffer."
+  ;; Modifying each line is used to make sure there is an indentation
+  ;; rule that moves the line back to the initial location, rather
+  ;; than no indentation rule that just leaves the line alone.  This
+  ;; is useful for finding lines with missing indentation rules.
+  (goto-char (point-min))
+  (cl-flet ((line-length () (- (line-end-position)
+                               (line-beginning-position))))
+    (while (not (eobp))
+      (when (> (line-length) 0)
+        (if (= (following-char) ?\s)
+            (while (and (> (line-length) 0)
+                        (= (following-char) ?\s))
+              (delete-char 1))
+          (insert-char ?\s)))
+      (forward-line 1)
+      (beginning-of-line)))
+  (indent-region (point-min) (point-max)))
+
+(defun ada-ts-mode-tests--check-indentation ()
+  "Check test setup indentation is as expected."
+  (let ((buffer (buffer-string))
+        (point (point)))
+    (ada-ts-mode-tests--modify-and-reindent)
+    (should (string-equal buffer (buffer-string)))
+    (goto-char point)))
+
+(defun ada-ts-mode-tests--simulate-key-press (key)
+  "Simulate interactively pressing KEY.
+
+Simulates execution of the command associated with the key as well as
+execution of pre and post command hooks."
+  (let ((inhibit-message t))
+    (save-window-excursion
+      (set-window-buffer nil (current-buffer))
+      (execute-kbd-macro (kbd key)))))
+
+;;;; Transform Functions
+
+(defun default-transform (&optional expect-error setup)
+  "Default transform function for test.
+
+If EXPECT-ERROR is \\='t\\=' or \\='expect-error\\=', then check for an
+error in the parse tree, else if EXPECT-ERROR is \\='nil\\=', check that
+there is no error in the parse tree, otherwise no check is performed.
+
+SETUP can be used to perform custom initialization."
   (ada-ts-mode)
-  (should (not (treesit-search-subtree
-                (treesit-buffer-root-node) "ERROR")))
-  (setq-local indent-tabs-mode nil))
+  (setq-local indent-tabs-mode nil)
+  (cond ((or (eq expect-error 't)
+             (eq expect-error 'expect-error))
+         (should (treesit-search-subtree
+                  (treesit-buffer-root-node) "ERROR")))
+        ((eq expect-error 'nil)
+         (should (not (treesit-search-subtree
+                       (treesit-buffer-root-node) "ERROR")))))
+  (when setup
+    (funcall setup)))
 
 (defun defun-transform (name)
   "Defun NAME transform function for test."
@@ -48,9 +103,7 @@
 
 Only the structure is checked, not the markers.  SETUP can be used to
 perform custom initialization."
-  (default-transform)
-  (when setup
-    (funcall setup))
+  (default-transform nil setup)
   (cl-labels ((filter-menu (menu-item)
                 (cond ((markerp menu-item) nil) ; remove marker
                       ((proper-list-p menu-item)
@@ -66,28 +119,23 @@ perform custom initialization."
   "Indent transform function for test.
 
 SETUP can be used to perform custom initialization."
-  (default-transform)
-  (when setup
-    (funcall setup))
-  (goto-char (point-min))
-  (cl-flet ((line-length () (- (line-end-position)
-                               (line-beginning-position))))
-    (while (not (eobp))
-      (if (> (line-length) 0)
-          (if (= (following-char) ?\s)
-              (while (and (> (line-length) 0)
-                          (= (following-char) ?\s))
-                (delete-char 1))
-            (insert-char ?\s)))
-      (forward-line 1)
-      (beginning-of-line)))
+  (default-transform nil setup)
   (cl-letf (((symbol-function 'ada-ts-mode--anchor-catch-all)
              (lambda ()
                (lambda (node parent bol &rest _)
                  (let ((prefix "Indentation using catch-all rule: ")
                        (suffix (format "[NODE: %s, PARENT: %s, BOL: %s" node parent bol)))
                    (ert-fail (concat prefix suffix)))))))
-    (indent-region (point-min) (point-max))))
+    (ada-ts-mode-tests--modify-and-reindent)))
+
+(defun electric-indent-transform (key &optional setup)
+  "Electric Indentation transform function for test.
+
+KEY is used to trigger the electric indentation condition.  SETUP can be
+used to perform custom initialization before the test."
+  (default-transform 'dont-care setup)
+  (ada-ts-mode-tests--check-indentation)
+  (ada-ts-mode-tests--simulate-key-press key))
 
 (defun mode-transform (&optional version)
   "Mode transform function for test.
@@ -109,8 +157,9 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
 (defun newline-transform ()
   "Newline transform function for test."
   (default-transform)
-  (call-interactively #'newline))
+  (ada-ts-mode-tests--simulate-key-press "RET"))
 
+;;;; Test Loop
 
 (dolist (file (directory-files (ert-resource-directory)
                                nil

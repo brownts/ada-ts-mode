@@ -126,3 +126,34 @@ package Test is
            end record;
 end Test;
 =-=-=
+
+Name: Custom "when" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+     (setq-local ada-ts-mode-indent-when-offset 8))))
+
+=-=
+package Test is
+   type Record_Type (A : Boolean;
+                     B : Boolean) is record
+      X : Integer;
+      case A is
+              when True =>
+                 Y : Integer;
+      end case;
+   end record;
+
+   type Record_Type (A : Boolean;
+                     B : Boolean) is
+      record
+         X : Integer;
+         case A is
+                 when True =>
+                    Y : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=

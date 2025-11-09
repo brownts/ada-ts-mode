@@ -1,0 +1,301 @@
+Code: (lambda () (electric-indent-transform "e"))
+
+Point-Char: |
+
+Name: if_expression (1)
+
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+        els|
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      else|
+=-=-=
+
+Name: if_expression (2)
+
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      elsif A then
+         2
+        els|
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      elsif A then
+         2
+      else|
+=-=-=
+
+Name: if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+      els|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   else|
+=-=-=
+
+Name: if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   else|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+      elsee|
+=-=-=
+
+
+
+Name: if_statement (3)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+      els|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+   else|
+=-=-=
+
+Name: if_statement (4)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+   else|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+      elsee|
+=-=-=
+
+Name: conditional_entry_call (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      els|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else|
+=-=-=
+
+Name: conditional_entry_call (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      elsee|
+=-=-=
+
+Name: selective_accept (1)
+
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+         els|
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   else|
+=-=-=
+
+Name: selective_accept (2)
+
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   else|
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+         elsee|
+=-=-=
+
+Name: selective_accept (3)
+
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   or
+      when Y =>
+         delay 2.0;
+         els|
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   or
+      when Y =>
+         delay 2.0;
+   else|
+=-=-=
+
+Name: selective_accept (4)
+
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   or
+      when Y =>
+         delay 2.0;
+   else|
+=-=
+procedure Test is
+begin
+   select
+      when X =>
+         delay 1.0;
+   or
+      when Y =>
+         delay 2.0;
+         elsee|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (1)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+      #els|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #else|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (2)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True then
+      Y : Integer;
+      #els|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True then
+      Y : Integer;
+   #else|
+=-=-=
+
+Name: gnatprep_if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+         #els|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #else|
+=-=-=
+
+Name: gnatprep_if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True then
+         null;
+         #els|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True then
+         null;
+      #else|
+=-=-=

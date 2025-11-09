@@ -1,0 +1,532 @@
+Code: (lambda () (electric-indent-transform "n"))
+
+Point-Char: |
+
+Name: subprogram_body (1)
+
+=-=
+function Test (X : Integer) return Integer is
+   begi|
+=-=
+function Test (X : Integer) return Integer is
+begin|
+=-=-=
+
+Name: subprogram_body (2)
+
+=-=
+function Test (X : Integer) return Integer is
+begin|
+=-=
+function Test (X : Integer) return Integer is
+   beginn|
+=-=-=
+
+Name: subprogram_body (3)
+
+=-=
+function Test (X : Integer) return Integer is
+   X : Integer;
+   begi|
+=-=
+function Test (X : Integer) return Integer is
+   X : Integer;
+begin|
+=-=-=
+
+Name: subprogram_body (4)
+
+=-=
+function Test (X : Integer) return Integer is
+   X : Integer;
+begin|
+=-=
+function Test (X : Integer) return Integer is
+   X : Integer;
+   beginn|
+=-=-=
+
+Name: subprogram_body (5)
+
+=-=
+procedure Test is
+   begi|
+=-=
+procedure Test is
+begin|
+=-=-=
+
+Name: subprogram_body (6)
+
+=-=
+procedure Test is
+begin|
+=-=
+procedure Test is
+   beginn|
+=-=-=
+
+
+Name: subprogram_body (7)
+
+=-=
+procedure Test is
+   X : Integer;
+   begi|
+=-=
+procedure Test is
+   X : Integer;
+begin|
+=-=-=
+
+Name: subprogram_body (8)
+
+=-=
+procedure Test is
+   X : Integer;
+begin|
+=-=
+procedure Test is
+   X : Integer;
+   beginn|
+=-=-=
+
+Name: subprogram_body (9)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      begi|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      begin|
+=-=-=
+
+Name: subprogram_body (10)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      begin|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      beginn|
+=-=-=
+
+Name: package_body (1)
+
+=-=
+package body Test is
+   begi|
+=-=
+package body Test is
+begin|
+=-=-=
+
+Name: package_body (2)
+
+=-=
+package body Test is
+begin|
+=-=
+package body Test is
+   beginn|
+=-=-=
+
+Name: package_body (3)
+
+=-=
+package body Test is
+   X : Integer;
+   begi|
+=-=
+package body Test is
+   X : Integer;
+begin|
+=-=-=
+
+Name: package_body (4)
+
+=-=
+package body Test is
+   X : Integer;
+begin|
+=-=
+package body Test is
+   X : Integer;
+   beginn|
+=-=-=
+
+Name: declare_expression (1)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         begi|)
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+      begin|)
+=-=-=
+
+Name: declare_expression (2)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+      begin|)
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         beginn|)
+=-=-=
+
+Name: declare_expression (3)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         X : Integer;
+         begi|)
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         X : Integer;
+      begin|)
+=-=-=
+
+Name: declare_expression (4)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         X : Integer;
+      begin|)
+=-=
+procedure Test is
+   X : Integer :=
+     (declare
+         X : Integer;
+         beginn|)
+=-=-=
+
+Name: task_body (1)
+
+=-=
+task body Test is
+   begi|
+=-=
+task body Test is
+begin|
+=-=-=
+
+Name: task_body (2)
+
+=-=
+task body Test is
+begin|
+=-=
+task body Test is
+   beginn|
+=-=-=
+
+Name: task_body (3)
+
+=-=
+task body Test is
+   X : Integer;
+   begi|
+=-=
+task body Test is
+   X : Integer;
+begin|
+=-=-=
+
+Name: task_body (4)
+
+=-=
+task body Test is
+   X : Integer;
+begin|
+=-=
+task body Test is
+   X : Integer;
+   beginn|
+=-=-=
+
+Name: entry_body (1)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+      begi|
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin|
+=-=-=
+
+Name: entry_body (2)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin|
+=-=
+protected body Test is
+   entry Op when X > Y is
+      beginn|
+=-=-=
+
+Name: entry_body (3)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+      X : Integer;
+      begi|
+=-=
+protected body Test is
+   entry Op when X > Y is
+      X : Integer;
+   begin|
+=-=-=
+
+Name: entry_body (4)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+      X : Integer;
+   begin|
+=-=
+protected body Test is
+   entry Op when X > Y is
+      X : Integer;
+      beginn|
+=-=-=
+
+Name: block_statement (1)
+
+=-=
+procedure Test is
+begin
+   begi|
+=-=
+procedure Test is
+begin
+   begin|
+=-=-=
+
+Name: block_statement (2)
+
+=-=
+procedure Test is
+begin
+   begin|
+=-=
+procedure Test is
+begin
+   beginn|
+=-=-=
+
+Name: block_statement (3)
+
+=-=
+procedure Test is
+begin
+   declare
+      begi|
+=-=
+procedure Test is
+begin
+   declare
+   begin|
+=-=-=
+
+Name: block_statement (4)
+
+=-=
+procedure Test is
+begin
+   declare
+   begin|
+=-=
+procedure Test is
+begin
+   declare
+      beginn|
+=-=-=
+
+Name: block_statement (5)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+      begi|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin|
+=-=-=
+
+Name: block_statement (6)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+      beginn|
+=-=-=
+
+Name: block_statement (7)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      begi|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+   begin|
+=-=-=
+
+Name: block_statement (8)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+   begin|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      beginn|
+=-=-=
+
+Name: block_statement (9)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+      begi|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin|
+=-=-=
+
+Name: block_statement (10)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+      beginn|
+=-=-=
+
+Name: block_statement (11)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         begi|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+      begin|
+=-=-=
+
+Name: block_statement (12)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+      begin|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         beginn|
+=-=-=
+
+Name: block_statement (13)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+         begi|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin|
+=-=-=
+
+Name: block_statement (14)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+         beginn|
+=-=-=

@@ -1,0 +1,119 @@
+Code: (lambda () (electric-indent-transform "n"))
+
+Point-Char: |
+
+Name: exception_handler (1)
+
+=-=
+procedure Test is
+begin
+   null;
+exception
+   when Program_Error =>
+      null;
+      whe|
+=-=
+procedure Test is
+begin
+   null;
+exception
+   when Program_Error =>
+      null;
+   when|
+=-=-=
+
+Name: exception_handler (2)
+
+=-=
+procedure Test is
+begin
+   null;
+exception
+   when Program_Error =>
+      null;
+   when|
+=-=
+procedure Test is
+begin
+   null;
+exception
+   when Program_Error =>
+      null;
+      whenn|
+=-=-=
+
+Name: case_statement_alternative (1)
+
+=-=
+procedure Test is
+begin
+   case X is
+      when 1 =>
+         null;
+         whe|
+=-=
+procedure Test is
+begin
+   case X is
+      when 1 =>
+         null;
+      when|
+=-=-=
+
+Name: case_statement_alternative (2)
+
+=-=
+procedure Test is
+begin
+   case X is
+      when 1 =>
+         null;
+      when|
+=-=
+procedure Test is
+begin
+   case X is
+      when 1 =>
+         null;
+         whenn|
+=-=-=
+
+Name: variant_part (1)
+
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+            when True =>
+               T : Integer;
+               whe|
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+            when True =>
+               T : Integer;
+            when|
+=-=-=
+
+Name: variant_part (2)
+
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+            when True =>
+               T : Integer;
+            when|
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+            when True =>
+               T : Integer;
+               whenn|
+=-=-=

@@ -1,0 +1,191 @@
+Code: (lambda () (electric-indent-transform "r"))
+
+Point-Char: |
+
+Name: timed_entry_call (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      o|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or|
+=-=-=
+
+Name: timed_entry_call (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      orr|
+=-=-=
+
+Name: selective_accept (1)
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+      o|
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   or|
+=-=-=
+
+Name: selective_accept (2)
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   or|
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+      orr|
+=-=-=
+
+Name: selective_accept (3)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         o|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or|
+=-=-=
+
+Name: selective_accept (4)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         orr|
+=-=-=
+
+Name: selective_accept (5)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         null;
+         o|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         null;
+   or|
+=-=-=
+
+Name: selective_accept (6)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         null;
+   or|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         null;
+         orr|
+=-=-=
+
+Name: selective_accept (7)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+         o|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+   or|
+=-=-=
+
+Name: selective_accept (8)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+   or|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+         orr|
+=-=-=

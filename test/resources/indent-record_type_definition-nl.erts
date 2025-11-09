@@ -1,0 +1,309 @@
+Name: Before first variant (variant_part line)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is|
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            |
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: Before first variant (before comment line)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is|
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            |
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: Before first variant (after comment line)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant|
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            |
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: variant (before comment line)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>|
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               |
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: variant (after comment line)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list|
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               |
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: variant (after last component_item)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;|
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+               |
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: Last variant (after last component_item)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;|
+         end case;
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+               |
+         end case;
+      end record;
+end Test;
+=-=-=
+
+Name: variant (after end case)
+
+Point-Char: |
+
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;|
+      end record;
+end Test;
+=-=
+package Test is
+   type Record_Type (B : Boolean) is
+      record
+         X : Integer;
+         case B is
+            -- before variant
+            when True =>
+               -- before component_list
+               Y : Integer;
+            when False =>
+               -- before component_list
+               Z : Integer;
+         end case;
+         |
+      end record;
+end Test;
+=-=-=

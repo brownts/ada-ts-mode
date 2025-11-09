@@ -1,0 +1,143 @@
+Code: (lambda () (electric-indent-transform "f"))
+
+Point-Char: |
+
+Name: if_expression (1)
+
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+        elsi|
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      elsif|
+=-=-=
+
+Name: if_expression (2)
+
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      elsif A then
+         2
+        elsi|
+=-=
+procedure Test is
+   Y : constant Integer :=
+     (if X then
+         1
+      elsif A then
+         2
+      elsif|
+=-=-=
+
+Name: if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+      elsi|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif|
+=-=-=
+
+Name: if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+      elsiff|
+=-=-=
+
+Name: if_statement (3)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+      elsi|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+   elsif|
+=-=-=
+
+Name: if_statement (4)
+
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+   elsif|
+=-=
+procedure Test is
+begin
+   if X then
+      null;
+   elsif A then
+      null;
+      elsiff|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (1)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+      #elsi|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (2)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True then
+      Y : Integer;
+      #elsi|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True then
+      Y : Integer;
+   #elsif|
+=-=-=

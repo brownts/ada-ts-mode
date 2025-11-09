@@ -1,0 +1,300 @@
+Code: (lambda () (electric-indent-transform "e"))
+
+Point-Char: |
+
+Name: package_declaration (1)
+
+=-=
+package Test is
+   privat|
+=-=
+package Test is
+private|
+=-=-=
+
+Name: package_declaration (2)
+
+=-=
+package Test is
+private|
+=-=
+package Test is
+   privatee|
+=-=-=
+
+
+Name: package_declaration (3)
+
+=-=
+package Test is
+   type X is private;
+   privat|
+=-=
+package Test is
+   type X is private;
+private|
+=-=-=
+
+Name: package_declaration (4)
+
+=-=
+package Test is
+   type X is private;
+private|
+=-=
+package Test is
+   type X is private;
+   privatee|
+=-=-=
+
+Name: package_declaration (5)
+
+=-=
+private package Test is
+   privat|
+=-=
+private package Test is
+private|
+=-=-=
+
+Name: package_declaration (6)
+
+=-=
+private package Test is
+private|
+=-=
+private package Test is
+   privatee|
+=-=-=
+
+Name: package_declaration (7)
+
+=-=
+package Test is
+   package Test 2 is
+      privat|
+=-=
+package Test is
+   package Test 2 is
+   private|
+=-=-=
+
+Name: package_declaration (8)
+
+=-=
+package Test is
+   package Test 2 is
+   private|
+=-=
+package Test is
+   package Test 2 is
+      privatee|
+=-=-=
+
+Name: protected_type_declaration (1)
+
+=-=
+package Test is
+   protected type Test_Type is
+      privat|
+=-=
+package Test is
+   protected type Test_Type is
+   private|
+=-=-=
+
+Name: protected_type_declaration (2)
+
+=-=
+package Test is
+   protected type Test_Type is
+   private|
+=-=
+package Test is
+   protected type Test_Type is
+      privatee|
+=-=-=
+
+Name: protected_type_declaration (3)
+
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+      privat|
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+   private|
+=-=-=
+
+Name: protected_type_declaration (4)
+
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+   private|
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+      privatee|
+=-=-=
+
+Name: single_protected_declaration (1)
+
+=-=
+package Test is
+   protected Test_Object is
+      privat|
+=-=
+package Test is
+   protected Test_Object is
+   private|
+=-=-=
+
+Name: single_protected_declaration (2)
+
+=-=
+package Test is
+   protected Test_Object is
+   private|
+=-=
+package Test is
+   protected Test_Object is
+      privatee|
+=-=-=
+
+Name: single_protected_declaration (3)
+
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+      privat|
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+   private|
+=-=-=
+
+Name: single_protected_declaration (4)
+
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+   private|
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+      privatee|
+=-=-=
+
+Name: task_type_declaration (1)
+
+=-=
+package Test is
+   task type Test_Type is
+      privat|
+=-=
+package Test is
+   task type Test_Type is
+   private|
+=-=-=
+
+Name: task_type_declaration (2)
+
+=-=
+package Test is
+   task type Test_Type is
+   private|
+=-=
+package Test is
+   task type Test_Type is
+      privatee|
+=-=-=
+
+Name: task_type_declaration (3)
+
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+      privat|
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+   private|
+=-=-=
+
+Name: task_type_declaration (4)
+
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+   private|
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+      privatee|
+=-=-=
+
+Name: single_task_declaration (1)
+
+=-=
+package Test is
+   task Test_Object is
+      privat|
+=-=
+package Test is
+   task Test_Object is
+   private|
+=-=-=
+
+Name: single_task_declaration (2)
+
+=-=
+package Test is
+   task Test_Object is
+   private|
+=-=
+package Test is
+   task Test_Object is
+      privatee|
+=-=-=
+
+Name: single_task_declaration (3)
+
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+      privat|
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+   private|
+=-=-=
+
+Name: single_task_declaration (4)
+
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+   private|
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+      privatee|
+=-=-=

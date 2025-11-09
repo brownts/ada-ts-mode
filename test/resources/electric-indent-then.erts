@@ -1,0 +1,291 @@
+Code: (lambda () (electric-indent-transform "n"))
+
+Point-Char: |
+
+Name: if_expression (1)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2
+           the|
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2
+      then|
+=-=-=
+
+Name: if_expression (2)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2
+      then|
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2
+           thenn|
+=-=-=
+
+Name: elsif_expression_item (1)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2 then
+         1
+      elsif X > 1
+              the|
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2 then
+         1
+      elsif X > 1
+      then|
+=-=-=
+
+Name: elsif_expression_item (2)
+
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2 then
+         1
+      elsif X > 1
+      then|
+=-=
+procedure Test is
+   X : Integer :=
+     (if X > 2 then
+         1
+      elsif X > 1
+              thenn|
+=-=-=
+
+Name: if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X > 2
+        the|
+=-=
+procedure Test is
+begin
+   if X > 2
+   then|
+=-=-=
+
+Name: if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X > 2
+   then|
+=-=
+procedure Test is
+begin
+   if X > 2
+        thenn|
+=-=-=
+
+Name: elsif_statement_item (1)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1
+           the|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1
+   then|
+=-=-=
+
+Name: elsif_statement_item (2)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1
+   then|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1
+           thenn|
+=-=-=
+
+Name: asynchronous_select (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      the|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then|
+=-=-=
+
+Name: asynchronous_select (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+      thenn|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (1)
+
+=-=
+procedure Test is
+   #if Y = True
+         the|
+=-=
+procedure Test is
+   #if Y = True
+   then|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (2)
+
+=-=
+procedure Test is
+   #if Y = True
+   then|
+=-=
+procedure Test is
+   #if Y = True
+         thenn|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (3)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True
+            the|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True
+   then|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (4)
+
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True
+   then|
+=-=
+procedure Test is
+   #if Y = True then
+      X : Integer;
+   #elsif Z = True
+            thenn|
+=-=-=
+
+Name: gnatprep_if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True
+            the|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True
+      then|
+=-=-=
+
+Name: gnatprep_if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True
+      then|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True
+            thenn|
+=-=-=
+
+Name: gnatprep_if_statement (3)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True
+               the|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True
+      then|
+=-=-=
+
+Name: gnatprep_if_statement (4)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True
+      then|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      #if Y = True then
+         null;
+      #elsif Z = True
+               thenn|
+=-=-=

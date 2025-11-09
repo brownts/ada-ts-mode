@@ -1,0 +1,487 @@
+Code: (lambda () (electric-indent-transform "n"))
+
+Point-Char: |
+
+Name: package_body (1)
+
+=-=
+package body Test is
+begin
+   null;
+   exceptio|
+=-=
+package body Test is
+begin
+   null;
+exception|
+=-=-=
+
+Name: package_body (2)
+
+=-=
+package body Test is
+begin
+   null;
+exception|
+=-=
+package body Test is
+begin
+   null;
+   exceptionn|
+=-=-=
+
+Name: subprogram_body (1)
+
+=-=
+procedure Test_Procedure is
+begin
+   null;
+   exceptio|
+=-=
+procedure Test_Procedure is
+begin
+   null;
+exception|
+=-=-=
+
+Name: subprogram_body (2)
+
+=-=
+procedure Test_Procedure is
+begin
+   null;
+exception|
+=-=
+procedure Test_Procedure is
+begin
+   null;
+   exceptionn|
+=-=-=
+
+Name: subprogram_body (3)
+
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+      exceptio|
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: subprogram_body (4)
+
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+   exception|
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: subprogram_body (5)
+
+=-=
+function Test_Function return Integer is
+begin
+   null;
+   exceptio|
+=-=
+function Test_Function return Integer is
+begin
+   null;
+exception|
+=-=-=
+
+Name: subprogram_body (6)
+
+=-=
+function Test_Function return Integer is
+begin
+   null;
+exception|
+=-=
+function Test_Function return Integer is
+begin
+   null;
+   exceptionn|
+=-=-=
+
+Name: subprogram_body (7)
+
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+      exceptio|
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: subprogram_body (8)
+
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+   exception|
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: subprogram_body (9)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      exceptio|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   exception|
+=-=-=
+
+Name: subprogram_body (10)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   exception|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: task_body (1)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+      exceptio|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: task_body (2)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   exception|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: entry_body (1)
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+         exceptio|
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      exception|
+=-=-=
+
+Name: entry_body (2)
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      exception|
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+         exceptionn|
+=-=-=
+
+Name: accept_statement (1)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+         exceptio|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+      exception|
+=-=-=
+
+Name: accept_statement (2)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+      exception|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+         exceptionn|
+=-=-=
+
+Name: block_statement (1)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      exceptio|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: block_statement (2)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   exception|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: block_statement (3)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      exceptio|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: block_statement (4)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   exception|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: block_statement (5)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         exceptio|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      exception|
+=-=-=
+
+Name: block_statement (6)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      exception|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         exceptionn|
+=-=-=
+
+Name: block_statement (7)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      exceptio|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   exception|
+=-=-=
+
+Name: block_statement (8)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   exception|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      exceptionn|
+=-=-=
+
+Name: extended_return_statement (1)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+      exceptio|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+   exception|
+=-=-=
+
+Name: extended_return_statement (2)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+   exception|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+      exceptionn|
+=-=-=
+
+Name: exception_declaration
+
+=-=
+package Test is
+   X :
+       exceptio|
+=-=
+package Test is
+   X :
+       exception|
+=-=-=

@@ -1,0 +1,1641 @@
+Code:
+  (lambda ()
+    (electric-indent-transform "d" (lambda () (setq-local ada-ts-mode-indent-when-offset 8))))
+
+Point-Char: |
+
+Name: package_declaration (1)
+
+=-=
+package Test is
+   en|
+=-=
+package Test is
+end|
+=-=-=
+
+Name: package_declaration (2)
+
+=-=
+package Test is
+end|
+=-=
+package Test is
+   endd|
+=-=-=
+
+Name: subprogram_body (1)
+
+=-=
+procedure Test is
+begin
+   null;
+   en|
+=-=
+procedure Test is
+begin
+   null;
+end|
+=-=-=
+
+Name: subprogram_body (2)
+
+=-=
+procedure Test is
+begin
+   null;
+end|
+=-=
+procedure Test is
+begin
+   null;
+   endd|
+=-=-=
+
+Name: subprogram_body (3)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      en|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   end|
+=-=-=
+
+Name: subprogram_body (4)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   end|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      endd|
+=-=-=
+
+Name: package_body (1)
+
+=-=
+package body Test is
+   en|
+=-=
+package body Test is
+end|
+=-=-=
+
+Name: package_body (2)
+
+=-=
+package body Test is
+end|
+=-=
+package body Test is
+   endd|
+=-=-=
+
+Name: record_definition (1)
+
+=-=
+package Test is
+   type Record_Type is
+      record
+         X : Integer;
+         en|
+=-=
+package Test is
+   type Record_Type is
+      record
+         X : Integer;
+      end|
+=-=-=
+
+Name: record_definition (2)
+
+=-=
+package Test is
+   type Record_Type is
+      record
+         X : Integer;
+      end|
+=-=
+package Test is
+   type Record_Type is
+      record
+         X : Integer;
+         endd|
+=-=-=
+
+Name: record_definition (3)
+
+=-=
+package Test is
+   type Record_Type is
+      limited record
+         X : Integer;
+         en|
+=-=
+package Test is
+   type Record_Type is
+      limited record
+         X : Integer;
+      end|
+=-=-=
+
+Name: record_definition (4)
+
+=-=
+package Test is
+   type Record_Type is
+      limited record
+         X : Integer;
+      end|
+=-=
+package Test is
+   type Record_Type is
+      limited record
+         X : Integer;
+         endd|
+=-=-=
+
+Name: record_definition (5)
+
+=-=
+package Test is
+   type Record_Type is record
+      X : Integer;
+      en|
+=-=
+package Test is
+   type Record_Type is record
+      X : Integer;
+   end|
+=-=-=
+
+Name: record_definition (6)
+
+=-=
+package Test is
+   type Record_Type is record
+      X : Integer;
+   end|
+=-=
+package Test is
+   type Record_Type is record
+      X : Integer;
+      endd|
+=-=-=
+
+Name: task_body (1)
+
+=-=
+task body Test is
+begin
+   null;
+   en|
+=-=
+task body Test is
+begin
+   null;
+end|
+=-=-=
+
+Name: task_body (2)
+
+=-=
+task body Test is
+begin
+   null;
+end|
+=-=
+task body Test is
+begin
+   null;
+   endd|
+=-=-=
+
+Name: protected_type_declaration (1)
+
+=-=
+package Test is
+   protected type Test_Type is
+      en|
+=-=
+package Test is
+   protected type Test_Type is
+   end|
+=-=-=
+
+Name: protected_type_declaration (2)
+
+=-=
+package Test is
+   protected type Test_Type is
+   end|
+=-=
+package Test is
+   protected type Test_Type is
+      endd|
+=-=-=
+
+Name: protected_type_declaration (3)
+
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+      en|
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+   end|
+=-=-=
+
+Name: protected_type_declaration (4)
+
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+   end|
+=-=
+package Test is
+   protected type Test_Type is
+      function Value return Integer;
+      endd|
+=-=-=
+
+Name: single_protected_declaration (1)
+
+=-=
+package Test is
+   protected Test_Object is
+      en|
+=-=
+package Test is
+   protected Test_Object is
+   end|
+=-=-=
+
+Name: single_protected_declaration (2)
+
+=-=
+package Test is
+   protected Test_Object is
+   end|
+=-=
+package Test is
+   protected Test_Object is
+      endd|
+=-=-=
+
+Name: single_protected_declaration (3)
+
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+      en|
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+   end|
+=-=-=
+
+Name: single_protected_declaration (4)
+
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+   end|
+=-=
+package Test is
+   protected Test_Object is
+      function Value return Integer;
+      endd|
+=-=-=
+
+Name: protected_body (1)
+
+=-=
+protected body Protected_Body is
+   en|
+=-=
+protected body Protected_Body is
+end|
+=-=-=
+
+Name: protected_body (2)
+
+=-=
+protected body Protected_Body is
+end|
+=-=
+protected body Protected_Body is
+   endd|
+=-=-=
+
+Name: entry_body (1)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+      en|
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   end|
+=-=-=
+
+Name: entry_body (2)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   end|
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+      endd|
+=-=-=
+
+Name: entry_body (3)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+         en|
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end|
+=-=-=
+
+Name: entry_body (4)
+
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   end|
+=-=
+protected body Test is
+   entry Op when X > Y is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+         endd|
+=-=-=
+
+Name: single_task_declaration (1)
+
+=-=
+package Test is
+   task Test_Object is
+      en|
+=-=
+package Test is
+   task Test_Object is
+   end|
+=-=-=
+
+Name: single_task_declaration (2)
+
+=-=
+package Test is
+   task Test_Object is
+   end|
+=-=
+package Test is
+   task Test_Object is
+      endd|
+=-=-=
+
+Name: single_task_declaration (3)
+
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+      en|
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+   end|
+=-=-=
+
+Name: single_task_declaration (4)
+
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+   end|
+=-=
+package Test is
+   task Test_Object is
+      entry Start;
+      endd|
+=-=-=
+
+Name: task_type_declaration (1)
+
+=-=
+package Test is
+   task type Test_Type is
+      en|
+=-=
+package Test is
+   task type Test_Type is
+   end|
+=-=-=
+
+Name: task_type_declaration (2)
+
+=-=
+package Test is
+   task type Test_Type is
+   end|
+=-=
+package Test is
+   task type Test_Type is
+      endd|
+=-=-=
+
+Name: task_type_declaration (3)
+
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+      en|
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+   end|
+=-=-=
+
+Name: task_type_declaration (4)
+
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+   end|
+=-=
+package Test is
+   task type Test_Type is
+      entry Start;
+      endd|
+=-=-=
+
+Name: record_representation_clause (1)
+
+=-=
+package Test is
+   for Test_Type use
+      record
+         X at 0 range 0 .. 31;
+         en|
+=-=
+package Test is
+   for Test_Type use
+      record
+         X at 0 range 0 .. 31;
+      end|
+=-=-=
+
+Name: record_representation_clause (2)
+
+=-=
+package Test is
+   for Test_Type use
+      record
+         X at 0 range 0 .. 31;
+      end|
+=-=
+package Test is
+   for Test_Type use
+      record
+         X at 0 range 0 .. 31;
+         endd|
+=-=-=
+
+Name: record_representation_clause (3)
+
+=-=
+package Test is
+   for Test_Type use record
+      X at 0 range 0 .. 31;
+      en|
+=-=
+package Test is
+   for Test_Type use record
+      X at 0 range 0 .. 31;
+   end|
+=-=-=
+
+Name: record_representation_clause (4)
+
+=-=
+package Test is
+   for Test_Type use record
+      X at 0 range 0 .. 31;
+   end|
+=-=
+package Test is
+   for Test_Type use record
+      X at 0 range 0 .. 31;
+      endd|
+=-=-=
+
+Name: asynchronous_select (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then abort
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then abort
+      null;
+   end|
+=-=-=
+
+Name: asynchronous_select (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then abort
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   then abort
+      null;
+      endd|
+=-=-=
+
+Name: conditional_entry_call (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else
+      null;
+   end|
+=-=-=
+
+Name: conditional_entry_call (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   else
+      null;
+      endd|
+=-=-=
+
+Name: timed_entry_call (1)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or
+      delay 1.0;
+      en|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or
+      delay 1.0;
+   end|
+=-=-=
+
+Name: timed_entry_call (2)
+
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or
+      delay 1.0;
+   end|
+=-=
+procedure Test is
+begin
+   select
+      Do_Something;
+   or
+      delay 1.0;
+      endd|
+=-=-=
+
+Name: selective_accept (1)
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+      en|
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end|
+=-=-=
+
+Name: selective_accept (2)
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end|
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+      endd|
+=-=-=
+
+Name: selective_accept (3)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         en|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   end|
+=-=-=
+
+Name: selective_accept (4)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   end|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+         endd|
+=-=-=
+
+Name: selective_accept (5)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   else
+      null;
+      en|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   else
+      null;
+   end|
+=-=-=
+
+Name: selective_accept (6)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   else
+      null;
+   end|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   else
+      null;
+      endd|
+=-=-=
+
+Name: selective_accept (7)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+         en|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+   end|
+=-=-=
+
+Name: selective_accept (8)
+
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+   end|
+=-=
+task body Test is
+begin
+   select
+      when X =>
+         accept Do_Something;
+   or
+      when Y =>
+         accept Do_Something;
+         endd|
+=-=-=
+
+Name: accept_statement (1)
+
+=-=
+task body Test is
+begin
+   accept Do_Something do
+      null;
+      en|
+=-=
+task body Test is
+begin
+   accept Do_Something do
+      null;
+   end|
+=-=-=
+
+Name: accept_statement (2)
+
+=-=
+task body Test is
+begin
+   accept Do_Something do
+      null;
+   end|
+=-=
+task body Test is
+begin
+   accept Do_Something do
+      null;
+      endd|
+=-=-=
+
+Name: case_statement (1)
+
+=-=
+procedure Test is
+begin
+   case Blah is
+           when others =>
+              null;
+              en|
+=-=
+procedure Test is
+begin
+   case Blah is
+           when others =>
+              null;
+   end|
+=-=-=
+
+Name: case_statement (2)
+
+=-=
+procedure Test is
+begin
+   case Blah is
+           when others =>
+              null;
+   end|
+=-=
+procedure Test is
+begin
+   case Blah is
+           when others =>
+              null;
+              endd|
+=-=-=
+
+Name: block_statement (1)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   end|
+=-=-=
+
+Name: block_statement (2)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      endd|
+=-=-=
+
+Name: block_statement (3)
+
+=-=
+procedure Test is
+begin
+   LABEL: begin
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   LABEL: begin
+      null;
+   end|
+=-=-=
+
+Name: block_statement (4)
+
+=-=
+procedure Test is
+begin
+   LABEL: begin
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   LABEL: begin
+      null;
+      endd|
+=-=-=
+
+Name: block_statement (5)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      begin
+         null;
+         en|
+=-=
+procedure Test is
+begin
+   LABEL:
+      begin
+         null;
+      end|
+=-=-=
+
+Name: block_statement (6)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      begin
+         null;
+      end|
+=-=
+procedure Test is
+begin
+   LABEL:
+      begin
+         null;
+         endd|
+=-=-=
+
+Name: block_statement (7)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   end|
+=-=-=
+
+Name: block_statement (8)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      endd|
+=-=-=
+
+Name: block_statement (9)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   end|
+=-=-=
+
+Name: block_statement (10)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      endd|
+=-=-=
+
+Name: block_statement (11)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         en|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      end|
+=-=-=
+
+Name: block_statement (12)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      end|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         endd|
+=-=-=
+
+Name: if_statement (1)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   end|
+=-=-=
+
+Name: if_statement (2)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+      endd|
+=-=-=
+
+Name: if_statement (3)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1 then
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1 then
+      null;
+   end|
+=-=-=
+
+Name: if_statement (4)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1 then
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   elsif X > 1 then
+      null;
+      endd|
+=-=-=
+
+Name: if_statement (5)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   else
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   else
+      null;
+   end|
+=-=-=
+
+Name: if_statement (6)
+
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   else
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   if X > 2 then
+      null;
+   else
+      null;
+      endd|
+=-=-=
+
+Name: extended_return_statement (1)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 5;
+      en|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 5;
+   end|
+=-=-=
+
+Name: extended_return_statement (2)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 5;
+   end|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 5;
+      endd|
+=-=-=
+
+Name: loop_statement (1)
+
+=-=
+procedure Test is
+begin
+   loop
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   loop
+      null;
+   end|
+=-=-=
+
+Name: loop_statement (2)
+
+=-=
+procedure Test is
+begin
+   loop
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   loop
+      null;
+      endd|
+=-=-=
+
+Name: loop_statement (3)
+
+=-=
+procedure Test is
+begin
+   LABEL: loop
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   LABEL: loop
+      null;
+   end|
+=-=-=
+
+Name: loop_statement (4)
+
+=-=
+procedure Test is
+begin
+   LABEL: loop
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   LABEL: loop
+      null;
+      endd|
+=-=-=
+
+Name: loop_statement (5)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      loop
+         null;
+         en|
+=-=
+procedure Test is
+begin
+   LABEL:
+      loop
+         null;
+      end|
+=-=-=
+
+Name: loop_statement (6)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      loop
+         null;
+      end|
+=-=
+procedure Test is
+begin
+   LABEL:
+      loop
+         null;
+         endd|
+=-=-=
+
+Name: loop_statement (7)
+
+=-=
+procedure Test is
+begin
+   while
+     X > 2 loop
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   while
+     X > 2 loop
+      null;
+   end|
+=-=-=
+
+Name: loop_statement (8)
+
+=-=
+procedure Test is
+begin
+   while
+     X > 2 loop
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   while
+     X > 2 loop
+      null;
+      endd|
+=-=-=
+
+Name: variant_part (1)
+
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+                 when True =>
+                    T : Integer;
+                 when False =>
+                    F : Integer;
+                    en|
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+                 when True =>
+                    T : Integer;
+                 when False =>
+                    F : Integer;
+         end|
+=-=-=
+
+Name: variant_part (2)
+
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+                 when True =>
+                    T : Integer;
+                 when False =>
+                    F : Integer;
+         end|
+=-=
+package Test is
+   type Test_Type (B : Boolean) is
+      record
+         case B is
+                 when True =>
+                    T : Integer;
+                 when False =>
+                    F : Integer;
+                    endd|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (1)
+
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+      #en|
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #end|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (2)
+
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #else
+      Y : Integer;
+      #en|
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #else
+      Y : Integer;
+   #end|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (3)
+
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #elsif X > 1 then
+      Y : Integer;
+      #en|
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #elsif X > 1 then
+      Y : Integer;
+   #end|
+=-=-=
+
+Name: gnatprep_declarative_if_statement (4)
+
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #elsif X > 1 then
+      Y : Integer;
+   #else
+      Z : Integer;
+      #en|
+=-=
+procedure Test is
+   #if X > 2 then
+      X : Integer;
+   #elsif X > 1 then
+      Y : Integer;
+   #else
+      Z : Integer;
+   #end|
+=-=-=
+
+Name: gnatprep_if_statement (1)
+
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+      #en|
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #end|
+=-=-=
+
+Name: gnatprep_if_statement (2)
+
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #else
+      null;
+      #en|
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #else
+      null;
+   #end|
+=-=-=
+
+Name: gnatprep_if_statement (3)
+
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #elsif X > 1 then
+      null;
+      #en|
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #elsif X > 1 then
+      null;
+   #end|
+=-=-=
+
+Name: gnatprep_if_statement (4)
+
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #elsif X > 1 then
+      null;
+   #else
+      null;
+      #en|
+=-=
+procedure Test is
+begin
+   #if X > 2 then
+      null;
+   #elsif X > 1 then
+      null;
+   #else
+      null;
+   #end|
+=-=-=

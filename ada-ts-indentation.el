@@ -651,19 +651,54 @@ START is either a node or a position."
 (defun ada-ts-mode--matching-prev-node (start matches)
   "Find a node before START where node type is contained in MATCHES.
 
-  MATCHES is either a list of strings consisting of node types or a
-  predicate function which takes a node as its sole parameter and returns
-  non nil for a match."
+  MATCHES is either a string representing a node type, a list of strings
+  representing node types or a predicate function which takes a node as
+  its sole parameter and returns non nil for a match."
   (let ((prev-node start)
         (predicate (if (functionp matches)
                        matches
                      (lambda (node)
-                       (member (treesit-node-type node) matches)))))
+                       (member (treesit-node-type node)
+                               (ensure-list matches))))))
     (while (or (treesit-node-eq prev-node start)
                (and prev-node
                     (not (funcall predicate prev-node))))
       (setq prev-node (ada-ts-mode--prev-node prev-node)))
     prev-node))
+
+(defun ada-ts-mode--not-matching-prev-node (start matches)
+  "Find a node before START where node type is not contained in MATCHES.
+
+MATCHES is either a string representing a node type, a list of strings
+representing node types or a predicate function which takes a node as
+its sole parameter and returns non nil for a match."
+  (let ((prev-node start)
+        (predicate (if (functionp matches)
+                       matches
+                     (lambda (node)
+                       (member (treesit-node-type node)
+                               (ensure-list matches))))))
+    (while (or (treesit-node-eq prev-node start)
+               (and prev-node
+                    (funcall predicate prev-node)))
+      (setq prev-node (ada-ts-mode--prev-node prev-node)))
+    prev-node))
+
+(defun ada-ts-indent--node-at-indentation-p (node)
+  "Check if NODE begins a line."
+  (let* ((node-pos (treesit-node-start node))
+         (indent-pos (save-excursion
+                       (goto-char node-pos)
+                       (back-to-indentation)
+                       (point))))
+    (= node-pos indent-pos)))
+
+(defun ada-ts-indent--point-at-indentation (node)
+  "Find position at indentation from start of NODE."
+  (save-excursion
+    (goto-char (treesit-node-start node))
+    (back-to-indentation)
+    (point)))
 
 (defun ada-ts-mode--is-keyword-anchor (node)
   "Find anchor node for \\='is\\=' keyword NODE."
@@ -691,10 +726,8 @@ START is either a node or a position."
     ;; with.
     (if (string-equal anchor-node-t "case")
         anchor-node
-      (save-excursion
-        (goto-char (treesit-node-start anchor-node))
-        (back-to-indentation)
-        (treesit-node-at (point))))))
+      (treesit-node-at
+       (ada-ts-indent--point-at-indentation anchor-node)))))
 
 (defun ada-ts-mode--then-keyword-anchor (node)
   "Find anchor node for \\='then\\=' keyword NODE."
@@ -707,6 +740,118 @@ START is either a node or a position."
 (defun ada-ts-mode--do-keyword-anchor (node)
   "Find anchor node for \\='do\\=' keyword NODE."
   (ada-ts-mode--matching-prev-node node '("accept" "return")))
+
+(defun ada-ts-indent--location-after-keyword-loop (node)
+  "Find (anchor, offset) when after \\='loop\\=' keyword NODE."
+  (when-let* ((prev-node (ada-ts-mode--prev-node node))
+              (prev-node-t (treesit-node-type prev-node))
+              ;; Account for possible iteration_scheme
+              (anchor-node (if (string-equal prev-node-t "iteration_scheme")
+                               prev-node
+                             node))
+              ;; Account for possible loop_label
+              (anchor (ada-ts-indent--point-at-indentation anchor-node)))
+    (cons anchor ada-ts-mode-indent-offset)))
+
+(defun ada-ts-indent--location-for-keyword-begin (node)
+  "Find (anchor, offset) for \\='begin\\=' keyword NODE."
+  (when-let* ((prev-node (ada-ts-mode--prev-node node))
+              (prev-node-t (treesit-node-type prev-node)))
+    (let ((anchor nil)
+          (offset nil))
+      (cond
+       ;; "is" "begin"
+       ((string-equal prev-node-t "is")
+        (when-let* ((anchor-node (ada-ts-mode--is-keyword-anchor prev-node)))
+          (setq anchor (treesit-node-start anchor-node)
+                offset 0)))
+       ;; "begin" "begin"
+       ((string-equal prev-node-t "begin")
+        (when-let* ((location (ada-ts-indent--location-after-keyword-begin prev-node)))
+          (setq anchor (car location)
+                offset (cdr location))))
+       ;; loop_label "begin"
+       ((string-equal prev-node-t "loop_label")
+        (setq anchor (treesit-node-start prev-node)
+              offset ada-ts-mode-indent-label-offset))
+       ;; ["("] "declare" "begin"
+       ((string-equal prev-node-t "declare")
+        (setq anchor
+              (if-let* ((prev-prev-node (ada-ts-mode--prev-node prev-node))
+                        (prev-prev-node-t (treesit-node-type prev-prev-node))
+                        ((string-equal prev-prev-node-t "(")))
+                  ;; declare_expression
+                  (treesit-node-start prev-node)
+                ;; block_statement
+                (ada-ts-indent--point-at-indentation prev-node))
+              offset 0))
+       ;; non_empty_declarative_part "begin"
+       ((string-equal prev-node-t "non_empty_declarative_part")
+        (when-let* ((prev-prev-node (ada-ts-mode--prev-node prev-node))
+                    (prev-prev-node-t (treesit-node-type prev-prev-node)))
+          (cond
+           ;; "is" non_empty_declarative_part "begin"
+           ((string-equal prev-prev-node-t "is")
+            (let ((anchor-node (ada-ts-mode--is-keyword-anchor prev-prev-node)))
+              (setq anchor (treesit-node-start anchor-node)
+                    offset 0)))
+           ;; "declare" non_empty_declarative_part "begin"
+           ((string-equal prev-prev-node-t "declare")
+            (setq anchor (ada-ts-indent--point-at-indentation prev-prev-node)
+                  offset 0)))))
+       ;; "(" "declare" [declare_item] "begin"
+       ((member
+         (treesit-node-type
+          (ada-ts-mode--not-matching-prev-node node "pragma_g"))
+         '("object_declaration" "object_renaming_declaration" "declare"))
+        (setq anchor (treesit-node-start prev-node)
+              offset (- ada-ts-mode-indent-offset)))
+       (t
+        (setq anchor (treesit-node-start prev-node)
+              offset 0)))
+      (cons anchor offset))))
+
+(defun ada-ts-indent--location-after-keyword-begin (node)
+  "Find (anchor, offset) when after \\='begin\\=' keyword NODE.
+
+The offset is a list consisting of 1 or more offsets whose sum is the
+total offset."
+  (let ((anchor)
+        (offset))
+    (if (ada-ts-indent--node-at-indentation-p node)
+        (setq anchor node
+              offset ada-ts-mode-indent-offset)
+      (if-let* ((prev-node (ada-ts-mode--prev-node node))
+                (prev-node-t (treesit-node-type prev-node))
+                ((string-equal prev-node-t "loop_label")))
+          (setq anchor prev-node
+                offset ada-ts-mode-indent-label-offset)
+        (when-let* ((location (ada-ts-indent--location-for-keyword-begin node)))
+          (setq anchor (car location)
+                offset (cons ada-ts-mode-indent-offset (ensure-list (cdr location)))))))
+    (when anchor
+      (when (treesit-node-p anchor)
+        (setq anchor (treesit-node-start anchor)))
+      (cons anchor (ensure-list offset)))))
+
+(defun ada-ts-indent--location-after-keyword-record (node)
+  "Find (anchor, offset) when after \\='record\\=' keyword NODE."
+  (when-let* ((prev-node (ada-ts-mode--prev-node node))
+              (prev-node-t (treesit-node-type prev-node))
+              ((member prev-node-t '("is" "tagged" "limited" "use" "with"))))
+    ;; Anchor to "limited" or "record" keyword if it's at the
+    ;; beginning of the line, otherwise anchor to the "type"
+    ;; (in type definition) or "for" (in representation
+    ;; clause) keyword, which might be on a different line,
+    ;; especially if discriminant arguments are present.
+    (let* ((bol-pos (ada-ts-indent--point-at-indentation node))
+           (bol-node (treesit-node-at bol-pos))
+           (bol-node-t (treesit-node-type bol-node)))
+      (if (member bol-node-t '("limited" "record"))
+          (cons bol-pos ada-ts-mode-indent-offset)
+        (when-let* ((anchor-node (ada-ts-mode--matching-prev-node node '("for" "type"))))
+          (cons (treesit-node-start anchor-node)
+                ada-ts-mode-indent-offset))))))
 
 (defun ada-ts-mode--indent-best-effort (node _parent bol)
   "Attempt best effort to determine indentation of NODE at BOL."
@@ -737,32 +882,68 @@ START is either a node or a position."
       (setq anchor (treesit-node-start anchor-node)
             offset 0
             scenario "Scenario [Keyword: 'is']"))
+    ;; Keyword: "end"
+    (when-let* (((not anchor))
+                ((and node-t (string-equal node-t "end")))
+                (anchor-node (ada-ts-mode--matching-prev-node
+                              node
+                              '("accept" "begin" "case" "if" "loop" "package"
+                                "protected" "record" "return" "select" "task")))
+                (anchor-node-t (treesit-node-type anchor-node)))
+      (if (ada-ts-indent--node-at-indentation-p anchor-node)
+          (setq anchor (treesit-node-start anchor-node)
+                offset 0)
+        (cond
+         ((string-equal anchor-node-t "begin")
+          (when-let* ((location (ada-ts-indent--location-after-keyword-begin anchor-node)))
+            (setq anchor (car location)
+                  offset (cons 0 (cddr location)))))
+         ((string-equal anchor-node-t "record")
+          (setq anchor (car (ada-ts-indent--location-after-keyword-record anchor-node))
+                offset 0))
+         ((string-equal anchor-node-t "loop")
+          (setq anchor (car (ada-ts-indent--location-after-keyword-loop anchor-node))
+                offset 0))
+         (t
+          (setq anchor (ada-ts-indent--point-at-indentation anchor-node)
+                offset 0))))
+      (when anchor
+        (setq scenario "Scenario [Keyword: 'end']")))
+    ;; Keyword: "#end"
+    (when-let* (((not anchor))
+                ((and node-t (string-equal node-t "#end")))
+                (anchor-node (ada-ts-mode--matching-prev-node
+                              node
+                              '("#if" "#elsif" "#else"))))
+      (setq anchor (treesit-node-start anchor-node)
+            offset 0
+            scenario "Scenario [Keyword: '#end']"))
+    ;; Keyword: "private"
+    (when-let* (((not anchor))
+                ((and node-t (string-equal node-t "private")))
+                (anchor-node (ada-ts-mode--matching-prev-node node '("package" "type" "task" "protected")))
+                (anchor-node-t (treesit-node-type anchor-node)))
+      (setq anchor
+            (save-excursion
+              (goto-char (treesit-node-start anchor-node))
+              (back-to-indentation)
+              (point))
+            offset 0
+            scenario "Scenario [Keyword: 'private']"))
     ;; Keyword: "begin"
     (when-let* (((not anchor))
-                ((and node-t (string-equal node-t "begin"))))
-      (setq scenario "Scenario [Keyword: 'begin']")
-      (cond ((string-equal prev-node-t "is")
-             (when-let* ((anchor-node (ada-ts-mode--is-keyword-anchor prev-node)))
-               (setq anchor (treesit-node-start anchor-node)
-                     offset 0)))
-            ((string-equal prev-node-t "begin")
-             (setq anchor (treesit-node-start prev-node)
-                   offset ada-ts-mode-indent-offset))
-            (t
-             (when-let* ((prev-node (ada-ts-mode--prev-node node))
-                         (prev-node-t (treesit-node-type prev-node)))
-               (if (string-equal prev-node-t "non_empty_declarative_part")
-                   (setq anchor (treesit-node-start prev-node)
-                         offset (- ada-ts-mode-indent-offset))
-                 (setq anchor (treesit-node-start prev-node)
-                       offset 0))))))
+                ((and node-t (string-equal node-t "begin")))
+                (location (ada-ts-indent--location-for-keyword-begin node)))
+      (setq anchor (car location)
+            offset (cdr location)
+            scenario "Scenario [Keyword: 'begin']"))
     ;; Keyword: "limited"
     (when-let* (((not anchor))
                 ((and node-t (string-equal node-t "limited")))
                 (next-node (ada-ts-mode--next-leaf-node node))
                 (next-node-t (treesit-node-type next-node))
                 ((string-equal next-node-t "record"))
-                (anchor-node (ada-ts-mode--matching-prev-node node '("type"))))
+                (anchor-node (ada-ts-mode--matching-prev-node node "type")))
       (setq anchor (treesit-node-start anchor-node)
             offset ada-ts-mode-indent-record-offset
             scenario "Scenario [Keyword: 'limited']"))
@@ -778,29 +959,10 @@ START is either a node or a position."
     ;; After Keyword: "record"
     (when-let* (((not anchor))
                 ((string-equal prev-node-t "record"))
-                (prev-prev-node (ada-ts-mode--prev-node prev-node))
-                (prev-prev-node-t (treesit-node-type prev-prev-node))
-                ((member prev-prev-node-t '("is" "tagged" "limited" "use" "with")))
-                (prev-node-s (treesit-node-start prev-node)))
-      ;; Anchor to "limited" or "record" keyword if it's at the
-      ;; beginning of the line, otherwise anchor to the "type"
-      ;; (in type definition) or "for" (in representation
-      ;; clause) keyword, which might be on a different line,
-      ;; especially if discriminant arguments are present.
-      (let* ((bol-node
-              (save-excursion
-                (goto-char prev-node-s)
-                (back-to-indentation)
-                (treesit-node-at (point))))
-             (bol-node-t (treesit-node-type bol-node)))
-        (if (member bol-node-t '("limited" "record"))
-            (setq anchor (treesit-node-start bol-node)
-                  offset ada-ts-mode-indent-offset
-                  scenario "Scenario [After Keyword: 'record']")
-          (when-let* ((anchor-node (ada-ts-mode--matching-prev-node prev-node '("for" "type"))))
-            (setq anchor (treesit-node-start anchor-node)
-                  offset ada-ts-mode-indent-offset
-                  scenario "Scenario [After Keyword: 'record']")))))
+                (location (ada-ts-indent--location-after-keyword-record prev-node)))
+      (setq anchor (car location)
+            offset (cdr location)
+            scenario "Scenario [After Keyword: 'record']"))
     ;; After Keyword: "is"
     (when-let* (((not anchor))
                 ((string-equal prev-node-t "is"))
@@ -812,23 +974,58 @@ START is either a node or a position."
                        ada-ts-mode-indent-when-offset
                      ada-ts-mode-indent-offset)
             scenario "Scenario [After Keyword: 'is']"))
-    ;; After "elsif_statement_item"
+    ;; Keyword: "#elsif", "#else"
     (when-let* (((not anchor))
                 ((and node-t
-                      (member node-t '("elsif" "elsif_statement_item" "else" "end"))))
-                ((string-equal prev-node-t "elsif_statement_item")))
-      (setq anchor (treesit-node-start prev-node)
+                      (member node-t '("#elsif" "#else"))))
+                (anchor-node (ada-ts-mode--matching-prev-node
+                              node
+                              '("#if" "#elsif"))))
+      (setq anchor (treesit-node-start anchor-node)
             offset 0
-            scenario "Scenario [After 'elsif_statement_item']"))
-    ;; Keywords after "statement"
+            scenario "Scenario [Keyword: '#elsif', '#else']"))
+    ;; Keyword: "elsif", "else"
     (when-let* (((not anchor))
                 ((and node-t
-                      (member node-t '("elsif" "elsif_statement_item" "else" "end" "exception"))))
-                ((or (string-equal prev-node-t "handled_sequence_of_statements")
-                     (ada-ts-mode--statement-p prev-node))))
+                      (member node-t '("elsif" "else"))))
+                (anchor-node (ada-ts-mode--matching-prev-node
+                              node
+                              '("if_expression"
+                                "elsif_expression_item"
+                                "if_statement"
+                                "elsif_statement_item"
+                                "if" "elsif" "select")))
+                (anchor-node-s (treesit-node-start anchor-node)))
+      (setq anchor anchor-node-s
+            offset 0
+            scenario "Scenario [Keyword: 'elsif', 'else']"))
+    ;; After Keyword: "#else"
+    (when-let* (((not anchor))
+                ((and prev-node-t (string-equal prev-node-t "#else"))))
       (setq anchor (treesit-node-start prev-node)
-            offset (- ada-ts-mode-indent-offset)
-            scenario "Scenario [Keywords after 'statement']"))
+            offset ada-ts-mode-indent-offset
+            scenario "Scenario [After Keyword: '#else']"))
+    ;; Keyword: "exception"
+    (when-let* (((not anchor))
+                ((and node-t (string-equal node-t "exception")))
+                ((and prev-node-t (not (string-equal prev-node-t ":"))))
+                (anchor-node (ada-ts-mode--matching-prev-node
+                              node '("begin" "do")))
+                (anchor-node-t (treesit-node-type anchor-node)))
+      (cond
+       ;; "begin" ... "exception"
+       ((string-equal anchor-node-t "begin")
+        (when-let* ((location (ada-ts-indent--location-after-keyword-begin anchor-node)))
+          (setq anchor (car location)
+                offset (cons 0 (cddr location)))))
+       ;; "do" ... "exception"
+       ((string-equal anchor-node-t "do")
+        (setq anchor-node (ada-ts-mode--do-keyword-anchor anchor-node))
+        (when anchor-node
+          (setq anchor (treesit-node-start anchor-node)
+                offset 0))))
+      (when anchor
+        (setq scenario "Scenario [Keyword: 'exception']")))
     ;; Keyword: "then"
     (when-let* (((not anchor))
                 ((and node-t (string-equal node-t "then")))
@@ -836,7 +1033,7 @@ START is either a node or a position."
       (setq anchor (treesit-node-start anchor-node)
             offset 0
             scenario "Scenario [Keyword: 'then']"))
-    ;; Keywords after "then"
+    ;; After Keyword: "then"
     (when-let* (((not anchor))
                 ((string-equal prev-node-t "then"))
                 (anchor-node (ada-ts-mode--then-keyword-anchor prev-node))
@@ -844,7 +1041,7 @@ START is either a node or a position."
                 ((member anchor-node-t '("elsif" "#elsif" "if" "#if"))))
       (setq anchor (treesit-node-start anchor-node)
             offset ada-ts-mode-indent-offset
-            scenario "Scenario [Keywords after 'then']"))
+            scenario "Scenario [After Keyword 'then']"))
     ;; Keyword: "do"
     (when-let* (((not anchor))
                 ((and node-t (string-equal node-t "do")))
@@ -871,11 +1068,8 @@ START is either a node or a position."
                 ((and node-t (string-equal node-t "loop")))
                 ((not (string-equal prev-node-t "end"))))
       (setq anchor
-            ;; Account for possible loop label
-            (save-excursion
-              (goto-char (treesit-node-start prev-node))
-              (back-to-indentation)
-              (point))
+            ;; Account for possible iteration_scheme
+            (ada-ts-indent--point-at-indentation prev-node)
             offset (if (string-equal prev-node-t "begin")
                        ada-ts-mode-indent-offset
                      0)
@@ -883,19 +1077,9 @@ START is either a node or a position."
     ;; After Keyword: "loop"
     (when-let* (((not anchor))
                 ((string-equal prev-node-t "loop"))
-                (prev-prev-node (ada-ts-mode--prev-node prev-node))
-                (prev-prev-node-t (treesit-node-type prev-prev-node)))
-      (setq anchor
-            ;; Account for possible loop label
-            (save-excursion
-              (goto-char
-               (treesit-node-start
-                (if (string-equal prev-prev-node-t "iteration_scheme")
-                    prev-prev-node
-                  prev-node)))
-              (back-to-indentation)
-              (point))
-            offset ada-ts-mode-indent-offset
+                (location (ada-ts-indent--location-after-keyword-loop prev-node)))
+      (setq anchor (car location)
+            offset (cdr location)
             scenario "Scenario [After Keyword: 'loop']"))
     ;; Generic subprogram/package declaration
     (when-let* (((not anchor))
@@ -907,18 +1091,19 @@ START is either a node or a position."
       (setq anchor (treesit-node-start prev-node)
             offset 0
             scenario "Scenario [Generic subprogram/package declaration]"))
-    ;; Keyword: "end"
+    ;; Keywords after expression: "or", "and"
     (when-let* (((not anchor))
-                ((and node-t (string-equal node-t "end"))))
+                ((and node-t (member node-t '("or" "and"))))
+                ((and prev-node-t (string-equal prev-node-t "expression"))))
       (setq anchor (treesit-node-start prev-node)
-            offset (- ada-ts-mode-indent-offset)
-            scenario "Scenario [Keyword: 'end']"))
+            offset ada-ts-mode-indent-exp-item-offset
+            scenario "Scenario [Keywords after expression: 'or', 'and']"))
     ;; Keywords: "or", "else" (select statement)
     (when-let* (((not anchor))
                 ((and node-t (member node-t '("or" "else"))))
                 (prev-token (ada-ts-mode--prev-token node))
                 ((string-equal prev-token ";"))
-                (anchor-node (ada-ts-mode--matching-prev-node node '("select"))))
+                (anchor-node (ada-ts-mode--matching-prev-node node "select")))
       (setq anchor (treesit-node-start anchor-node)
             offset 0
             scenario "Scenario [Keywords: 'or', 'else']"))
@@ -935,7 +1120,7 @@ START is either a node or a position."
                 ((string-equal prev-node-t "abort"))
                 (prev-prev-token (ada-ts-mode--prev-token prev-node))
                 ((string-equal prev-prev-token "then"))
-                (anchor-node (ada-ts-mode--matching-prev-node prev-node '("select"))))
+                (anchor-node (ada-ts-mode--matching-prev-node prev-node "select")))
       (setq anchor (treesit-node-start anchor-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [After Keyword: 'abort']"))
@@ -961,6 +1146,32 @@ START is either a node or a position."
           (setq anchor (treesit-node-start anchor-node)
                 offset ada-ts-mode-indent-broken-offset
                 scenario "Scenario [After Punctuation: '=>']"))))
+    ;; Punctuation: "("
+    (when-let* (((not anchor))
+                ((and node (string-equal node-t "(")))
+                (prev-leaf-node (ada-ts-mode--prev-leaf-node node))
+                (prev-leaf-node-t (treesit-node-type prev-leaf-node))
+                ((string-equal prev-leaf-node-t "identifier"))
+                (anchor-node (treesit-parent-while
+                              prev-leaf-node
+                              (lambda (node)
+                                (member (treesit-node-type node) '("identifier" "selected_component"))))))
+      (setq anchor (ada-ts-indent--point-at-indentation anchor-node)
+            offset ada-ts-mode-indent-broken-offset
+            scenario "Scenario [Punctuation: '(']"))
+    ;; Newline after identifer/selected_component
+    (when-let* (((not anchor))
+                ((not node))
+                (prev-leaf-node (ada-ts-mode--prev-leaf-node (point)))
+                (prev-leaf-node-t (treesit-node-type prev-leaf-node))
+                ((string-equal prev-leaf-node-t "identifier"))
+                (anchor-node (treesit-parent-while
+                              prev-leaf-node
+                              (lambda (node)
+                                (member (treesit-node-type node) '("identifier" "selected_component"))))))
+      (setq anchor (ada-ts-indent--point-at-indentation anchor-node)
+            offset ada-ts-mode-indent-broken-offset
+            scenario "Scenario [Newline after identifier/selected_component"))
     ;; Newline after case_statement_alternative
     (when-let* (((not anchor))
                 ((not node))
@@ -968,6 +1179,13 @@ START is either a node or a position."
       (setq anchor (treesit-node-start prev-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [Newline after case_statement_alternative]"))
+    ;; Newline after variant/variant_list
+    (when-let* (((not anchor))
+                ((not node))
+                ((member prev-node-t '("variant" "variant_list"))))
+      (setq anchor (treesit-node-start prev-node)
+            offset ada-ts-mode-indent-offset
+            scenario "Scenario [Newline after variant/variant_list]"))
     ;; Newline after handled_sequence_of_statements
     (when-let* (((not anchor))
                 ((not node))
@@ -982,10 +1200,7 @@ START is either a node or a position."
                   'include-node)))
       ;; Anchor to beginning of line to handle multiple items per line
       ;; (e.g., "null; null;")
-      (setq anchor (save-excursion
-                     (goto-char (treesit-node-start statement-node))
-                     (back-to-indentation)
-                     (point))
+      (setq anchor (ada-ts-indent--point-at-indentation statement-node)
             offset 0
             scenario "Scenario [Newline after handled_sequence_of_statements]"))
     ;; After Punctuation: ":="
@@ -1004,13 +1219,30 @@ START is either a node or a position."
       (setq anchor (treesit-node-start anchor-node)
             offset ada-ts-mode-indent-broken-offset
             scenario "Scenario [After Punctuation: ':=']"))
+    ;; After Keyword: declare
+    (when-let* (((not anchor))
+                ((string-equal prev-node-t "declare")))
+      (setq anchor
+            (if-let* ((prev-prev-node (ada-ts-mode--prev-node prev-node))
+                      (prev-prev-node-t (treesit-node-type prev-prev-node))
+                      ((string-equal prev-prev-node-t "(")))
+                ;; declare_expression
+                (treesit-node-start prev-node)
+              ;; block_statement
+              (ada-ts-indent--point-at-indentation prev-node))
+            offset ada-ts-mode-indent-offset
+            scenario "Scenario [After Keyword: declare]"))
+    ;; After Keyword: begin
+    (when-let* (((not anchor))
+                ((and prev-node (string-equal prev-node-t "begin")))
+                (location (ada-ts-indent--location-after-keyword-begin prev-node)))
+      (setq anchor (car location)
+            offset (cdr location)
+            scenario "Scenario [After Keyword: begin]"))
     ;; After Keywords: ada-ts-mode-indent-offset
     (when-let* (((not anchor))
-                ((member prev-node-t '("begin" "declare" "else" "exception" "generic" "private" "record" "select"))))
-      (setq anchor (save-excursion
-                     (goto-char (treesit-node-start prev-node))
-                     (back-to-indentation)
-                     (point))
+                ((member prev-node-t '("else" "exception" "generic" "private" "record" "select"))))
+      (setq anchor (ada-ts-indent--point-at-indentation prev-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [After Keywords: ada-ts-mode-indent-offset]"))
     ;; After elsif_statement_item
@@ -1022,10 +1254,7 @@ START is either a node or a position."
     ;; After keywords
     (when-let* (((not anchor))
                 ((member prev-node-t ada-ts-mode--keywords)))
-      (setq anchor (save-excursion
-                     (goto-char (treesit-node-start prev-node))
-                     (back-to-indentation)
-                     (point))
+      (setq anchor (ada-ts-indent--point-at-indentation prev-node)
             offset (if (and node
                             (member
                              (treesit-node-type (treesit-node-at (treesit-node-start node)))
@@ -1051,10 +1280,7 @@ START is either a node or a position."
                      (ada-ts-mode--compilation-unit-p prev-node))))
       ;; Anchor to beginning of line to handle multiple items per line
       ;; (e.g., "with System; use System;")
-      (setq anchor (save-excursion
-                     (goto-char (treesit-node-start prev-node))
-                     (back-to-indentation)
-                     (point))
+      (setq anchor (ada-ts-indent--point-at-indentation prev-node)
             offset 0
             scenario "Scenario [After Compilation Unit / Declaration / Statement]"))
     ;; Fallback
@@ -1070,7 +1296,7 @@ START is either a node or a position."
               offset ada-ts-mode-indent-broken-offset)))
     (when ada-ts-mode--indent-verbose
       (message scenario))
-    (cons anchor offset)))
+    (cons anchor (apply #'+ (ensure-list offset)))))
 
 ;;; Indentation Anchors and Offsets
 
@@ -1195,13 +1421,19 @@ any of the types in TYPE or TYPES."
 
 ;;; Indent Line / Indent Region
 
+(defvar-local ada-ts-indent--last-indent-tick nil)
+
 (defun ada-ts-mode--indent-line ()
   "Perform line indentation."
-  (ada-ts-mode-indent-line ada-ts-mode-indent-backend))
+  (prog1
+      (ada-ts-mode-indent-line ada-ts-mode-indent-backend)
+    (setq ada-ts-indent--last-indent-tick (buffer-chars-modified-tick))))
 
 (defun ada-ts-mode--indent-region (beg end)
   "Perform region indentation between BEG and END."
-  (ada-ts-mode-indent-region ada-ts-mode-indent-backend beg end))
+  (prog1
+      (ada-ts-mode-indent-region ada-ts-mode-indent-backend beg end)
+    (setq ada-ts-indent--last-indent-tick (buffer-chars-modified-tick))))
 
 (cl-defgeneric ada-ts-mode-indent-line (backend)
   "Indent line using BACKEND."
@@ -1539,6 +1771,92 @@ When CLIENT is not nil, use it as the active LSP client."
               "generic_package_declaration"
 
               "generic_instantiation"))))
+
+;;; Electric Indentation
+
+(defconst ada-ts-indent--electric-punctuation
+  '(";" ")" "]" "=>", ",")
+  "Ada punctuation which should trigger electric indentation.
+
+The specified punctuation is only considered if it is entered at the end
+of the line.")
+
+(defconst ada-ts-indent--electric-keywords
+  '("begin" "else" "#else" "elsif" "#elsif" "end" "#end" "exception" "or" "private" "then" "when")
+  "Ada keywords which should trigger electric indentation.
+
+The specified keywords are only considered if they are the only thing on
+the line.")
+
+(defun ada-ts-indent--electric-indent-p (&optional _char)
+  "Determine if electric indentation should be performed.
+
+When triggered by `self-insert-command', CHAR will be the character
+inserted, else nil."
+  (when-let* (((not (bobp)))
+              (node (treesit-node-at (1- (point))))
+              (end (treesit-node-end node))
+              ((= end (point)))
+              (start (treesit-node-start node))
+              (type (treesit-node-type node)))
+    (or (member type ada-ts-indent--electric-punctuation)
+        (and (= start
+                (save-excursion
+                  (back-to-indentation)
+                  (point)))
+             (or (member type ada-ts-indent--electric-keywords)
+                 ;; Re-indent identifier that looked like a keyword
+                 ;; (and was likely indented as a keyword) before last
+                 ;; key press.
+                 (and (string-equal type "identifier")
+                      (let* ((text (treesit-node-text node 'no-property))
+                             (text- (substring text 0 (1- (length text)))))
+                        (member-ignore-case
+                         text-
+                         ada-ts-indent--electric-keywords))))))))
+
+(defvar-local ada-ts-indent--electric-indent-check-needed nil)
+
+(defun ada-ts-indent--maybe-electric-indent ()
+  "Maybe perform electric indentation."
+  (when ada-ts-indent--electric-indent-check-needed
+    (when (and (or (null ada-ts-indent--last-indent-tick)
+                   (not (= ada-ts-indent--last-indent-tick
+                           (buffer-chars-modified-tick))))
+               (ada-ts-indent--electric-indent-p))
+      (ignore-errors (indent-according-to-mode)))
+    (setq ada-ts-indent--electric-indent-check-needed nil)))
+
+(defun ada-ts-indent--after-change (beg end length)
+  "Buffer local after-change function.
+
+Only check indentation on text insertion (i.e., LENGTH = 0) or text
+replacement (BEG /= END), but ignore changes that are deletions
+only (BEG = END and LENGTH /= 0) as the user typically does not want to
+cause electric indentation through deletion of characters immediately
+following electric punctuation or electric keywords."
+  (when (and (or (zerop length)
+                 (/= beg end))
+             (bound-and-true-p electric-indent-mode)
+             (not (bound-and-true-p electric-indent-inhibit)))
+    (setq ada-ts-indent--electric-indent-check-needed t)))
+
+(defun ada-ts-indent--setup ()
+  "Setup indentation for buffer."
+  (setq-local treesit-simple-indent-rules ada-ts-mode--indent-rules)
+
+  ;; When `electric-indent-mode' is enabled, it only performs electric
+  ;; condition checks after `self-insert-command'.  There are other
+  ;; commands which can modify the buffer (e.g., `completion-at-point'),
+  ;; but no check is performed by `electric-indent-mode'.
+  ;;
+  ;; As a workaround, hook into `after-change-functions' to know when
+  ;; the buffer has changed.  Also hook into `post-command-hook' to
+  ;; perform the electric condition check when `electric-indent-mode' is
+  ;; enabled and we've detected a buffer change that wasn't due to
+  ;; indentation.
+  (add-hook 'after-change-functions #'ada-ts-indent--after-change nil 'local)
+  (add-hook 'post-command-hook #'ada-ts-indent--maybe-electric-indent nil 'local))
 
 (provide 'ada-ts-indentation)
 
