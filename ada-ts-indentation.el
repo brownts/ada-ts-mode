@@ -1649,7 +1649,7 @@ When CLIENT is not nil, use it as the active LSP client."
                                              "end")))))
                           (next-node (ada-ts-mode--next-node end-node))
                           (next-node-t (treesit-node-type next-node))
-                          ((string-equal next-node-t "identifier")))
+                          ((member next-node-t '("identifier" "selected_component"))))
                 (ada-ts-mode--node-to-name next-node)))))
       (when ada-ts-mode--indent-verbose
         (message "NAME: %s" name)
