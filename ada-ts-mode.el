@@ -550,13 +550,23 @@ the string property to those instances."
      (incomplete_type_declaration (identifier) @font-lock-type-face)
      (private_type_declaration (identifier) @font-lock-type-face)
      (private_extension_declaration (identifier) @font-lock-type-face)
-     (protected_type_declaration (identifier) @font-lock-type-face "is")
+     (private_extension_declaration (selected_component
+                                     selector_name: _ @font-lock-type-face))
+     (protected_type_declaration (identifier) @font-lock-type-face)
+     (protected_type_declaration (selected_component
+                                  selector_name: _ @font-lock-type-face))
      (protected_type_declaration
       (protected_definition "end" (identifier) @font-lock-type-face))
-     (task_type_declaration "type"
-                            :anchor (comment) :*
-                            :anchor (identifier) @font-lock-type-face)
+     (single_protected_declaration "new" (identifier) @font-lock-type-face)
+     (single_protected_declaration "new" (selected_component
+                                          selector_name: _ @font-lock-type-face))
+     (task_type_declaration (identifier) @font-lock-type-face)
+     (task_type_declaration (selected_component
+                             selector_name: _ @font-lock-type-face))
      (task_type_declaration (task_definition endname: _ @font-lock-type-face))
+     (single_task_declaration "new" (identifier) @font-lock-type-face)
+     (single_task_declaration "new" (selected_component
+                                     selector_name: _ @font-lock-type-face))
      (subtype_declaration (identifier) @font-lock-type-face)
      (_ subtype_mark: (selected_component
                        selector_name: _ @font-lock-type-face))
@@ -580,7 +590,16 @@ the string property to those instances."
      (record_representation_clause local_name: _ @font-lock-type-face)
      (record_representation_clause end_local_name: _ @font-lock-type-face) ; Ada 2022
      (formal_complete_type_declaration (identifier) @font-lock-type-face)
-     (formal_incomplete_type_declaration (identifier) @font-lock-type-face))
+     (formal_incomplete_type_declaration (identifier) @font-lock-type-face)
+     (formal_derived_type_definition (identifier) @font-lock-type-face)
+     (formal_derived_type_definition (selected_component
+                                      selector_name: _ @font-lock-type-face))
+     (interface_type_definition (identifier) @font-lock-type-face)
+     (interface_type_definition (selected_component
+                                 selector_name: _ @font-lock-type-face))
+     (derived_type_definition (identifier) @font-lock-type-face)
+     (derived_type_definition (selected_component
+                               selector_name: _ @font-lock-type-face)))
 
    ;; Syntax errors
    :language 'ada

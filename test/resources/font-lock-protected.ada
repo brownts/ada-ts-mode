@@ -1,16 +1,21 @@
 package body Test is
 
-   protected type Protected_Type_Declaration is
-      --   ^    ^                             ^ font-lock-keyword-face
-      --          ^ font-lock-type-face
+   protected type Protected_Type_Declaration is new Interface_Type and ABC.Interface_Type with
+      --   ^    ^                             ^ ^                  ^                      ^ font-lock-keyword-face
+      --          ^                                 ^                      ^font-lock-type-face
+      --                                                               ^ nil
+      --                                                                  ^ font-lock-delimiter-face
    end Protected_Type_Declaration;
    -- <- font-lock-keyword-face
    --  ^ font-lock-type-face
 
 
-   protected Single_Protected_Declaration is
-      --   ^                              ^ font-lock-keyword-face
+   protected Single_Protected_Declaration is new Interface_Type and ABC.Interface_Type with
+      --   ^                              ^  ^                  ^                      ^ font-lock-keyword-face
       --     ^ font-lock-variable-name-face
+      --                                         ^                      ^ font-lock-type-face
+      --                                                            ^ nil
+      --                                                               ^ font-lock-delimiter-face
    end Single_Protected_Declaration;
    -- <- font-lock-keyword-face
    --  ^ font-lock-variable-name-face
