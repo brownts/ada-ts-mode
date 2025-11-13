@@ -1200,9 +1200,6 @@ the name of the branch given the branch node."
   :group 'ada-ts
 
   ;; Grammar.
-  (setq-local treesit-language-source-alist
-              `((ada . ,(ensure-list ada-ts-mode-grammar))))
-
   (when (and (treesit-available-p)
              (not (treesit-language-available-p 'ada))
              (pcase ada-ts-mode-grammar-install
@@ -1321,6 +1318,11 @@ the name of the branch given the branch node."
   (if (boundp 'major-mode-remap-defaults)
       (add-to-list 'major-mode-remap-defaults '(ada-mode . ada-ts-mode))
     (add-to-list 'major-mode-remap-alist '(ada-mode . ada-ts-mode))))
+
+;; Register mode's default grammar
+(add-to-list 'treesit-language-source-alist
+             `(ada . ,(ensure-list ada-ts-mode-grammar))
+             'append)
 
 ;; Lazily register mode's info lookup help.
 (with-eval-after-load 'info-look
