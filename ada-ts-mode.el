@@ -224,7 +224,7 @@ the string property to those instances."
     "mod"
     "new" "not" "null"
     "of" "or" "others" "out" "overriding"
-    "package" "pragma" "private" "procedure" "protected"
+    "package" "parallel" "pragma" "private" "procedure" "protected"
     "raise" "range" "record" "renames" "return" "reverse"
     "select" "separate" "some" "subtype" "synchronized"
     "tagged" "task" "terminate" "then" "type"
@@ -425,7 +425,10 @@ the string property to those instances."
      (discriminant_specification (identifier) @font-lock-variable-name-face ":")
      (discriminant_specification (identifier) @font-lock-constant-face ":")
      (variant_part (identifier) @font-lock-variable-name-face)
-     (variant_part (identifier) @font-lock-constant-face))
+     (variant_part (identifier) @font-lock-constant-face)
+     (reduction_specification :anchor [(identifier) (string_literal)] @font-lock-function-name-face)
+     (reduction_specification :anchor (selected_component
+                                       selector_name: _ @font-lock-function-name-face)))
 
    ;; Function/Procedure Calls
    :language 'ada
