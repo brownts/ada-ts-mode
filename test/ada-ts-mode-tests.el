@@ -186,6 +186,13 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
       (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
                (ert-test-erts-file ,file-path #',transform))))))
 
+;;;; Test Eglot support
+
+(ert-deftest ada-ts-mode-test-eglot-config ()
+  "Tests that Eglot contains a server configuration for `ada-ts-mode'."
+  (require 'eglot)
+  (should (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)))
+
 (provide 'ada-ts-mode-tests)
 
 ;;; ada-ts-mode-tests.el ends here

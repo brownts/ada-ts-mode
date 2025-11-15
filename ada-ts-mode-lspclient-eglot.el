@@ -84,6 +84,58 @@
        (string-prefix-p folder expanded-path))
      workspace-folders)))
 
+(defun ada-ts-mode-lspclient-eglot--find-mode-config (mode-to-find)
+  "Find Eglot server configuration for MODE-TO-FIND."
+  (seq-find
+   (pcase-lambda (`(,modes . ,contact))
+     (when (or (and (symbolp modes)
+                    (eq mode-to-find modes))
+               (and (listp modes)
+                    (keywordp (cadr modes))
+                    (eq mode-to-find (car modes)))
+               (and (listp modes)
+                    (seq-find
+                     (lambda (mode)
+                       (or (and (symbolp mode)
+                                (eq mode-to-find mode))
+                           (and (listp mode)
+                                (keywordp (cadr mode))
+                                (eq mode-to-find (car mode)))))
+                     modes)))
+       (cons modes contact)))
+   eglot-server-programs))
+
+(defun ada-ts-mode-lspclient-eglot--setup ()
+  "Setup Eglot for mode.
+
+No configuration was provided for `ada-ts-mode' in the version of Eglot
+as shipped with Emacs 29, so it is added if it cannot be found.
+
+The language id was not properly inferred for tree-sitter major modes in
+the version of Eglot shipped with Emacs 29, so the language id is
+included if the mode configuration must be added."
+  (unless (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)
+    (if-let* ((config '(ada-ts-mode :language-id "ada"))
+              (entry (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-mode))
+              (modes (car entry))
+              (contact (cdr entry))
+              (new-modes
+               (cond ((symbolp modes)
+                      (list modes config))
+                     ((and (listp modes)
+                           (keywordp (cadr modes)))
+                      (list modes config))
+                     ((listp modes)
+                      (append modes (list config)))
+                     (t nil))))
+        ;; Update existing Ada configuration
+        (add-to-list 'eglot-server-programs (cons new-modes contact))
+      ;; Add Ada configuration
+      (add-to-list 'eglot-server-programs
+                   (list `(ada-mode ,config) "ada_language_server")))))
+
+(ada-ts-mode-lspclient-eglot--setup)
+
 (add-hook 'ada-ts-mode-lspclient-find-functions #'ada-ts-mode-lspclient-eglot)
 
 (provide 'ada-ts-mode-lspclient-eglot)
