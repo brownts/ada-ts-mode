@@ -57,7 +57,9 @@
 
 (cl-defmethod ada-ts-mode-lspclient-format-region ((_client (eql eglot)) beg end)
   "Format region BEG to END of using Language Server."
-  (eglot-format beg end))
+  (if (= (- end beg) (buffer-size))
+      (eglot-format-buffer)
+    (eglot-format beg end)))
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope)
   "Retrieve workspace configuration for SCOPE."

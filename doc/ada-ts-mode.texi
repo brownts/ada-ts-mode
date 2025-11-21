@@ -400,9 +400,9 @@ formatting engines.
 
 The value of @code{ada-ts-mode-indent-offset} is provided to the Ada Language
 Server as the @samp{tabSize} parameter in the @samp{textDocument/rangeFormatting}
-request.  This corresponds to the main indentation amount (i.e.,
-overriding the @samp{--indentation} switch for @samp{GNATpp} or the @samp{Indentation}
-package setting for @samp{GNATformat}).
+and @samp{textDocument/formatting} requests.  This corresponds to the main
+indentation amount (i.e., overriding the @samp{--indentation} switch for
+@samp{GNATpp} or the @samp{Indentation} package setting for @samp{GNATformat}).
 
 @node Navigation
 @chapter Navigation

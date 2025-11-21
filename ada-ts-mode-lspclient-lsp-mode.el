@@ -25,6 +25,7 @@
 
 (declare-function lsp-can-execute-command?      "ext:lsp-mode" (command-name))
 (declare-function lsp-configuration-section     "ext:lsp-mode" (section))
+(declare-function lsp-format-buffer             "ext:lsp-mode" ())
 (declare-function lsp-format-region             "ext:lsp-mode" (s e))
 (declare-function lsp-text-document-identifier  "ext:lsp-mode" ())
 (declare-function lsp-workspaces                "ext:lsp-mode" ())
@@ -55,7 +56,9 @@
 
 (cl-defmethod ada-ts-mode-lspclient-format-region ((_client (eql lsp-mode)) beg end)
   "Format region BEG to END using Language Server."
-  (lsp-format-region beg end))
+  (if (= (- end beg) (buffer-size))
+      (lsp-format-buffer)
+    (lsp-format-region beg end)))
 
 (cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql lsp-mode)) scope)
   "Retrieve workspace configuration for SCOPE."
