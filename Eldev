@@ -7,3 +7,17 @@
 
 ;; Configure for automatic build/installation of the Ada grammar library.
 (setq ada-ts-mode-grammar-install 'auto)
+
+(eldev-add-loading-roots 'test "test")
+
+;; Install `lsp-mode' for testing.
+(setq package-check-signature nil)
+(eldev-add-extra-dependencies 'test '(:package lsp-mode :archives (melpa-unstable gnu)))
+
+;; Configure Linting
+(setq eldev-lint-default '(doc re))
+
+;; Configure Doctor
+(when (eq system-type 'windows-nt)
+  ;; Check doesn't seem to work on Windows runner
+  (setq eldev-doctor-disabled-tests '(eldev-file-owners)))

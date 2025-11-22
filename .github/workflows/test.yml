@@ -15,8 +15,10 @@ jobs:
         emacs-version: ['29.1', '29.4', '30.1', '30.2']
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          - os: ubuntu-latest
-            emacs-version: 'snapshot'
+          - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux', emacs-version: 'snapshot'}
+          - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux'}
+          - {os: windows-latest, als-pattern: 'als-*-win32-x64.tar.gz',    als-location: 'integration\vscode\ada\x64\win32'}
+          - {os: macos-latest,   als-pattern: 'als-*-darwin-arm64.tar.gz', als-location: 'integration/vscode/ada/arm64/darwin'}
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.emacs-version == 'snapshot'}}
 
@@ -49,6 +51,30 @@ jobs:
           echo ${{runner.temp}}\msys64\usr\bin\perl ${{runner.temp}}\msys64\usr\bin\makeinfo %%*>> ${{runner.temp}}\msys64\mingw64\bin\makeinfo.bat
           echo ${{runner.temp}}\msys64\mingw64\bin>> %GITHUB_PATH%
 
+      - name: Install Ada Languager Server (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          gh release download --repo AdaCore/ada_language_server --pattern ${{matrix.als-pattern}} --output ${{runner.temp}}\als.tar.gz
+          if not exist ${{runner.temp}}\als mkdir ${{runner.temp}}\als
+          tar -xzvf ${{runner.temp}}\als.tar.gz --directory ${{runner.temp}}\als
+          echo ${{runner.temp}}\als\${{matrix.als-location}}>> %GITHUB_PATH%
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Install Ada Language Server (Linux, MacOS)
+        if: runner.os != 'Windows'
+        run: |
+          gh release download --repo AdaCore/ada_language_server --pattern ${{matrix.als-pattern}} --output ${{runner.temp}}/als.tar.gz
+          mkdir -p ${{runner.temp}}/als
+          tar -xzvf ${{runner.temp}}/als.tar.gz --directory ${{runner.temp}}/als
+          echo "${{runner.temp}}/als/${{matrix.als-location}}" >> $GITHUB_PATH
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Display ALS Version
+        run: ada_language_server --version
+
       - name: Setup Emacs
         uses: jcs090218/setup-emacs@master
         with:
@@ -59,3 +85,12 @@ jobs:
 
       - name: Test the project
         run: eldev -p -dtT test
+
+      - name: Ensure the project byte-compiles cleanly
+        run: eldev compile --keep-going --set all --warnings-as-errors
+
+      - name: Lint the project
+        run: eldev -p lint
+
+      - name: Check the project for common issues
+        run: eldev -p doctor --all-tests

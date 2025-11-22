@@ -20,51 +20,12 @@
 ;;; Code:
 
 (require 'ada-ts-mode)
+(require 'ada-ts-mode-test-utils)
 (require 'ert)
 (require 'ert-font-lock nil 'noerror) ; Emacs 30+
 (require 'ert-x)
 (require 'treesit)
 (require 'which-func)
-
-;;;; Utilities
-
-(defun ada-ts-mode-tests--modify-and-reindent ()
-  "Modify each line and reindent buffer."
-  ;; Modifying each line is used to make sure there is an indentation
-  ;; rule that moves the line back to the initial location, rather
-  ;; than no indentation rule that just leaves the line alone.  This
-  ;; is useful for finding lines with missing indentation rules.
-  (goto-char (point-min))
-  (cl-flet ((line-length () (- (line-end-position)
-                               (line-beginning-position))))
-    (while (not (eobp))
-      (when (> (line-length) 0)
-        (if (= (following-char) ?\s)
-            (while (and (> (line-length) 0)
-                        (= (following-char) ?\s))
-              (delete-char 1))
-          (insert-char ?\s)))
-      (forward-line 1)
-      (beginning-of-line)))
-  (indent-region (point-min) (point-max)))
-
-(defun ada-ts-mode-tests--check-indentation ()
-  "Check test setup indentation is as expected."
-  (let ((buffer (buffer-string))
-        (point (point)))
-    (ada-ts-mode-tests--modify-and-reindent)
-    (should (string-equal buffer (buffer-string)))
-    (goto-char point)))
-
-(defun ada-ts-mode-tests--simulate-key-press (key)
-  "Simulate interactively pressing KEY.
-
-Simulates execution of the command associated with the key as well as
-execution of pre and post command hooks."
-  (let ((inhibit-message t))
-    (save-window-excursion
-      (set-window-buffer nil (current-buffer))
-      (execute-kbd-macro (kbd key)))))
 
 ;;;; Transform Functions
 
@@ -164,12 +125,13 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
 (dolist (file (directory-files (ert-resource-directory)
                                nil
                                directory-files-no-dot-files-regexp))
-  (let* ((file-noext (file-name-sans-extension file))
-         (file-path (ert-resource-file file))
-         (transform (cond ((string-suffix-p "-nl"     file-noext) #'newline-transform)
-                          ((string-prefix-p "filling" file-noext) #'filling-transform)
-                          ((string-prefix-p "indent"  file-noext) #'indent-transform)
-                          (t #'default-transform))))
+  (when-let* ((file-path (ert-resource-file file))
+              ((file-regular-p file-path))
+              (file-noext (file-name-sans-extension file))
+              (transform (cond ((string-suffix-p "-nl"     file-noext) #'newline-transform)
+                               ((string-prefix-p "filling" file-noext) #'filling-transform)
+                               ((string-prefix-p "indent"  file-noext) #'indent-transform)
+                               (t #'default-transform))))
     (if (string-prefix-p "font-lock" file-noext)
         (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
                  (skip-unless (featurep 'ert-font-lock))
@@ -185,13 +147,6 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
                      (setq treesit-font-lock-level prev-level)))))
       (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
                (ert-test-erts-file ,file-path #',transform))))))
-
-;;;; Test Eglot support
-
-(ert-deftest ada-ts-mode-test-eglot-config ()
-  "Tests that Eglot contains a server configuration for `ada-ts-mode'."
-  (require 'eglot)
-  (should (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)))
 
 (provide 'ada-ts-mode-tests)
 

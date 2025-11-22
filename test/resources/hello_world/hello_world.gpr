@@ -1,0 +1,4 @@
+project Hello_World is
+   for Main use ("hello_world");
+   for Source_Dirs use (".");
+end Hello_World;
