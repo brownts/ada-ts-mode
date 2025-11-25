@@ -21,3 +21,7 @@
 (when (eq system-type 'windows-nt)
   ;; Check doesn't seem to work on Windows runner
   (setq eldev-doctor-disabled-tests '(eldev-file-owners)))
+
+;; Configure Maintainer Plugin
+(setq eldev-release-allowed-branch "main")
+(setq eldev-release-test-local t)
