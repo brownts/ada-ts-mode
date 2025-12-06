@@ -14,6 +14,9 @@
 (setq package-check-signature nil)
 (eldev-add-extra-dependencies 'test '(:package lsp-mode :archives (melpa-unstable gnu)))
 
+;; Install `smartparens' for testing.
+(eldev-add-extra-dependencies 'test '(:package smartparens :archives melpa-unstable))
+
 ;; Configure Linting
 (setq eldev-lint-default '(doc re))
 

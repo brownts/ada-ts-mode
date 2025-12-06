@@ -24,6 +24,7 @@
 (require 'eglot)
 (require 'ert)
 (require 'ert-x)
+(require 'smartparens nil 'noerror)
 
 (ert-deftest ada-ts-mode-test-eglot-als-other-file ()
   "Test ALS command 'als-other-file'.
@@ -115,6 +116,37 @@ Emacs 29) did not support it."
       (setq-local indent-tabs-mode nil)
       (let ((inhibit-message t))
         (ada-ts-mode-tests--check-line-indentation)))))
+
+(ert-deftest ada-ts-mode-test-eglot-smartparens ()
+  "Test Eglot in combination with smartparens."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'smartparens)))
+  (with-file-in-project
+      "example.adb"
+      (ert-resource-file "smartparens")
+      "example.adb"
+    (let ((buffer (buffer-string))
+          (size (buffer-size)))
+      (with-language-server eglot
+        (message "Emacs               : %s" emacs-version)
+        (message "ada-ts-mode         : %s" (lm-version (find-library-name "ada-ts-mode")))
+        (message "Eglot               : %s" (lm-version (find-library-name "eglot")))
+        (message "smartparens         : %s" (lm-with-file (find-library-name "smartparens")
+                                              (or (lm-header "package-version")
+                                                  (lm-header "version"))))
+        (message "ada_language_server : %s" (car (process-lines (executable-find "ada_language_server") "--version")))
+        (smartparens-mode)
+        (goto-char 96)
+        ;; Let LSP server finish initializing
+        (sit-for 5)
+        (message "Starting test...")
+        (ada-ts-mode-tests--simulate-key-press ")")
+        ;; Provide time for asynchronous LSP behavior
+        (sit-for 5)
+        ;; Should only move point, not insert the character.
+        (should (= (point) 97))
+        (should (= (buffer-size) size))
+        (should (string-equal buffer (buffer-string)))))))
 
 (provide 'ada-ts-mode-eglot-tests)
 
