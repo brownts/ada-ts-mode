@@ -116,6 +116,30 @@ Emacs 29) did not support it."
       (let ((inhibit-message t))
         (ada-ts-mode-tests--check-line-indentation)))))
 
+(ert-deftest ada-ts-mode-test-eglot-electric-pair ()
+  "Test Eglot in combination with `electric-pair-mode'."
+  (skip-unless (executable-find "ada_language_server"))
+  (with-file-in-project
+      "example.adb"
+      (ert-resource-file "electric-pair")
+      "example.adb"
+    (setq-local indent-tabs-mode nil)
+    (setq-local ada-ts-mode-indent-backend 'lsp)
+    (let ((buffer (buffer-string))
+          (size (buffer-size)))
+      (with-language-server eglot
+        (message "Emacs               : %s" emacs-version)
+        (message "ada-ts-mode         : %s" (lm-version (find-library-name "ada-ts-mode")))
+        (message "Eglot               : %s" (lm-version (find-library-name "eglot")))
+        (message "ada_language_server : %s" (car (process-lines (executable-find "ada_language_server") "--version")))
+        (electric-pair-local-mode)
+        (setq-local electric-pair-skip-self t)
+        (goto-char 96)
+        (ada-ts-mode-tests--simulate-key-press ")")
+        ;; Should only move point, not insert the character.
+        (should (string-equal buffer (buffer-string)))
+        (should (= (point) 97))))))
+
 (provide 'ada-ts-mode-eglot-tests)
 
 ;;; ada-ts-mode-eglot-tests.el ends here

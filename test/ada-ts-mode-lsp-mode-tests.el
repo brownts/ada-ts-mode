@@ -93,6 +93,33 @@
       (let ((inhibit-message t))
         (ada-ts-mode-tests--check-line-indentation)))))
 
+(ert-deftest ada-ts-mode-test-lsp-mode-electric-pair ()
+  "Test `lsp-mode' in combination with `electric-pair-mode'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "example.adb"
+      (ert-resource-file "electric-pair")
+      "example.adb"
+    (setq-local indent-tabs-mode nil)
+    (setq-local ada-ts-mode-indent-backend 'lsp)
+    (let ((buffer (buffer-string))
+          (size (buffer-size)))
+      (with-language-server lsp-mode
+        (message "Emacs               : %s" emacs-version)
+        (message "ada-ts-mode         : %s" (lm-version (find-library-name "ada-ts-mode")))
+        (message "lsp-mode            : %s" (lm-with-file (find-library-name "lsp-mode")
+                                              (or (lm-header "package-version")
+                                                  (lm-header "version"))))
+        (message "ada_language_server : %s" (car (process-lines (executable-find "ada_language_server") "--version")))
+        (electric-pair-local-mode)
+        (setq-local electric-pair-skip-self t)
+        (goto-char 96)
+        (ada-ts-mode-tests--simulate-key-press ")")
+        ;; Should only move point, not insert the character.
+        (should (string-equal buffer (buffer-string)))
+        (should (= (point) 97))))))
+
 (provide 'ada-ts-mode-lsp-mode-tests)
 
 ;;; ada-ts-mode-lsp-mode-tests.el ends here
