@@ -25,3 +25,14 @@
 ;; Configure Maintainer Plugin
 (setq eldev-release-allowed-branch "main")
 (setq eldev-release-test-local t)
+(setq eldev-release-min-version-size 3)
+(setq eldev-release-post-release-commit-message "Post-release version bump."
+      eldev-release-post-release-commit
+      (lambda (version)
+        (if (eldev-version-snapshot-p version)
+            version
+          (let* ((next-version (eldev-release-next-minor-version version))
+                 (next-version-len (length next-version))
+                 (padding (when (< next-version-len eldev-release-min-version-size)
+                            (make-list (- eldev-release-min-version-size next-version-len) 0))))
+            (append next-version padding (cdr (version-to-list "0snapshot")))))))
