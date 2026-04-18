@@ -1,6 +1,6 @@
 ;;; ada-ts-mode-test-utils.el --- Common utilities shared by tests -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025 Troy Brown
+;; Copyright (C) 2025-2026 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 

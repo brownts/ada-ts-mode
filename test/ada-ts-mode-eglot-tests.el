@@ -1,6 +1,6 @@
 ;;; ada-ts-mode-eglot-tests.el --- Tests specific to Eglot and LSP -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025 Troy Brown
+;; Copyright (C) 2025-2026 Troy Brown
 
 ;; This file is not part of GNU Emacs.
 
