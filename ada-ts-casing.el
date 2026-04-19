@@ -127,7 +127,7 @@ The following keywords are meaningful:
           (when-let* ((line-words
                        (string-split
                         (buffer-substring-no-properties (pos-bol) (pos-eol))
-                        "*" 'omit-nulls (rx (+ whitespace)))))
+                        (rx "*") 'omit-nulls (rx (+ whitespace)))))
             (dolist (line-word line-words)
               (unless (assoc-string line-word file-words t)
                 (push line-word file-words))))
