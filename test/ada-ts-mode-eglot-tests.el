@@ -101,9 +101,9 @@ Emacs 29) did not support it."
     (should (string-equal (buffer-file-name (window-buffer (selected-window)))
                           (buffer-file-name (current-buffer))))
     (with-language-server eglot
-      (ada-ts-mode-lspclient-command-execute
+      (ada-ts-lspclient-command-execute
        client "als-other-file"
-       (ada-ts-mode-lspclient-document-id client))
+       (ada-ts-lspclient-document-id client))
       ;; Wait for window/showDocument
       (with-timeout (5)
         (while (string-equal (buffer-file-name (window-buffer (selected-window)))
@@ -148,11 +148,11 @@ Emacs 29) did not support it."
 
 (ert-deftest ada-ts-mode-test-eglot-config-exists ()
   "Tests that Eglot contains a server configuration for `ada-ts-mode'."
-  (should (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)))
+  (should (ada-ts-lspclient-eglot--find-mode-config 'ada-ts-mode)))
 
 (ert-deftest ada-ts-mode-test-eglot-config-language ()
   "Tests that Eglot correctly determines language for `ada-ts-mode'."
-  (skip-unless (and (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)
+  (skip-unless (and (ada-ts-lspclient-eglot--find-mode-config 'ada-ts-mode)
                     (executable-find "ada_language_server")))
   (with-file-in-project
       "hello_world.adb"

@@ -91,7 +91,7 @@ execution of pre and post command hooks."
   (cond
    ((eq client 'eglot)
     `(progn
-       (should (not (ada-ts-mode-lspclient-current)))
+       (should (not (ada-ts-lspclient-current)))
        (let* ((inhibit-message t)
               (initialized nil)
               (connect-hook #'(lambda (&rest _) (setq initialized t))))
@@ -109,7 +109,7 @@ execution of pre and post command hooks."
                (should initialized))
            (remove-hook 'eglot-connect-hook connect-hook)))
        (unwind-protect
-           (let ((client (ada-ts-mode-lspclient-current))
+           (let ((client (ada-ts-lspclient-current))
                  (jsonrpc-default-request-timeout 30))
              (should (eq client 'eglot))
              ,@body)
@@ -118,7 +118,7 @@ execution of pre and post command hooks."
            (eglot-shutdown (eglot-current-server) nil timeout)))))
    ((eq client 'lsp-mode)
     `(progn
-       (should (not (ada-ts-mode-lspclient-current)))
+       (should (not (ada-ts-lspclient-current)))
        (let ((lsp-auto-guess-root t)
              (lsp-enable-indentation nil)
              (lsp-keep-workspace-alive nil))
@@ -133,7 +133,7 @@ execution of pre and post command hooks."
                (sleep-for 0.01)))
            (should initialized))
          (unwind-protect
-             (let ((client (ada-ts-mode-lspclient-current)))
+             (let ((client (ada-ts-lspclient-current)))
                (should (eq client 'lsp-mode))
                ,@body)
            (let ((inhibit-message t))

@@ -1,4 +1,4 @@
-;;; ada-ts-mode-lspclient-eglot.el -- LSP client interface for Eglot -*- lexical-binding: t; -*-
+;;; ada-ts-lspclient-eglot.el -- LSP client interface for Eglot -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024-2026 Troy Brown
 
@@ -25,14 +25,14 @@
 (require 'eglot)
 (require 'json)
 
-(defun ada-ts-mode-lspclient-eglot ()
+(defun ada-ts-lspclient-eglot-try ()
   "Return Eglot client."
   (when (eglot-managed-p)
     'eglot))
 
-(cl-defmethod ada-ts-mode-lspclient-command-execute ((_client (eql eglot)) command &rest arguments)
+(cl-defmethod ada-ts-lspclient-command-execute ((_client (eql eglot)) command &rest arguments)
   "Execute COMMAND with ARGUMENTS using Language Server."
-  (ada-ts-mode-lspclient-eglot--normalize
+  (ada-ts-lspclient-eglot--normalize
    (cond ((functionp 'eglot-execute-command)
           (eglot-execute-command (eglot-current-server)
                                  command (vconcat arguments)))
@@ -41,7 +41,7 @@
                          `( :command   ,command
                             :arguments ,(vconcat arguments)))))))
 
-(cl-defmethod ada-ts-mode-lspclient-command-supported-p ((_client (eql eglot)) command)
+(cl-defmethod ada-ts-lspclient-command-supported-p ((_client (eql eglot)) command)
   "Determine if Language Server supports COMMAND."
   (when-let* ((server-capable
                (cond ((functionp 'eglot-server-capable)  #'eglot-server-capable)
@@ -50,20 +50,20 @@
               (commands (plist-get command-provider :commands)))
     (seq-contains-p commands command)))
 
-(cl-defmethod ada-ts-mode-lspclient-document-id ((_client (eql eglot)))
+(cl-defmethod ada-ts-lspclient-document-id ((_client (eql eglot)))
   "Determine document identifier of current buffer."
   (when-let* ((path-to-uri
                (cond ((functionp 'eglot-path-to-uri)  #'eglot-path-to-uri)
                      ((functionp 'eglot--path-to-uri) #'eglot--path-to-uri))))
     `(:uri ,(funcall path-to-uri (buffer-file-name)))))
 
-(cl-defmethod ada-ts-mode-lspclient-format-region ((_client (eql eglot)) beg end)
+(cl-defmethod ada-ts-lspclient-format-region ((_client (eql eglot)) beg end)
   "Format region BEG to END of using Language Server."
   (if (= (- end beg) (buffer-size))
       (eglot-format-buffer)
     (eglot-format beg end)))
 
-(cl-defmethod ada-ts-mode-lspclient-workspace-configuration ((_client (eql eglot)) scope &optional false)
+(cl-defmethod ada-ts-lspclient-workspace-configuration ((_client (eql eglot)) scope &optional false)
   "Retrieve workspace configuration for SCOPE.
 
 FALSE specifies the representation to use for JSON false values."
@@ -88,7 +88,7 @@ FALSE specifies the representation to use for JSON false values."
                                (intern (concat ":" n)))
                              namespaces))))
 
-(cl-defmethod ada-ts-mode-lspclient-workspace-root ((_client (eql eglot)) path)
+(cl-defmethod ada-ts-lspclient-workspace-root ((_client (eql eglot)) path)
   "Determine workspace root for PATH."
   (when-let* ((expanded-path (expand-file-name path))
               (workspace-folders
@@ -102,16 +102,16 @@ FALSE specifies the representation to use for JSON false values."
        (string-prefix-p folder expanded-path))
      workspace-folders)))
 
-(defun ada-ts-mode-lspclient-eglot--normalize (value)
+(defun ada-ts-lspclient-eglot--normalize (value)
   "Normalize VALUE using lists, property lists, etc."
   (cond ((listp value)
-         (seq-map #'ada-ts-mode-lspclient-eglot--normalize value))
+         (seq-map #'ada-ts-lspclient-eglot--normalize value))
         ((vectorp value)
-         (append (seq-map #'ada-ts-mode-lspclient-eglot--normalize value) nil))
+         (append (seq-map #'ada-ts-lspclient-eglot--normalize value) nil))
         ((eq value :json-false) nil)
         (t value)))
 
-(defun ada-ts-mode-lspclient-eglot--find-mode-config (mode-to-find)
+(defun ada-ts-lspclient-eglot--find-mode-config (mode-to-find)
   "Find Eglot server configuration for MODE-TO-FIND."
   (seq-find
    (pcase-lambda (`(,modes . ,contact))
@@ -132,7 +132,7 @@ FALSE specifies the representation to use for JSON false values."
        (cons modes contact)))
    eglot-server-programs))
 
-(defun ada-ts-mode-lspclient-eglot--setup ()
+(defun ada-ts-lspclient-eglot--setup ()
   "Setup Eglot for mode.
 
 No configuration was provided for `ada-ts-mode' in the version of Eglot
@@ -141,9 +141,9 @@ as shipped with Emacs 29, so it is added if it cannot be found.
 The language id was not properly inferred for tree-sitter major modes in
 the version of Eglot shipped with Emacs 29, so the language id is
 included if the mode configuration must be added."
-  (unless (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-ts-mode)
+  (unless (ada-ts-lspclient-eglot--find-mode-config 'ada-ts-mode)
     (if-let* ((config '(ada-ts-mode :language-id "ada"))
-              (entry (ada-ts-mode-lspclient-eglot--find-mode-config 'ada-mode))
+              (entry (ada-ts-lspclient-eglot--find-mode-config 'ada-mode))
               (modes (car entry))
               (contact (cdr entry))
               (new-modes
@@ -161,15 +161,15 @@ included if the mode configuration must be added."
       (add-to-list 'eglot-server-programs
                    (list `(ada-mode ,config) "ada_language_server")))))
 
-(ada-ts-mode-lspclient-eglot--setup)
+(ada-ts-lspclient-eglot--setup)
 
-(add-hook 'ada-ts-mode-lspclient-find-functions #'ada-ts-mode-lspclient-eglot)
+(add-hook 'ada-ts-lspclient-find-functions #'ada-ts-lspclient-eglot-try)
 
-(provide 'ada-ts-mode-lspclient-eglot)
+(provide 'ada-ts-lspclient-eglot)
 
 ;;;###autoload
 (with-eval-after-load 'ada-ts-mode
   (with-eval-after-load 'eglot
-    (require 'ada-ts-mode-lspclient-eglot)))
+    (require 'ada-ts-lspclient-eglot)))
 
-;;; ada-ts-mode-lspclient-eglot.el ends here
+;;; ada-ts-lspclient-eglot.el ends here

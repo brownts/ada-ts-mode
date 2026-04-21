@@ -21,7 +21,7 @@
 
 ;;; Code:
 
-(require 'ada-ts-mode-lspclient)
+(require 'ada-ts-lspclient)
 (eval-when-compile (require 'cl-lib)) ; cl-labels
 (require 'json)
 (require 'project)
@@ -372,5 +372,5 @@ LSP client is active."
 
 ;;; ada-ts-als.el ends here
 ;; Local Variables:
-;; read-symbol-shorthands: (("lspclient/" . "ada-ts-mode-lspclient-"))
+;; read-symbol-shorthands: (("lspclient/" . "ada-ts-lspclient-"))
 ;; End:

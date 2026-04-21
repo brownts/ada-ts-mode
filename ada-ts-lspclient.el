@@ -1,4 +1,4 @@
-;;; ada-ts-mode-lspclient.el --- LSP client interface -*- lexical-binding: t; -*-
+;;; ada-ts-lspclient.el --- LSP client interface -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024-2026 Troy Brown
 
@@ -23,7 +23,7 @@
 
 (require 'cl-generic)
 
-(defvar ada-ts-mode-lspclient-find-functions nil
+(defvar ada-ts-lspclient-find-functions nil
   "Special hook to find the LSP client for a given buffer.
 
 Each function on this hook is called in turn and should return either
@@ -32,27 +32,27 @@ form of the client instance is up to each respective function; the only
 practical limitation is to use values that `cl-defmethod' can dispatch
 on.")
 
-(defvar ada-ts-mode-lspclient-session-hook nil
+(defvar ada-ts-lspclient-session-hook nil
   "Hook called when an LSP session is established.")
 
-(defun ada-ts-mode-lspclient-current ()
+(defun ada-ts-lspclient-current ()
   "Return the client instance for the current buffer."
   (run-hook-with-args-until-success
-   'ada-ts-mode-lspclient-find-functions))
+   'ada-ts-lspclient-find-functions))
 
-(cl-defgeneric ada-ts-mode-lspclient-command-execute (_client command &rest arguments)
+(cl-defgeneric ada-ts-lspclient-command-execute (_client command &rest arguments)
   "Execute COMMAND with ARGUMENTS using Language Server.")
 
-(cl-defgeneric ada-ts-mode-lspclient-command-supported-p (_client command)
+(cl-defgeneric ada-ts-lspclient-command-supported-p (_client command)
   "Determine if Language Server supports COMMAND.")
 
-(cl-defgeneric ada-ts-mode-lspclient-document-id (_client)
+(cl-defgeneric ada-ts-lspclient-document-id (_client)
   "Determine document identifier of current buffer.")
 
-(cl-defgeneric ada-ts-mode-lspclient-format-region (_client beg end)
+(cl-defgeneric ada-ts-lspclient-format-region (_client beg end)
   "Format region BEG to END using Language Server.")
 
-(cl-defgeneric ada-ts-mode-lspclient-workspace-configuration (_client scope &optional false)
+(cl-defgeneric ada-ts-lspclient-workspace-configuration (_client scope &optional false)
   "Retrieve workspace configuration for SCOPE.
 
 SCOPE may represent a section name (or \\='.\\=' separated nested
@@ -66,12 +66,12 @@ the configuration, nil is returned.
 If FALSE is provided, it represents the JSON false value in Emacs Lisp.
 When omitted, it is represented as nil.")
 
-(cl-defgeneric ada-ts-mode-lspclient-workspace-dirs-add (_client dirs)
+(cl-defgeneric ada-ts-lspclient-workspace-dirs-add (_client dirs)
   "Add workspace DIRS to session.")
 
-(cl-defgeneric ada-ts-mode-lspclient-workspace-root (_client path)
+(cl-defgeneric ada-ts-lspclient-workspace-root (_client path)
   "Determine workspace root for PATH.")
 
-(provide 'ada-ts-mode-lspclient)
+(provide 'ada-ts-lspclient)
 
-;;; ada-ts-mode-lspclient.el ends here
+;;; ada-ts-lspclient.el ends here

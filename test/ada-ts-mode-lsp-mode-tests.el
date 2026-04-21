@@ -101,9 +101,9 @@
     (should (string-equal (buffer-file-name (window-buffer (selected-window)))
                           (buffer-file-name (current-buffer))))
     (with-language-server lsp-mode
-      (ada-ts-mode-lspclient-command-execute
+      (ada-ts-lspclient-command-execute
        client "als-other-file"
-       (ada-ts-mode-lspclient-document-id client))
+       (ada-ts-lspclient-document-id client))
       ;; Wait for window/showDocument
       (with-timeout (5)
         (while (string-equal (buffer-file-name (window-buffer (selected-window)))

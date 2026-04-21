@@ -541,20 +541,19 @@ initialized.  Refer to the documentation for the specific LSP client
 used for details.
 
 A generic interface is used to support different LSP clients.  This
-interface is described in =ada-ts-mode-lspclient.el=.  There are
-separate files for each supported LSP client which implement those
-interfaces.  These separate files are configured to automatically load
-when both ~ada-ts-mode~ and the corresponding LSP client package have
-been loaded.
+interface is described in =ada-ts-lspclient.el=.  There are separate
+files for each supported LSP client which implement those interfaces.
+These separate files are configured to automatically load when both
+~ada-ts-mode~ and the corresponding LSP client package have been loaded.
 
 To add an unsupported LSP client, add client-specific methods for all
-of the interfaces described in =ada-ts-mode-lspclient.el=.  In addition,
-a parameterless function for that client should be added to the
-~ada-ts-mode-lspclient-find-functions~ hook variable (via ~add-hook~).
-That function, when invoked, should determine if the LSP client is
-active in the current buffer, and when active, return an LSP client
-instance (which can be used to dispatch on the client-specific
-methods), else return ~nil~.
+of the interfaces described in =ada-ts-lspclient.el=.  In addition, a
+parameter-less function for that client should be added to the
+~ada-ts-lspclient-find-functions~ hook variable (via ~add-hook~).  That
+function, when invoked, should determine if the LSP client is active
+in the current buffer, and when active, return an LSP client instance
+(which can be used to dispatch on the client-specific methods), else
+return ~nil~.
 
 * Troubleshooting
 
