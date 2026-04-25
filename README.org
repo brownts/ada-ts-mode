@@ -8,6 +8,7 @@
 #+TEXINFO_DIR_DESC: Ada Major Mode using Tree-Sitter
 
 #+HTML: <a href="https://melpa.org/#/ada-ts-mode"><img alt="MELPA" src="https://melpa.org/packages/ada-ts-mode-badge.svg"/></a>
+#+HTML: <a href="https://stable.melpa.org/#/ada-ts-mode"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/ada-ts-mode-badge.svg"/></a>
 #+HTML: <a href="https://github.com/brownts/ada-ts-mode/actions/workflows/test.yml"><img alt="CI" src="https://github.com/brownts/ada-ts-mode/actions/workflows/test.yml/badge.svg"/></a>
 
 A major mode for Ada files, which utilizes the Emacs built-in support
