@@ -21,9 +21,33 @@
 
 ;;; Code:
 
+(require 'ada-ts-lspclient)
 (require 'cl-generic)
 (require 'eglot)
 (require 'json)
+
+;;;; Customization
+
+(defcustom ada-ts-lspclient-eglot-stay-out-of
+  '(;; Let major mode control Imenu
+    imenu)
+  "Mode specific settings for Eglot's `eglot-stay-out-of'."
+  :type '(repeat symbol)
+  :group 'ada-ts-lspclient
+  :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
+  :package-version '(ada-ts-mode . "0.9.0"))
+
+(defcustom ada-ts-lspclient-eglot-ignored-server-capabilities
+  '(;; Interferes with Emacs indenting
+    ;; See: https://github.com/AdaCore/ada_language_server/issues/1197
+    :documentOnTypeFormattingProvider)
+  "Mode specific settings for Eglot's `eglot-ignored-server-capabilities'."
+  :type '(repeat symbol)
+  :group 'ada-ts-lspclient
+  :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
+  :package-version '(ada-ts-mode . "0.9.0"))
+
+;;;; LSP Client Support
 
 (defun ada-ts-lspclient-eglot-try ()
   "Return Eglot client."
@@ -111,6 +135,8 @@ FALSE specifies the representation to use for JSON false values."
         ((eq value :json-false) nil)
         (t value)))
 
+;;;; Configuration
+
 (defun ada-ts-lspclient-eglot--find-mode-config (mode-to-find)
   "Find Eglot server configuration for MODE-TO-FIND."
   (seq-find
@@ -132,8 +158,8 @@ FALSE specifies the representation to use for JSON false values."
        (cons modes contact)))
    eglot-server-programs))
 
-(defun ada-ts-lspclient-eglot--setup ()
-  "Setup Eglot for mode.
+(defun ada-ts-lspclient-eglot--config ()
+  "Configure Eglot for mode.
 
 No configuration was provided for `ada-ts-mode' in the version of Eglot
 as shipped with Emacs 29, so it is added if it cannot be found.
@@ -161,7 +187,25 @@ included if the mode configuration must be added."
       (add-to-list 'eglot-server-programs
                    (list `(ada-mode ,config) "ada_language_server")))))
 
-(ada-ts-lspclient-eglot--setup)
+(ada-ts-lspclient-eglot--config)
+
+;;;; Setup
+
+(defun ada-ts-lspclient-eglot--setup ()
+  "Mode specific settings for Eglot."
+  (when ada-ts-lspclient-eglot-stay-out-of
+    (setq-local eglot-stay-out-of
+                (seq-union (default-value 'eglot-stay-out-of)
+                           ada-ts-lspclient-eglot-stay-out-of)))
+  (when ada-ts-lspclient-eglot-ignored-server-capabilities
+    (setq-local eglot-ignored-server-capabilities
+                (seq-union (default-value 'eglot-ignored-server-capabilities)
+                           ada-ts-lspclient-eglot-ignored-server-capabilities))))
+
+(add-hook 'ada-ts-lspclient-setup-hook #'ada-ts-lspclient-eglot--setup)
+
+(when (derived-mode-p 'ada-ts-mode)
+  (ada-ts-lspclient-eglot--setup))
 
 (add-hook 'ada-ts-lspclient-find-functions #'ada-ts-lspclient-eglot-try)
 

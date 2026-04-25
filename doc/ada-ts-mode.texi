@@ -53,9 +53,9 @@ required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 * Navigation::
 * Imenu::
 * Casing::
+* LSP Client Support::
 * Ada Language Server::
 * Miscellaneous::
-* LSP Client Support::
 * Troubleshooting::
 * Example Configuration::
 * Resources::
@@ -73,6 +73,10 @@ Installation
 Indentation
 
 * Ada Language Server Indentation::
+
+LSP Client Support
+
+* Adding Support for an Additional LSP Client::
 
 Troubleshooting
 
@@ -568,29 +572,126 @@ specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.
 
+@node LSP Client Support
+@chapter LSP Client Support
+
+While @code{ada-ts-mode} is a fully capable major mode, users may desire to
+utilize an LSP server (i.e., Ada Language Server) in order to enhance
+their experience.  This can provide enhanced capabilities for
+completion, cross-referencing, documentation, etc.  It's up to the
+user to configure the LSP client for an @code{ada-ts-mode} buffer, typically
+through the use of the @code{ada-ts-mode-hook} to enable the LSP client minor
+mode.  Those clients which utilize directory local variables for
+configuration (e.g., GPR project filename), may need to hook into the
+@code{hack-local-variables-hook} in order to initialize after the directory
+local variables have been initialized.  Refer to the documentation for
+the specific LSP client used for details.
+
+The Ada Language Server allows for client-agnostic configuration
+through a project-specific configuration file (@samp{.als.json}) in addition
+to a user-specific configuration file (@samp{config.json}).  This approach is
+recommended such that users aren't reliant on an LSP client's specific
+configuration peculiarities.  Using this approach also allows the user
+to easily switch between LSP clients (and even editors) with a unified
+configuration.  Refer to the Ada Language Server's documentation for
+specific details on the format and location of these files.
+
+Some Ada Language Server features are known to be problematic with
+Emacs (such as on-type formatting).  Additionally, some Emacs LSP
+clients have default settings which aggressively override similar
+functionality provided by @code{ada-ts-mode}.  As a result, @code{ada-ts-mode}
+provides a way for the settings of each LSP client to be customized
+specifically for use within an @code{ada-ts-mode} buffer.  The customizations
+are specific to the @code{ada-ts-mode} buffer and will not impact the
+settings for other major modes using the same LSP client.  This allows
+the LSP client's global settings to be retained for other major modes
+while providing customization for @code{ada-ts-mode}.
+
+A default set of configurations have been provided out-of-the-box to
+optimize the experience with each supported LSP client.  The following
+user options may be adjusted as desired.  For each LSP client, if
+their user option(s) are set to @code{nil}, no customization for @code{ada-ts-mode}
+will be applied, allowing the LSP client's global settings to be used
+instead.
+
+@defopt ada-ts-lspclient-eglot-stay-out-of
+An @code{ada-ts-mode} version of @code{eglot}'s @code{eglot-stay-out-of} setting.  The
+global value of @code{eglot-stay-out-of} is merged with this user option to
+determine the buffer-local value.
+@end defopt
+
+@defopt ada-ts-lspclient-eglot-ignored-server-capabilities
+An @code{ada-ts-mode} version of @code{eglot}'s @code{eglot-ignored-server-capabilities}
+setting.  The global value of @code{eglot-ignored-server-capabilities} is
+merged with this user option to determine the buffer-local value.
+@end defopt
+
+@defopt ada-ts-lspclient-lsp-mode-settings-alist
+An attribute list of @code{lsp-mode} settings whose key should be an
+@code{lsp-mode} variable to set and the value is the corresponding value
+which the variable should receive.  These variables are set
+buffer-locally to avoid impacting settings outside of @code{ada-ts-mode}
+buffers.
+@end defopt
+
+@menu
+* Adding Support for an Additional LSP Client::
+@end menu
+
+@node Adding Support for an Additional LSP Client
+@section Adding Support for an Additional LSP Client
+
+In order to integrate functionality provided by the Ada Language
+Server (such as completion), @code{ada-ts-mode} must interact with an active
+LSP client.  Since multiple LSP clients exist, this interaction must
+be configurable such that additional LSP clients can be added when
+needed.  Additionally, @code{ada-ts-mode} must be able to determine which LSP
+client is active in the buffer.  If there is no active LSP client in
+the buffer, @code{ada-ts-mode} will not be able to make use of LSP provided
+capabilities and thus falls back on providing this capability without
+it's support, which likely will be less precise.
+
+There are already two LSP clients supported by @code{ada-ts-mode}, @code{eglot} and
+@code{lsp-mode}, so it is unlikely that a user will need to provide their own
+support for a new client.  In the event that is not the case, a
+generic interface is used to support different LSP clients.  This
+interface is described in @samp{ada-ts-lspclient.el}.  There are separate
+files for each supported LSP client which implement those interfaces.
+These separate files are configured to automatically load when both
+@code{ada-ts-mode} and the corresponding LSP client package have been loaded.
+
+To add an unsupported LSP client, add client-specific methods for all
+of the interfaces described in @samp{ada-ts-lspclient.el}.  In addition, a
+parameter-less function for that client should be added to the
+@code{ada-ts-lspclient-find-functions} hook variable (via @code{add-hook}).  That
+function, when invoked, should determine if the LSP client is active
+in the current buffer, and when active, return an LSP client instance
+(which can be used to dispatch on the client-specific methods), else
+return @code{nil}.
+
 @node Ada Language Server
 @chapter Ada Language Server
 
 Functionality provided by the Ada Language Server is seamlessly
 integrated into the corresponding functional areas as appropriate
 (i.e., indentation, cross-references, etc.).  However, there is other
-support @samp{ada-ts-mode} provides which is specific to managing the Ada
+support @code{ada-ts-mode} provides which is specific to managing the Ada
 Language Server itself, not the functionality it provides.
 
 @deffn Command ada-ts-als-find-user-config-file
 Find Ada Language Server user configuration file.  If the variable
-@code{$XDG_CONFIG_HOME} exists, the user configuration file is
-@code{$XDG_CONFIG_HOME/als/config.json}.  Otherwise, the user configuration
-file is @code{~/.config/als/config.json}.  If the file does not exist, a
+@samp{$XDG_CONFIG_HOME} exists, the user configuration file is
+@samp{$XDG_CONFIG_HOME/als/config.json}.  Otherwise, the user configuration
+file is @samp{~/.config/als/config.json}.  If the file does not exist, a
 new file will be visited.
 @end deffn
 
 @deffn Command ada-ts-als-find-workspace-config-file
 Find Ada Language Server workspace configuration file.  The file is
-found in the root of the LSP client defined workspace root
-directory, when an LSP client is active, otherwise the file is found
-relative to the project root as determined by project.el.  If the
-file does not exist, a new file will be visited.
+found in the LSP client defined workspace root directory, when an
+LSP client is active, otherwise the file is found relative to the
+project root as determined by @samp{project.el}.  If the file does not
+exist, a new file will be visited.
 @end deffn
 
 @deffn Command ada-ts-als-show-composite-config
@@ -645,43 +746,6 @@ begin
 end Hello_World;
 @end example
 @end deffn
-
-@node LSP Client Support
-@chapter LSP Client Support
-
-In order to integrate functionality provided by the Ada Language
-Server (such as indentation), @code{ada-ts-mode} must interact with an active
-LSP client.  Since multiple LSP clients exist, this interaction must
-be configurable such that additional LSP clients can be added when
-needed.  Additionally, @code{ada-ts-mode} must be able to determine which LSP
-client is active in the buffer.  If there is no active LSP client in
-the buffer, @code{ada-ts-mode} will not be able to make use of LSP provided
-capabilities and thus falls back on providing this capability without
-it's support, which likely will be less precise.
-
-It's up to the user to configure the LSP client to be active in an
-@code{ada-ts-mode} buffer, typically through the use of the @code{ada-ts-mode-hook}
-to enable the LSP client minor mode, although those clients which
-utilize directory local variables for configuration (e.g., GPR project
-filename), may need to hook into the @code{hack-local-variables-hook} in
-order to initialize after the directory local variables have been
-initialized.  Refer to the documentation for the specific LSP client
-used for details.
-
-A generic interface is used to support different LSP clients.  This
-interface is described in @samp{ada-ts-lspclient.el}.  There are separate
-files for each supported LSP client which implement those interfaces.
-These separate files are configured to automatically load when both
-@code{ada-ts-mode} and the corresponding LSP client package have been loaded.
-
-To add an unsupported LSP client, add client-specific methods for all
-of the interfaces described in @samp{ada-ts-lspclient.el}.  In addition, a
-parameter-less function for that client should be added to the
-@code{ada-ts-lspclient-find-functions} hook variable (via @code{add-hook}).  That
-function, when invoked, should determine if the LSP client is active
-in the current buffer, and when active, return an LSP client instance
-(which can be used to dispatch on the client-specific methods), else
-return @code{nil}.
 
 @node Troubleshooting
 @chapter Troubleshooting

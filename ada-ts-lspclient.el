@@ -23,6 +23,17 @@
 
 (require 'cl-generic)
 
+;;;; Customization
+
+(defgroup ada-ts-lspclient nil
+  "LSP-specific customization group for `ada-ts-mode'."
+  :group 'ada-ts
+  :link '(emacs-library-link :tag "Source" "ada-ts-lspclient.el")
+  :link '(custom-manual "(ada-ts-mode)LSP Client Support")
+  :prefix "ada-ts-lspclient-")
+
+;;;; Setup
+
 (defvar ada-ts-lspclient-find-functions nil
   "Special hook to find the LSP client for a given buffer.
 
@@ -34,6 +45,11 @@ on.")
 
 (defvar ada-ts-lspclient-session-hook nil
   "Hook called when an LSP session is established.")
+
+(defvar ada-ts-lspclient-setup-hook nil
+  "LSP client hooks to run when major mode is setup.")
+
+;;;; LSP Client Interface
 
 (defun ada-ts-lspclient-current ()
   "Return the client instance for the current buffer."

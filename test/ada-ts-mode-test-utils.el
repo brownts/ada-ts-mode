@@ -120,7 +120,6 @@ execution of pre and post command hooks."
     `(progn
        (should (not (ada-ts-lspclient-current)))
        (let ((lsp-auto-guess-root t)
-             (lsp-enable-indentation nil)
              (lsp-keep-workspace-alive nil))
          (let ((inhibit-message t)
                (initialized nil))

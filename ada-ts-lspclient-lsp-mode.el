@@ -21,6 +21,7 @@
 
 ;;; Code:
 
+(require 'ada-ts-lspclient)
 (require 'cl-generic)
 (require 'json)
 
@@ -35,6 +36,27 @@
 (declare-function lsp--workspace-buffers        "ext:lsp-mode" (workspace))
 (declare-function lsp--workspace-root           "ext:lsp-mode" (workspace))
 (defvar lsp-clients nil)
+
+;;;; Customization
+
+(defcustom ada-ts-lspclient-lsp-mode-settings-alist
+  '(;; Let major mode control Imenu
+    (lsp-enable-imenu . nil)
+    ;; Let major mode control indentation
+    (lsp-enable-indentation . nil)
+    ;; Interferes with Emacs indenting
+    ;; See: https://github.com/AdaCore/ada_language_server/issues/1197
+    (lsp-enable-on-type-formatting . nil)
+    ;; Helpful for improved font-lock
+    (lsp-semantic-tokens-enable . t))
+  "Mode specific settings for `lsp-mode'."
+  :type '(alist :key-type symbol :value-type boolean)
+  :group 'ada-ts-lspclient
+  :risky t
+  :link '(custom-manual :tag "LSP Client Support" "(ada-ts-mode)LSP Client Support")
+  :package-version '(ada-ts-mode . "0.9.0"))
+
+;;;; LSP Client Interface
 
 (defun ada-ts-lspclient-lsp-mode-try ()
   "Return lsp-mode client."
@@ -124,6 +146,8 @@ FALSE specifies the representation to use for JSON false values."
         ((eq value :json-false) nil)
         (t value)))
 
+;;;; Session Management
+
 (defun ada-ts-lspclient-lsp-mode--initialized ()
   "Notify registered hooks of LSP session establishment."
   (when-let* ((workspace (car (lsp-workspaces)))
@@ -153,6 +177,20 @@ FALSE specifies the representation to use for JSON false values."
             (lsp--client-library-folders-fn client))
       (setf (lsp--client-library-folders-fn client)
             #'ada-ts-lspclient-lsp-mode--extra-folders))))
+
+;;;; Setup
+
+(defun ada-ts-lspclient-lsp-mode--setup ()
+  "Mode specific settings for `lsp-mode'."
+  (dolist (setting ada-ts-lspclient-lsp-mode-settings-alist)
+    (let ((name (car setting))
+          (value (cdr setting)))
+      (set (make-local-variable name) value))))
+
+(add-hook 'ada-ts-lspclient-setup-hook #'ada-ts-lspclient-lsp-mode--setup)
+
+(when (derived-mode-p 'ada-ts-mode)
+  (ada-ts-lspclient-lsp-mode--setup))
 
 (provide 'ada-ts-lspclient-lsp-mode)
 

@@ -35,6 +35,7 @@
 ;;; Code:
 
 (require 'ada-ts-als)
+(require 'ada-ts-lspclient)
 (require 'lisp-mnt)
 (require 'treesit)
 (eval-when-compile (require 'rx))
@@ -1226,6 +1227,9 @@ the name of the branch given the branch node."
 
   ;; Other File.
   (setq-local ff-other-file-alist 'ada-ts-mode-other-file-alist)
+
+  ;; LSP Client.
+  (run-hooks 'ada-ts-lspclient-setup-hook)
 
   (treesit-major-mode-setup)
 

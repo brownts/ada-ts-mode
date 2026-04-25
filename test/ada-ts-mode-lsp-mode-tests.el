@@ -169,6 +169,23 @@
         (should (stringp language))
         (should (string-equal language "ada"))))))
 
+(ert-deftest ada-ts-mode-test-lsp-mode-setup ()
+  "Tests that `lsp-mode' is setup correctly for `ada-ts-mode'."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (featurep 'lsp-mode)))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server lsp-mode
+      (pcase-dolist (`(,name . ,value)
+                     '((lsp-enable-imenu . nil)
+                       (lsp-enable-indentation . nil)
+                       (lsp-enable-on-type-formatting . nil)
+                       (lsp-semantic-tokens-enable . t)))
+        (should (local-variable-p name))
+        (should (equal (symbol-value name) value))))))
+
 (ert-deftest ada-ts-mode-test-lsp-mode-formatting ()
   "Test LSP request 'textDocument/formatting'."
   (skip-unless (and (executable-find "ada_language_server")

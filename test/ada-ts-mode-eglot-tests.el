@@ -168,6 +168,22 @@ Emacs 29) did not support it."
         (should (stringp language))
         (should (string-equal language "ada"))))))
 
+(ert-deftest ada-ts-mode-test-eglot-setup ()
+  "Tests that Eglot is setup correctly for `ada-ts-mode'."
+  (skip-unless (and (ada-ts-lspclient-eglot--find-mode-config 'ada-ts-mode)
+                    (executable-find "ada_language_server")))
+  (with-file-in-project
+      "hello_world.adb"
+      (ert-resource-file "hello_world")
+      "hello_world.gpr"
+    (with-language-server eglot
+      (should (local-variable-p 'eglot-stay-out-of))
+      (should (equal (symbol-value 'eglot-stay-out-of)
+                     '(imenu)))
+      (should (local-variable-p 'eglot-ignored-server-capabilities))
+      (should (equal (symbol-value 'eglot-ignored-server-capabilities)
+                     '(:documentOnTypeFormattingProvider))))))
+
 (ert-deftest ada-ts-mode-test-eglot-formatting ()
   "Test LSP request 'textDocument/formatting'."
   (skip-unless (executable-find "ada_language_server"))
