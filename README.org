@@ -612,21 +612,25 @@ options which don't fit elsewhere.
 
 ** Org Mode Source Code Blocks
 
-When Org Mode doesn't know the major mode for the language of a source
-block, it will guess by appending "-mode" to the end of the language
-name.  If we use a language name of "ada", this means it will look for
-a major mode named "ada-mode".  This default behavior doesn't work if
-we want to use Tree-Sitter enabled modes.  Maybe in the future it will
-be aware of these modes, but in the meantime, we can explicitly
-configure Org Mode to map to the Tree-Sitter major mode using the
-customization variable =org-src-lang-modes=.
+Prior to Org Mode 9.8, when Org Mode doesn't know the major mode for
+the language of a source block, it will guess by appending =-mode= to
+the end of the language name.  If a language name of =ada= is used in
+the source block, it will look for a major mode named ~ada-mode~.  This
+default behavior doesn't work when using Tree-Sitter enabled modes.
 
-The following can be added to your configuration to persist the
-setting:
+As of Org Mode 9.8, Tree-Sitter enabled modes are properly detected
+and mapped correctly from the corresponding language.  However, if you
+are still using an older version, you can explicitly configure Org
+Mode to map to the Tree-Sitter major mode using the customization
+variable =org-src-lang-modes=.
+
+The following can be added to your configuration to detect the version
+of Org Mode being used, and conditionally apply the workaround:
 
 #+BEGIN_SRC emacs-lisp
   (with-eval-after-load 'org-src
-    (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))
+    (when (version< (org-version) "9.8")
+      (add-to-list 'org-src-lang-modes '("ada" . ada-ts))))
 #+END_SRC
 
 ** Function Calls not Highlighted Correctly
@@ -685,10 +689,7 @@ manager.  This checks to make sure tree-sitter support is enabled in
 Emacs before attempting to install/configure the package, thus your
 configuration will remain compatible with versions of Emacs which
 don't yet support tree-sitter, and will not install and configure this
-package in its absence.  This also demonstrates how to configure
-external indentation support through the Ada Language Server (assuming
-the user has configured an LSP client to be active in the buffer), if
-that is preferred over the intrinsic indentation support.
+package in its absence.
 
 #+BEGIN_SRC emacs-lisp
   (when (and (fboundp 'treesit-available-p)
@@ -696,11 +697,6 @@ that is preferred over the intrinsic indentation support.
     (use-package ada-ts-mode
       :ensure t
       :defer t ; autoload updates `auto-mode-alist'
-      :custom (ada-ts-mode-indent-backend 'lsp) ; Use Ada LS indentation
-      :init
-      ;; Configure source blocks for Org Mode.
-      (with-eval-after-load 'org-src
-        (add-to-list 'org-src-lang-modes '("ada" . ada-ts)))
       ;; Enable auto-casing
       :hook (ada-ts-mode . ada-ts-auto-case-mode)))
 
