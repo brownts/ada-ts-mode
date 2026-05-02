@@ -110,6 +110,7 @@ execution of pre and post command hooks."
            (remove-hook 'eglot-connect-hook connect-hook)))
        (unwind-protect
            (let ((client (ada-ts-lspclient-current))
+                 (eglot-report-progress nil)
                  (jsonrpc-default-request-timeout 30))
              (should (eq client 'eglot))
              ,@body)
