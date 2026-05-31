@@ -1,0 +1,36 @@
+name: CI-BSD
+
+on:
+   push:
+      paths-ignore:
+         - '**.org'
+      pull_request:
+         - '**.org'
+
+jobs:
+   test-bsd:
+      strategy:
+         matrix:
+            os:
+              - {name: 'openbsd', version: "7.8", emacs-version: 30.2}
+              - {name: 'openbsd', version: "7.9", emacs-version: 30.2p1, result: 'expect failure'} # Issue#8
+      runs-on: ubuntu-latest
+      continue-on-error: ${{matrix.os.result == 'expect failure'}}
+
+      steps:
+         - name: Checkout
+           uses: actions/checkout@v6
+
+         - name: OpenBSD
+           if: ${{matrix.os.name == 'openbsd'}}
+           uses: vmactions/openbsd-vm@v1
+           with:
+             release: ${{matrix.os.version}}
+             arch: x86_64
+             usesh: true
+             copyback: false
+             prepare: |
+               pkg_add curl emacs-${{matrix.os.emacs-version}}-no_x11 git texinfo
+               curl -fsSL https://raw.github.com/emacs-eldev/eldev/master/bin/eldev >eldev && chmod a+x eldev
+             run: |
+               ./eldev -p -dtT test
