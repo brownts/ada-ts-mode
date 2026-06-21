@@ -13,9 +13,8 @@ jobs:
          matrix:
             os:
               - {name: 'openbsd', version: "7.8", emacs-version: 30.2}
-              - {name: 'openbsd', version: "7.9", emacs-version: 30.2p1, result: 'expect failure'} # Issue#8
+              - {name: 'openbsd', version: "7.9", emacs-version: 30.2p2}
       runs-on: ubuntu-latest
-      continue-on-error: ${{matrix.os.result == 'expect failure'}}
 
       steps:
          - name: Checkout
