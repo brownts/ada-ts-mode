@@ -53,7 +53,7 @@
     "new" "not" "null"
     "of" "or" "others" "out" "overriding"
     "package" "parallel" "pragma" "private" "procedure" "protected"
-    "raise" "range" "record" "renames" "return" "reverse"
+    "raise" "range" "record" "renames" "requeue" "return" "reverse"
     "select" "separate" "some" "subtype" "synchronized"
     "tagged" "task" "terminate" "then" "type"
     "until" "use"
