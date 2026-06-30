@@ -433,14 +433,6 @@ the string property to those instances."
      ((multiplying_operator) @font-lock-operator-face)   ; *, /, mod, rem
      ([":=" ".." "|" "=>" "<>" "<<" ">>"] @font-lock-operator-face))
 
-   ;; Control
-   :language 'ada
-   :feature 'control
-   :override 'prepend
-   '(["accept" "delay" "entry" "exit" "goto"
-      "pragma" "raise" "requeue" "terminate" "until"]
-     @font-lock-operator-face)
-
    ;; Preprocessor
    :language 'ada
    :feature 'preprocessor
@@ -804,7 +796,7 @@ a paragraph."
   (setq-local treesit-font-lock-feature-list
               '((comment definition)
                 (keyword preprocessor string type)
-                (attribute assignment constant control function number operator)
+                (attribute assignment constant function number operator)
                 (bracket delimiter error label)))
 
   ;; Other File.

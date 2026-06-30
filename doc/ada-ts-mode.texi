@@ -246,8 +246,8 @@ comment, definition
 @item Level 2
 keyword, preprocessor, string, type
 @item Level 3
-attribute, assignment, constant, control, function,
-number, operator
+attribute, assignment, constant, function, number,
+operator
 @item Level 4
 bracket, delimiter, error, label
 @end table

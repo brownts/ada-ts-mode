@@ -159,8 +159,8 @@ the different font lock levels.
 
 - Level 1 :: comment, definition
 - Level 2 :: keyword, preprocessor, string, type
-- Level 3 :: attribute, assignment, constant, control, function,
-  number, operator
+- Level 3 :: attribute, assignment, constant, function, number,
+  operator
 - Level 4 :: bracket, delimiter, error, label
 
 * Indentation

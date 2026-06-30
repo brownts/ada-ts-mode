@@ -35,30 +35,28 @@ package body Test is
 
    function Raise_Error return Integer is
      (raise Foo_Exception);
-   -- ^ (font-lock-operator-face font-lock-keyword-face)
+   -- ^ font-lock-keyword-face
    --       ^ font-lock-type-face
 
    function Raise_Error return Integer is
      (raise Foo_Exception with "message");
-   -- ^ (font-lock-operator-face font-lock-keyword-face)
+   -- ^                   ^ font-lock-keyword-face)
    --       ^ font-lock-type-face
-   --                     ^ font-lock-keyword-face
    --                          ^ font-lock-string-face
 
    function Raise_Error return Integer is
      (raise Test.Foo_Exception);
-   -- ^ (font-lock-operator-face font-lock-keyword-face)
+   -- ^ font-lock-keyword-face
    --       ^ nil
    --           ^ font-lock-delimiter-face
    --            ^ font-lock-type-face
 
    function Raise_Error return Integer is
      (raise Test.Foo_Exception with "message");
-   -- ^ (font-lock-operator-face font-lock-keyword-face)
+   -- ^                        ^ font-lock-keyword-face)
    --       ^ nil
    --           ^ font-lock-delimiter-face
    --            ^ font-lock-type-face
-   --                          ^ font-lock-keyword-face
    --                               ^ font-lock-string-face
 
    ---------------------
@@ -73,14 +71,14 @@ package body Test is
       when others =>
          Put_Line ("exception handler");
          raise;
-      -- ^ (font-lock-operator-face font-lock-keyword-face)
+      -- ^ font-lock-keyword-face
       --      ^ font-lock-delimiter-face
    end ABC;
 
    procedure Raise_Error is
    begin
       raise Foo_Exception;
-      -- ^ (font-lock-operator-face font-lock-keyword-face)
+      -- ^ font-lock-keyword-face
       --    ^ font-lock-type-face
       --                 ^ font-lock-delimiter-face
    end ABC;
@@ -88,9 +86,8 @@ package body Test is
    procedure Raise_Error is
    begin
       raise Foo_Exception with "message";
-      -- ^ (font-lock-operator-face font-lock-keyword-face)
+      -- ^                ^ font-lock-keyword-face)
       --    ^ font-lock-type-face
-      --                  ^ font-lock-keyword-face
       --                       ^ font-lock-string-face
       --                                ^ font-lock-delimiter-face
    end ABC;
@@ -98,7 +95,7 @@ package body Test is
    procedure Raise_Error is
    begin
       raise Test.Foo_Exception;
-      -- ^ (font-lock-operator-face font-lock-keyword-face)
+      -- ^ font-lock-keyword-face
       --    ^ nil
       --        ^             ^ font-lock-delimiter-face
       --         ^ font-lock-type-face
@@ -107,11 +104,10 @@ package body Test is
    procedure Raise_Error is
    begin
       raise Test.Foo_Exception with "message";
-      -- ^ (font-lock-operator-face font-lock-keyword-face)
+      -- ^                     ^ font-lock-keyword-face)
       --    ^ nil
       --        ^                            ^ font-lock-delimiter-face
       --         ^ font-lock-type-face
-      --                       ^ font-lock-keyword-face
       --                            ^ font-lock-string-face
    end ABC;
 
