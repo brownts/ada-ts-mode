@@ -273,9 +273,4 @@ included if the mode configuration must be added."
 
 (provide 'ada-ts-lspclient-eglot)
 
-;;;###autoload
-(with-eval-after-load 'ada-ts-mode
-  (with-eval-after-load 'eglot
-    (require 'ada-ts-lspclient-eglot)))
-
 ;;; ada-ts-lspclient-eglot.el ends here

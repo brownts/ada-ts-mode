@@ -194,9 +194,4 @@ FALSE specifies the representation to use for JSON false values."
 
 (provide 'ada-ts-lspclient-lsp-mode)
 
-;;;###autoload
-(with-eval-after-load 'ada-ts-mode
-  (with-eval-after-load 'lsp-mode
-    (require 'ada-ts-lspclient-lsp-mode)))
-
 ;;; ada-ts-lspclient-lsp-mode.el ends here

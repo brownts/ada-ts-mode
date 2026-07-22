@@ -839,6 +839,12 @@ a paragraph."
    :doc-spec '(("(ada-ts-mode)Command & Function Index" nil "^ -+ .*: " "\\( \\|$\\)")
                ("(ada-ts-mode)Variable Index" nil "^ -+ .*: " "\\( \\|$\\)"))))
 
+;; Lazily load LSP client support.
+(with-eval-after-load 'eglot
+  (require 'ada-ts-lspclient-eglot))
+(with-eval-after-load 'lsp-mode
+  (require 'ada-ts-lspclient-lsp-mode))
+
 (provide 'ada-ts-mode)
 
 ;;; ada-ts-mode.el ends here
