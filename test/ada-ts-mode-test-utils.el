@@ -152,9 +152,8 @@ EXTRA-ROOT-MARKERS are used to anchor the project."
        (unwind-protect
            (progn
              (should (eq major-mode 'ada-ts-mode))
-             (should (string-equal
-                      (expand-file-name (directory-file-name (project-root (project-current))))
-                      ,root))
+             (should (project-current))
+             (should (file-equal-p (project-root (project-current)) ,root))
              ,@body)
          (kill-buffer buffer)))))
 

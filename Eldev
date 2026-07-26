@@ -22,6 +22,10 @@
   ;; Check doesn't seem to work on Windows runner
   (setq eldev-doctor-disabled-tests '(eldev-file-owners)))
 
+;; Configure `find` on CI runner
+(when (eq system-type 'windows-nt)
+  (setq find-program (shell-quote-argument "C:/Program Files/Git/usr/bin/find.exe")))
+
 ;; Configure Maintainer Plugin
 (setq eldev-release-allowed-branch "main")
 (setq eldev-release-test-local t)

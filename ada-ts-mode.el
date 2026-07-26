@@ -40,7 +40,9 @@
 (require 'ada-ts-imenu)
 (require 'ada-ts-indentation)
 (require 'ada-ts-lspclient)
+(require 'find-file)
 (require 'lisp-mnt)
+(require 'project)
 (require 'treesit)
 (eval-when-compile (require 'rx))
 
@@ -92,18 +94,24 @@ specified.  See `treesit-language-source-alist' for full details."
 
 (defcustom ada-ts-mode-other-file-alist
   `((,(rx   ".ads" eos) (  ".adb"))
+    (,(rx   ".ADS" eos) (  ".ADB"))
     (,(rx   ".adb" eos) (  ".ads"))
+    (,(rx   ".ADB" eos) (  ".ADS"))
     (,(rx ".1.ada" eos) (".2.ada"))
+    (,(rx ".1.ADA" eos) (".2.ADA"))
     (,(rx ".2.ada" eos) (".1.ada"))
+    (,(rx ".2.ADA" eos) (".1.ADA"))
     (,(rx  "_.ada" eos) (  ".ada"))
-    (,(rx   ".ada" eos) ( "_.ada")))
+    (,(rx  "_.ADA" eos) (  ".ADA"))
+    (,(rx   ".ada" eos) ( "_.ada"))
+    (,(rx   ".ADA" eos) ( "_.ADA")))
   "Ada file extension mapping for \\='find other file\\='."
   :type '(repeat (list regexp (choice (repeat string) function)))
   :group 'ada-ts
   :link '(custom-manual :tag "Navigation" "(ada-ts-mode)Navigation")
   :link '(function-link ff-find-other-file)
   :link '(variable-link ff-other-file-alist)
-  :package-version '(ada-ts-mode . "0.7.0"))
+  :package-version '(ada-ts-mode . "0.9.0"))
 
 ;;; Syntax
 
@@ -599,12 +607,31 @@ a paragraph."
                   (end (treesit-node-end node)))
         (indent-region start end nil)))))
 
-(defun ada-ts-mode-find-other-file ()
-  "Find other Ada file."
-  (interactive nil ada-ts-mode)
+(defun ada-ts-mode-find-other-file (&optional in-other-window)
+  "Find other Ada file.
+
+When an LSP client is active, the LSP client dictates where the file is
+shown (in the current window or in the other window).
+
+When an LSP client is not active, and if optional IN-OTHER-WINDOW is
+non-nil or the \\[universal-argument] prefix is used, find the file in
+other window, else find the file in the current window."
+  (interactive (list current-prefix-arg) ada-ts-mode)
   (unless (als/other-file)
-    (require 'find-file)
-    (ff-find-other-file)))
+    (let ((ff-search-directories ff-search-directories))
+      (when-let* ((project (project-current))
+                  (root (project-root project))
+                  (files (project-files project))
+                  (dirs (seq-uniq (seq-map #'file-name-directory files))))
+        (setq ff-search-directories
+              (append
+               (list default-directory)
+               (ensure-list
+                (if (symbolp ff-search-directories)
+                    (symbol-value ff-search-directories)
+                  ff-search-directories))
+               dirs)))
+      (ff-find-other-file in-other-window))))
 
 (defun ada-ts-mode--alire-project-file ()
   "Determine name of GNAT Project file, using Alire."
@@ -645,8 +672,6 @@ a paragraph."
 
 (defun ada-ts-mode--root-project-file ()
   "Determine name of GNAT Project file, looking in root directory."
-  (require 'project)
-  (declare-function project-root "project")
   (when-let* ((project (project-current))
               (root-dir (project-root project))
               (files (directory-files root-dir nil (rx ".gpr" eos) 'nosort)))
