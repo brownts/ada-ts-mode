@@ -25,6 +25,17 @@
 (require 'ert)
 (require 'ert-x)
 
+(defmacro with-traces (funcs &rest body)
+  "Enable traces for FUNCS and execute BODY."
+  (declare (indent 1) (debug t))
+  `(progn
+     (dolist (func ,funcs)
+       (trace-function func))
+     (unwind-protect
+         ,@body
+       (dolist (func ,funcs)
+         (untrace-function func)))))
+
 (ert-deftest ada-ts-mode-test-eglot-als-executables ()
   "Test ALS command 'als-executables'."
   (skip-unless (executable-find "ada_language_server"))
@@ -113,6 +124,64 @@ Emacs 29) did not support it."
              (buffer-name (buffer-file-name buffer))
              (filename-adb (buffer-file-name (current-buffer)))
              (filename-ads (concat (file-name-sans-extension filename-adb) ".ads")))
+        (should (string-equal buffer-name filename-ads))
+        (kill-buffer buffer)))))
+
+(ert-deftest ada-ts-mode-test-eglot-als-other-file-2 ()
+  "Test ALS command 'als-other-file'.
+
+Eglot must support 'window/showDocument' for this command to work
+correctly.  Older versions of Eglot (e.g., the version shipped with
+Emacs 29) did not support it."
+  (skip-unless (and (executable-find "ada_language_server")
+                    (cl-find-method 'eglot-handle-request nil '(t (eql window/showDocument)))))
+  (with-file-in-project
+      "gtkada-mdi.adb"
+      (ert-resource-file "als-other-file")
+      ".project"
+    (should (string-equal (buffer-file-name (window-buffer (selected-window)))
+                          (buffer-file-name (current-buffer))))
+    (with-language-server eglot
+      (sleep-for 3) ; Let LSP initialization complete first
+      (with-traces '(find-file-noselect
+                     find-file-noselect-1
+                     after-find-file
+                     normal-mode
+                     set-auto-mode
+                     set-auto-mode--apply-alist
+                     set-auto-mode-0
+                     ada-ts-mode
+                     run-mode-hooks
+                     eglot--maybe-activate-editing-mode
+                     eglot--signal-textDocument/didOpen
+                     eglot-execute-command
+                     jsonrpc-notify
+                     jsonrpc--continue
+                     jsonrpc-connection-receive
+                     jsonrpc-connection-send
+                     jsonrpc--event
+                     jsonrpc-request
+                     process-send-string)
+        (ada-ts-lspclient-command-execute
+         client "als-other-file"
+         (ada-ts-lspclient-document-id client))
+        ;; Wait for window/showDocument
+        (with-timeout (5)
+          (while (string-equal (buffer-file-name (window-buffer (selected-window)))
+                               (buffer-file-name (current-buffer)))
+            (sleep-for 0.01))))
+      (let* ((buffer (window-buffer (selected-window)))
+             (buffer-name (buffer-file-name buffer))
+             (filename-adb (buffer-file-name (current-buffer)))
+             (filename-ads (concat (file-name-sans-extension filename-adb) ".ads")))
+        (unless (string-equal buffer-name filename-ads)
+          (let ((event-buf (seq-find
+                            (lambda (buf)
+                              (string-match (rx bos "*EGLOT") (buffer-name buf)))
+                            (buffer-list))))
+            (message "%s"
+                     (with-current-buffer event-buf
+                       (buffer-string)))))
         (should (string-equal buffer-name filename-ads))
         (kill-buffer buffer)))))
 
