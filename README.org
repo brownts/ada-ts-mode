@@ -614,6 +614,16 @@ options which don't fit elsewhere.
   the rest of the mode map.  If the keymap prefix is set to nil, then
   the mode commands won't be mapped at all.
 
+- User Option: ada-ts-project-root-markers ::
+  File and directory identifiers which indicate the root of an Ada
+  project.  These markers are used to determine the boundary of an
+  Emacs (i.e., =project.el=) project.  If this value is set to nil, no
+  special detection is provided for Ada projects.  The user can still
+  configure ~project-vc-extra-root-markers~ manually to realize the same
+  benefits, in such a case.  The intent of this option is to provide
+  out-of-the-box settings to prevent or minimize the user from
+  explicitly having to configure Ada project markers.
+
 - Command: ada-ts-mode-defun-comment-box ::
   Creates a comment box above the defun enclosing point.  A comment
   box is typically used to visually identify the start of a

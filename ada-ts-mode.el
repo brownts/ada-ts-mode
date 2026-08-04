@@ -50,7 +50,7 @@
 (declare-function treesit-node-child-by-field-name "treesit.c")
 (declare-function treesit-node-type "treesit.c")
 
-;;; Customization
+;;;; Customization
 
 (defcustom ada-ts-mode-alire-program "alr"
   "Name of Alire executable program."
@@ -113,7 +113,14 @@ specified.  See `treesit-language-source-alist' for full details."
   :link '(variable-link ff-other-file-alist)
   :package-version '(ada-ts-mode . "0.9.0"))
 
-;;; Syntax
+(defcustom ada-ts-project-root-markers '("adainclude" "alire.toml" ".als.json")
+  "Root markers for Ada projects."
+  :type 'list-of-strings-p
+  :group 'ada-ts
+  :link '(custom-manual :tag "Miscellaneous" "(ada-ts-mode)Miscellaneous")
+  :package-version '(ada-ts-mode . "0.9.0"))
+
+;;;; Syntax
 
 (defvar ada-ts-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -150,7 +157,7 @@ the string property to those instances."
          (put-text-property beginning (1+ beginning) 'syntax-table descriptor)
          (put-text-property (1- end) end 'syntax-table descriptor))))))
 
-;;; Font Lock
+;;;; Font Lock
 
 (defvar ada-ts-mode--preproc-keywords
   '("#if" "#elsif" "#else" "#end" "if" "then" ";")
@@ -566,7 +573,7 @@ but it isn't an actual function call."
                  "out"
                  (treesit-node-type n))))))))
 
-;;; Commands
+;;;; Commands
 
 (defun ada-ts-mode-defun-comment-box ()
   "Create comment box for defun enclosing point, if exists."
@@ -692,6 +699,8 @@ other window, else find the file in the current window."
       (find-file project-file)
     (message "Project file unknown or non-existent.")))
 
+;;;; Keymap / Menu
+
 (defvar ada-ts-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-q") #'ada-ts-mode-fill-reindent-defun)
@@ -727,6 +736,22 @@ other window, else find the file in the current window."
     ["-----"                        nil                                     nil]
     ["Manual"                       (info "(ada-ts-mode)Top")               t]
     ["Customize"                    (customize-group 'ada-ts)               t]))
+
+;;;; Project
+
+(defun ada-ts-project-try (dir)
+  "Determine if DIR is an Ada project."
+  (when-let* (((and ada-ts-project-root-markers))
+              (roots (seq-remove #'null
+                                 (seq-map (apply-partially #'locate-dominating-file dir)
+                                          ada-ts-project-root-markers)))
+              (root (car (seq-sort-by #'length #'> roots))))
+    (let ((project-vc-extra-root-markers ada-ts-project-root-markers))
+      (project-try-vc root))))
+
+(add-hook 'project-find-functions #'ada-ts-project-try)
+
+;;;; Mode
 
 ;;;###autoload
 (define-derived-mode ada-ts-mode prog-mode "Ada"

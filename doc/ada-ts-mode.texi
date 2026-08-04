@@ -21,24 +21,24 @@
 @node Top
 @top Ada Major Mode using Tree-Sitter
 
-A major mode for Ada files, which utilizes the Emacs built-in support
-for tree-sitter, first available starting with Emacs 29.  The
+A major mode for Ada files@comma{} which utilizes the Emacs built-in support
+for tree-sitter@comma{} first available starting with Emacs 29.  The
 tree-sitter functionality is used to build an in-memory concrete
-syntax tree of the parsed language, allowing operations such as syntax
+syntax tree of the parsed language@comma{} allowing operations such as syntax
 highlighting to be performed more accurately than historical methods
-(e.g., regular expressions).
+(e.g.@comma{} regular expressions).
 
-This major mode provides support for syntax highlighting, indentation,
-navigation, Imenu, ``which function'' (i.e., displaying the current
-function name in the mode line), outlining (via @samp{outline-minor-mode})
+This major mode provides support for syntax highlighting@comma{} indentation@comma{}
+navigation@comma{} Imenu@comma{} ``which function'' (i.e.@comma{} displaying the current
+function name in the mode line)@comma{} outlining (via @samp{outline-minor-mode})
 and casing.
 
 @strong{Note}: This major mode is based on the Emacs 29 (or newer) built-in
-tree-sitter support, not to be confused with the separate Emacs
+tree-sitter support@comma{} not to be confused with the separate Emacs
 tree-sitter package.  The two are not compatible with each other.
 
 @strong{Note}: Outlining is made available through Emacs 30 (or newer) built-in
-support for outlining within tree-sitter major modes, therefore it is
+support for outlining within tree-sitter major modes@comma{} therefore it is
 required for @samp{outline-minor-mode} to work with @samp{ada-ts-mode}.
 
 
@@ -100,15 +100,15 @@ Emacs must have been built with tree-sitter support.  Versions of
 Emacs prior to Emacs 29 do not have built-in support.  The built-in
 support is optionally enabled when Emacs is built.  It is almost
 guaranteed that any pre-built Emacs 29 or newer executable supplied
-as part of an OS package manager (e.g., APT, Homebrew, MSYS2, etc.)
+as part of an OS package manager (e.g.@comma{} APT@comma{} Homebrew@comma{} MSYS2@comma{} etc.)
 will have been built with this capability enabled.
 @item
 The tree-sitter shared library must be installed on your system.
 The specifics of how to do this will vary based on the Operating
-System.  However, a pre-built Emacs 29 or newer executable that is
+System.  However@comma{} a pre-built Emacs 29 or newer executable that is
 installed by the OS package manager will likely have identified this
 library as a prerequisite and have installed it along with Emacs.
-Therefore, it is unlikely you will need to manually install this
+Therefore@comma{} it is unlikely you will need to manually install this
 library if you installed Emacs with an OS package manager.
 
 The following command can be used to determine if tree-sitter
@@ -126,17 +126,17 @@ Make sure it indicates @code{t} in the echo area instead of @code{nil}.
 @chapter Installation
 
 There are multiple ways in which a package can be installed in Emacs.
-The most convenient way is to use a package archive, however
+The most convenient way is to use a package archive@comma{} however
 installation directly from the git repository is also possible.  In
-addition, there are multiple third party package managers available,
+addition@comma{} there are multiple third party package managers available@comma{}
 but installation instructions in this section will focus only on the
-built-in package manager (i.e., @samp{package.el}).  It is assumed that
+built-in package manager (i.e.@comma{} @samp{package.el}).  It is assumed that
 power-users will not need direction as to how to use other package
 managers.
 
-In addition to package management, it is also common practice to
+In addition to package management@comma{} it is also common practice to
 perform package configuration.  There are also multiple third party
-packages for managing your package configuration, however @samp{use-package}
+packages for managing your package configuration@comma{} however @samp{use-package}
 is now built-in to Emacs.  Refer to the example configuration section
 for ideas on how to utilize @samp{use-package} to setup your own personal
 configuration.
@@ -150,8 +150,8 @@ configuration.
 @section From the MELPA Package Archive
 
 This package can be installed from the MELPA package archive using the
-Emacs built-in package manager (i.e., @samp{package.el}).  MELPA is not
-configured in the package manager by default, but the following can be
+Emacs built-in package manager (i.e.@comma{} @samp{package.el}).  MELPA is not
+configured in the package manager by default@comma{} but the following can be
 used to configure the use of the MELPA archive.  Refer to @uref{https://melpa.org/#/getting-started, Getting
 Started} for additional details on configuring and using the MELPA
 package archive.
@@ -160,8 +160,8 @@ package archive.
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 @end lisp
 
-Once configured as above, instruct the package manager to refresh the
-available packages and to perform the installation, as follows:
+Once configured as above@comma{} instruct the package manager to refresh the
+available packages and to perform the installation@comma{} as follows:
 
 @itemize
 @item
@@ -182,14 +182,14 @@ installation:
 @node Grammar Installation
 @chapter Grammar Installation
 
-In order for ada-ts-mode to be useful, it needs to have the specific
+In order for ada-ts-mode to be useful@comma{} it needs to have the specific
 tree-sitter Ada language grammar library installed.  This library is
 different from the tree-sitter library mentioned in the prerequisites
-section (e.g., @samp{libtree-sitter.so} vs @samp{libtree-sitter-ada.so}).  The
-library is not bundled with ada-ts-mode, but is maintained separately.
-With the default configuration, the first time ada-ts-mode is loaded
+section (e.g.@comma{} @samp{libtree-sitter.so} vs @samp{libtree-sitter-ada.so}).  The
+library is not bundled with ada-ts-mode@comma{} but is maintained separately.
+With the default configuration@comma{} the first time ada-ts-mode is loaded
 (in the absence of an existing installed library) it will prompt to
-download, build and install the grammar library.  The following
+download@comma{} build and install the grammar library.  The following
 settings provide control over this activity.
 
 @defopt ada-ts-mode-grammar
@@ -199,17 +199,17 @@ ada-ts-mode.
 
 @defopt ada-ts-mode-grammar-install
 Controls the level of automation in installing the grammar library
-(automatic, prompt first, etc).
+(automatic@comma{} prompt first@comma{} etc).
 @end defopt
 
-In order to build the library, you will need to have a C compiler
+In order to build the library@comma{} you will need to have a C compiler
 installed.  Refer to the Emacs documentation surrounding
-@code{treesit-install-language-grammar}, as ada-ts-mode uses the built-in
-Emacs functionality to perform the download, building and installation
+@code{treesit-install-language-grammar}@comma{} as ada-ts-mode uses the built-in
+Emacs functionality to perform the download@comma{} building and installation
 of the library.
 
 It's also possible to skip this step if you already have a pre-built
-library for the language.  In which case, placing the pre-built
+library for the language.  In which case@comma{} placing the pre-built
 library in the correct location will allow ada-ts-mode to find and use
 the library.  You can customize @code{treesit-extra-load-path} to add extra
 locations to search for libraries.
@@ -218,8 +218,8 @@ You will only be prompted if the library can't be found in one of the
 expected locations.  The prompting can also be controlled by changing
 the @code{ada-ts-mode-grammar-install} setting.
 
-If manually installing, or troubleshooting the installation of the Ada
-language grammar, you can use the following to check whether Emacs can
+If manually installing@comma{} or troubleshooting the installation of the Ada
+language grammar@comma{} you can use the following to check whether Emacs can
 locate the library:
 @itemize
 @item
@@ -231,25 +231,25 @@ Make sure it indicates @code{t} in the echo area instead of @code{nil}.
 @node Syntax Highlighting
 @chapter Syntax Highlighting
 
-There are 4 different levels of syntax highlighting available,
-providing an increasing amount of highlighting.  By default in Emacs,
+There are 4 different levels of syntax highlighting available@comma{}
+providing an increasing amount of highlighting.  By default in Emacs@comma{}
 level 3 (controlled by @code{treesit-font-lock-level}) is used to provide a
 compromise between providing too little and too much fontification.
-It should be noted that the levels are cumulative, meaning that each
+It should be noted that the levels are cumulative@comma{} meaning that each
 level also includes all of the fontification in the levels below it.
 The following provides the list of features and how they are mapped to
 the different font lock levels.
 
 @table @asis
 @item Level 1
-comment, definition
+comment@comma{} definition
 @item Level 2
-keyword, preprocessor, string, type
+keyword@comma{} preprocessor@comma{} string@comma{} type
 @item Level 3
-attribute, assignment, constant, function, number,
+attribute@comma{} assignment@comma{} constant@comma{} function@comma{} number@comma{}
 operator
 @item Level 4
-bracket, delimiter, error, label
+bracket@comma{} delimiter@comma{} error@comma{} label
 @end table
 
 @node Indentation
@@ -258,21 +258,21 @@ bracket, delimiter, error, label
 Indentation follows the nesting structure of the language. Each nested
 level is indented a fixed amount. Thus the general indentation offset
 governs the amount of this indentation. Additional configurations
-address special cases, such as the indentation of a construct spanning
-multiple lines (i.e., broken indent).
+address special cases@comma{} such as the indentation of a construct spanning
+multiple lines (i.e.@comma{} broken indent).
 
-Multiple indentation back-ends are supported, but the default back-end
-uses the intrinsic tree-sitter support.  Additionally, an external
-indentation back-end using the Ada Language Server can be configured,
+Multiple indentation back-ends are supported@comma{} but the default back-end
+uses the intrinsic tree-sitter support.  Additionally@comma{} an external
+indentation back-end using the Ada Language Server can be configured@comma{}
 which uses the Language Server to perform formatting.  In addition to
-configuring the indentation backed to use the LSP formatter, a
+configuring the indentation backed to use the LSP formatter@comma{} a
 Language Server client must be enabled in the buffer.
 
-Additionally, the LSP formatter does not use all of the user options
-below, it will only use the basic indentation offset and possibly the
-broken offset configuration.  Furthermore, because the LSP back-end
-uses a formatter rather than an indentation engine, depending on the
-configuration of the formatter, the back-end is likely to indent more
+Additionally@comma{} the LSP formatter does not use all of the user options
+below@comma{} it will only use the basic indentation offset and possibly the
+broken offset configuration.  Furthermore@comma{} because the LSP back-end
+uses a formatter rather than an indentation engine@comma{} depending on the
+configuration of the formatter@comma{} the back-end is likely to indent more
 than the current line.  See the documentation for the Language Server
 to learn about formatter details.
 
@@ -284,8 +284,8 @@ Selects the back-end used to provide indentation support.  The
 default uses Tree-sitter based indentation and supports all of the
 indentation options specified below.  The ``LSP'' setting will use the
 Language Server indentation support when a LSP client is active for
-the buffer.  If no LSP client is active, or if the LSP formatter
-refuses to format (e.g., when syntax errors are present) this falls
+the buffer.  If no LSP client is active@comma{} or if the LSP formatter
+refuses to format (e.g.@comma{} when syntax errors are present) this falls
 back to using Tree-sitter based indentation.
 @end defopt
 
@@ -294,7 +294,7 @@ Indentation used for structural visualization.
 @end defopt
 
 @defopt ada-ts-mode-indent-when-offset
-Indentation for case alternatives, relative to a case statement.
+Indentation for case alternatives@comma{} relative to a case statement.
 @end defopt
 
 @defopt ada-ts-mode-indent-broken-offset
@@ -307,8 +307,8 @@ Continuation indentation for partial expressions.
 @end defopt
 
 @defopt ada-ts-mode-indent-subprogram-is-offset
-Indentation for @samp{is} keyword in a short form subprogram body (i.e.,
-null procedure, expression function and abstract subprogram).
+Indentation for @samp{is} keyword in a short form subprogram body (i.e.@comma{}
+null procedure@comma{} expression function and abstract subprogram).
 @end defopt
 
 @defopt ada-ts-mode-indent-record-offset
@@ -322,13 +322,13 @@ Indentation for a block or loop statement containing a label.
 @end defopt
 
 @defopt ada-ts-mode-indent-strategy
-Indentation strategy to use, typically when @samp{RET} or @samp{TAB} are pressed
-during editing.  Historically, pressing one of these keys would
-drive a line-based indentation, however more complex indentation
+Indentation strategy to use@comma{} typically when @samp{RET} or @samp{TAB} are pressed
+during editing.  Historically@comma{} pressing one of these keys would
+drive a line-based indentation@comma{} however more complex indentation
 strategies can be used due to the available of the syntax tree.  By
-default, an ``aggressive'' indentation strategy is used that attempts
-to perform indentation at a higher structural level (e.g.,
-statement, subprogram, etc.) in order to correct possible incorrect
+default@comma{} an ``aggressive'' indentation strategy is used that attempts
+to perform indentation at a higher structural level (e.g.@comma{}
+statement@comma{} subprogram@comma{} etc.) in order to correct possible incorrect
 indentation that might have occurred while syntax errors were
 present in the buffer.  The ``line'' indentation strategy performs the
 historical behavior of only indenting the current line.
@@ -339,37 +339,37 @@ with formatting that the LSP formatter might perform.
 @end defopt
 
 It should be noted that the offsets defined above are described in
-terms of each other, so that by customizing the standard indentation
-offset @code{ada-ts-mode-indent-offset}, the other indentation offsets will
-be adjusted accordingly.  In other words, those settings either use
-the same value or a value derived from it.  Therefore, customizing the
+terms of each other@comma{} so that by customizing the standard indentation
+offset @code{ada-ts-mode-indent-offset}@comma{} the other indentation offsets will
+be adjusted accordingly.  In other words@comma{} those settings either use
+the same value or a value derived from it.  Therefore@comma{} customizing the
 base value will have an affect on the remaining values as well.  If
-this is not the desired outcome, the other offsets should be
+this is not the desired outcome@comma{} the other offsets should be
 customized as well.
 
-Indentation rules used in @code{ada-ts-mode}, as in all tree-sitter based
-modes, are based on the syntax of the language.  When what currently
-exists in the buffer is not syntactically correct, the in-memory
-syntax tree will contain errors, since the buffer doesn't adhere to
-the grammar rules of the language (i.e., it contains syntax errors).
-To help combat this issue, a best-effort approach is used to perform
-indentation around syntax errors.  Furthermore, the indentation
+Indentation rules used in @code{ada-ts-mode}@comma{} as in all tree-sitter based
+modes@comma{} are based on the syntax of the language.  When what currently
+exists in the buffer is not syntactically correct@comma{} the in-memory
+syntax tree will contain errors@comma{} since the buffer doesn't adhere to
+the grammar rules of the language (i.e.@comma{} it contains syntax errors).
+To help combat this issue@comma{} a best-effort approach is used to perform
+indentation around syntax errors.  Furthermore@comma{} the indentation
 strategy can help recover from previously incorrect indentation that
 has occurred while the buffer was in a syntactically invalid state.
 
-If none of the existing indentation strategies are sufficient, a
+If none of the existing indentation strategies are sufficient@comma{} a
 custom strategy can be created and used.  In order to create a
-strategy, a new strategy symbol should be specified in
-@code{ada-ts-mode-indent-strategy}, and an implementation of
-@code{ada-ts-mode-indent} should be created, specializing on the new strategy
+strategy@comma{} a new strategy symbol should be specified in
+@code{ada-ts-mode-indent-strategy}@comma{} and an implementation of
+@code{ada-ts-mode-indent} should be created@comma{} specializing on the new strategy
 symbol name.  Refer to existing instances of this function to
 understand how current strategy functions are implemented.
 
 @deffn Command ada-ts-mode-fill-reindent-defun
-Applies formatting to the comment at point or the defun (i.e.,
-subprogram, package, task, etc.) containing point.  For a comment,
+Applies formatting to the comment at point or the defun (i.e.@comma{}
+subprogram@comma{} package@comma{} task@comma{} etc.) containing point.  For a comment@comma{}
 the comment is refilled according to @code{fill-paragraph}.  When a prefix
-argument is supplied, the filled paragraph is justified.  Otherwise,
+argument is supplied@comma{} the filled paragraph is justified.  Otherwise@comma{}
 the defun containing point is re-indented using the configured
 indentation back-end.
 @end deffn
@@ -381,50 +381,50 @@ indentation back-end.
 @node Ada Language Server Indentation
 @section Ada Language Server Indentation
 
-Since the Ada Language Server provides code formatting, not just an
-indentation engine, it may be necessary to configure the settings of
-the code formatter to meet behavioral desires.  Under the hood, the
+Since the Ada Language Server provides code formatting@comma{} not just an
+indentation engine@comma{} it may be necessary to configure the settings of
+the code formatter to meet behavioral desires.  Under the hood@comma{} the
 Ada LS may use either @samp{GNATformat} or @samp{GNATpp} (pretty print) although the
 later appears to be deprecated.  @samp{GNATformat} is an opinionated
-formatter with only a few configuration options, while @samp{GNATpp} contains
+formatter with only a few configuration options@comma{} while @samp{GNATpp} contains
 many more options for the user to configure.  Configuration for either
 formatter occurs in the GNAT Project file in their corresponding
-packages (i.e., @samp{Format} and @samp{Pretty_Print}, respectively).  The Ada LS
+packages (i.e.@comma{} @samp{Format} and @samp{Pretty_Print}@comma{} respectively).  The Ada LS
 will read the settings from the project file to control formatting.
 The specific formatter to use is configured through the Ada LS
 @samp{useGnatformat} setting.  See the Ada Language Server documentation for
 details about this setting and its default value.
 
-When using the @samp{GNATpp} engine to format a line or region of the buffer,
-for minimal impact to the buffer, it's likely desirable to use the
+When using the @samp{GNATpp} engine to format a line or region of the buffer@comma{}
+for minimal impact to the buffer@comma{} it's likely desirable to use the
 @samp{--source-line-breaks} switch to prevent @samp{GNATpp} from reformatting the
-buffer beyond indentation.  With the @samp{GNATformat} engine, there is no
-control over the formatting, as it is opinionated.  Refer to their
+buffer beyond indentation.  With the @samp{GNATformat} engine@comma{} there is no
+control over the formatting@comma{} as it is opinionated.  Refer to their
 respective documentation for the full set of options available for the
 formatting engines.
 
 The value of @code{ada-ts-mode-indent-offset} is provided to the Ada Language
 Server as the @samp{tabSize} parameter in the @samp{textDocument/rangeFormatting}
 and @samp{textDocument/formatting} requests.  This corresponds to the main
-indentation amount (i.e., overriding the @samp{--indentation} switch for
+indentation amount (i.e.@comma{} overriding the @samp{--indentation} switch for
 @samp{GNATpp} or the @samp{Indentation} package setting for @samp{GNATformat}).
 
 @node Navigation
 @chapter Navigation
 
 The major mode implements the normal source navigation commands which
-can be used to move around the buffer (i.e., @samp{C-M-a}, @samp{C-M-e}, etc).  It
+can be used to move around the buffer (i.e.@comma{} @samp{C-M-a}@comma{} @samp{C-M-e}@comma{} etc).  It
 should also be noted that @samp{which-function-mode} is also supported and
-will show the current package and/or subprogram in the mode line, when
+will show the current package and/or subprogram in the mode line@comma{} when
 enabled.
 
 @deffn Command ada-ts-mode-find-other-file
 Locate the corresponding body or specification file related to the
-file in the current buffer.  When an LSP client is active, the Ada
+file in the current buffer.  When an LSP client is active@comma{} the Ada
 Language Server will be commanded to direct navigation to the other
 file.  This is the most accurate method as the Language Server will
 take into consideration non-standard naming conventions that are
-described in the GNAT project file.  When no LSP client is active,
+described in the GNAT project file.  When no LSP client is active@comma{}
 @code{ff-find-other-file} will be used to find the corresponding file.
 @end deffn
 
@@ -436,20 +436,20 @@ local @code{ff-find-other-file-alist}.
 
 @deffn Command ada-ts-mode-find-project-file
 Locate the GNAT project file related to the source file of the
-current buffer.  When an LSP client is active, the Ada Language
-Server will be queried for the project file, otherwise Alire will be
+current buffer.  When an LSP client is active@comma{} the Ada Language
+Server will be queried for the project file@comma{} otherwise Alire will be
 queried if an @samp{alire.toml} file exists in the directory hierarchy and
 the Alire executable is found in the path.  If neither of these two
-conditions occur, a single project file will be searched for in the
-root directory of the project if one exists.  Finally, if the
-project file still is not found, a search will look for a @samp{defaut.gpr}
+conditions occur@comma{} a single project file will be searched for in the
+root directory of the project if one exists.  Finally@comma{} if the
+project file still is not found@comma{} a search will look for a @samp{defaut.gpr}
 file somewhere in the directory hierarchy from the current buffer
 file's directory.
 @end deffn
 
 @defopt ada-ts-mode-alire-program
 The name of the Alire executable program that will be searched for
-on the path, and if found, may be invoked for certain @code{ada-ts-mode}
+on the path@comma{} and if found@comma{} may be invoked for certain @code{ada-ts-mode}
 commands (such as to query for the name and location of the GNAT
 project file).
 @end defopt
@@ -457,16 +457,16 @@ project file).
 @node Imenu
 @chapter Imenu
 
-With the provided Imenu support, additional options are available for
+With the provided Imenu support@comma{} additional options are available for
 ease of navigation within an Ada source file.  Imenu supports indexing
-of declarations, bodies and stubs for packages, subprograms, task
+of declarations@comma{} bodies and stubs for packages@comma{} subprograms@comma{} task
 units and protected units as well as type declarations and with
 clauses.
 
 @defopt ada-ts-mode-imenu-categories
 The set of categories to be used for Imenu.  Since there are a
-number of different categories supported, it may be a distraction to
-display categories that aren't desired.  Therefore, the set of
+number of different categories supported@comma{} it may be a distraction to
+display categories that aren't desired.  Therefore@comma{} the set of
 categories can be customized to reduce clutter or to increase
 performance.  The order in which the categories are listed will be
 respected when the Imenu indexing is performed.  This is helpful if
@@ -476,39 +476,39 @@ specific ordering of categories is desired.
 @defopt ada-ts-mode-imenu-category-name-alist
 The mapping between categories and the displayed name for the
 category.  This customization may be helpful if you are expecting a
-specific name for a category, use plural instead of singular nouns,
+specific name for a category@comma{} use plural instead of singular nouns@comma{}
 or want to customize for internationalization.
 @end defopt
 
 @defopt ada-ts-mode-imenu-nesting-strategy-function
 Function to use for constructing nested items within the Imenu data
 structure.  The specific nesting function the user should use will
-depend on which user interface is used to consume Imenu data, as
+depend on which user interface is used to consume Imenu data@comma{} as
 different interfaces behave differently with respect to how they
 handle nested items.  Some interfaces will display both an entry for
 the item as well as an entry for items nested within that item.  In
-that case, using ``Place Before Nested Entries'' is a good choice.
-Other user interfaces remove duplicate entries, so using ``Place
+that case@comma{} using ``Place Before Nested Entries'' is a good choice.
+Other user interfaces remove duplicate entries@comma{} so using ``Place
 Within Nested Entries'' will create a placeholder entry in the list
-of sub-items.  If none of these are satisfactory, a custom function
+of sub-items.  If none of these are satisfactory@comma{} a custom function
 can be used to implement a different strategy.
 @end defopt
 
 @defopt ada-ts-mode-imenu-nesting-strategy-placeholder
 Placeholder to use for the ``Place Within Nested Entries'' strategy.
 This placeholder could also be used with a custom function if it
-supports a placeholder.  If this option is customized, it should be
+supports a placeholder.  If this option is customized@comma{} it should be
 configured such that it doesn't interfere with other valid item
-names.  Therefore, it is suggested to choose a placeholder which is
-not a valid item name.  For example, surrounding a string with
+names.  Therefore@comma{} it is suggested to choose a placeholder which is
+not a valid item name.  For example@comma{} surrounding a string with
 parenthesis or brackets.
 @end defopt
 
 @defopt ada-ts-mode-imenu-sort-function
 The items in each Imenu category can be sorted for each nesting
 level.  The current options are to use ``In Buffer Order'' which will
-list the items as they appear in the buffer, or to sort the items
-``Alphabetically''.  Optionally, a custom sort function can be used if
+list the items as they appear in the buffer@comma{} or to sort the items
+``Alphabetically''.  Optionally@comma{} a custom sort function can be used if
 neither of these are suitable.  A custom sort function should be
 aware of the possible existence of a placeholder and to order that
 before any ``sorted'' items in order to put the placeholder at the top
@@ -519,15 +519,15 @@ of the list.
 @chapter Casing
 
 Functionality is provided to manage casing within an Ada buffer.  This
-includes a number of commands to apply casing rules to point, to a
+includes a number of commands to apply casing rules to point@comma{} to a
 region or to the entire buffer.  The commands can be used
-interactively, but may also be useful in other ways (such as calling
+interactively@comma{} but may also be useful in other ways (such as calling
 the buffer casing command from the @samp{buffer-save-hook}).  An auto-casing
 minor mode is also provided which performs case formatting as you
 type.
 
 @defopt ada-ts-mode-case-formatting
-A set of casing rules, used by the casing commands and modes, which
+A set of casing rules@comma{} used by the casing commands and modes@comma{} which
 apply category specific formatting and dictionaries.
 @end defopt
 
@@ -540,14 +540,14 @@ word or subword boundary.
 Applies formatting to the specified region for all items in the
 region which match the case formatting categories specified in
 @samp{ada-ts-mode-case-formatting}.  When the region doesn't start or stop
-exactly on a category boundary, the range is expanded to the
+exactly on a category boundary@comma{} the range is expanded to the
 category boundary.
 @end deffn
 
 @deffn Command ada-ts-mode-case-format-at-point
-Applies formatting to point, assuming the item at point matches a
+Applies formatting to point@comma{} assuming the item at point matches a
 case formatting category specified in @samp{ada-ts-mode-case-formatting}.
-When no category is matched, no formatting is applied.
+When no category is matched@comma{} no formatting is applied.
 @end deffn
 
 @deffn Command ada-ts-mode-case-format-buffer
@@ -562,12 +562,12 @@ point'' formatting depending on whether a region is active in the
 buffer.
 @end deffn
 
-If none of the existing casing categories are sufficient, or an
-additional category is desired, a custom category can be created and
-used.  In order to create a category, a new category symbol should be
+If none of the existing casing categories are sufficient@comma{} or an
+additional category is desired@comma{} a custom category can be created and
+used.  In order to create a category@comma{} a new category symbol should be
 added to @samp{ada-ts-mode-case-formatting} along with the corresponding
-formatter and optional dictionary properties.  Additionally, an
-implementation of @samp{ada-ts-mode-case-category-p} should be created,
+formatter and optional dictionary properties.  Additionally@comma{} an
+implementation of @samp{ada-ts-mode-case-category-p} should be created@comma{}
 specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.
@@ -575,14 +575,14 @@ category functions are implemented.
 @node LSP Client Support
 @chapter LSP Client Support
 
-While @code{ada-ts-mode} is a fully capable major mode, users may desire to
-utilize an LSP server (i.e., Ada Language Server) in order to enhance
+While @code{ada-ts-mode} is a fully capable major mode@comma{} users may desire to
+utilize an LSP server (i.e.@comma{} Ada Language Server) in order to enhance
 their experience.  This can provide enhanced capabilities for
-completion, cross-referencing, documentation, etc.  It's up to the
-user to configure the LSP client for an @code{ada-ts-mode} buffer, typically
+completion@comma{} cross-referencing@comma{} documentation@comma{} etc.  It's up to the
+user to configure the LSP client for an @code{ada-ts-mode} buffer@comma{} typically
 through the use of the @code{ada-ts-mode-hook} to enable the LSP client minor
 mode.  Those clients which utilize directory local variables for
-configuration (e.g., GPR project filename), may need to hook into the
+configuration (e.g.@comma{} GPR project filename)@comma{} may need to hook into the
 @code{hack-local-variables-hook} in order to initialize after the directory
 local variables have been initialized.  Refer to the documentation for
 the specific LSP client used for details.
@@ -597,9 +597,9 @@ configuration.  Refer to the Ada Language Server's documentation for
 specific details on the format and location of these files.
 
 Some Ada Language Server features are known to be problematic with
-Emacs (such as on-type formatting).  Additionally, some Emacs LSP
+Emacs (such as on-type formatting).  Additionally@comma{} some Emacs LSP
 clients have default settings which aggressively override similar
-functionality provided by @code{ada-ts-mode}.  As a result, @code{ada-ts-mode}
+functionality provided by @code{ada-ts-mode}.  As a result@comma{} @code{ada-ts-mode}
 provides a way for the settings of each LSP client to be customized
 specifically for use within an @code{ada-ts-mode} buffer.  The customizations
 are specific to the @code{ada-ts-mode} buffer and will not impact the
@@ -609,9 +609,9 @@ while providing customization for @code{ada-ts-mode}.
 
 A default set of configurations have been provided out-of-the-box to
 optimize the experience with each supported LSP client.  The following
-user options may be adjusted as desired.  For each LSP client, if
-their user option(s) are set to @code{nil}, no customization for @code{ada-ts-mode}
-will be applied, allowing the LSP client's global settings to be used
+user options may be adjusted as desired.  For each LSP client@comma{} if
+their user option(s) are set to @code{nil}@comma{} no customization for @code{ada-ts-mode}
+will be applied@comma{} allowing the LSP client's global settings to be used
 instead.
 
 @defopt ada-ts-lspclient-eglot-stay-out-of
@@ -635,7 +635,7 @@ buffers.
 @end defopt
 
 A set of customizations have also been provided for @code{eglot} semantic
-highlighting.  For @code{lsp-mode}, similar customizations are part of the
+highlighting.  For @code{lsp-mode}@comma{} similar customizations are part of the
 @code{lsp-mode} package itself.
 
 @defopt ada-ts-lspclient-eglot-semantic-token-types
@@ -673,31 +673,31 @@ retain their default faces as specified in the @code{eglot} package.
 @section Adding Support for an Additional LSP Client
 
 In order to integrate functionality provided by the Ada Language
-Server (such as completion), @code{ada-ts-mode} must interact with an active
-LSP client.  Since multiple LSP clients exist, this interaction must
+Server (such as completion)@comma{} @code{ada-ts-mode} must interact with an active
+LSP client.  Since multiple LSP clients exist@comma{} this interaction must
 be configurable such that additional LSP clients can be added when
-needed.  Additionally, @code{ada-ts-mode} must be able to determine which LSP
+needed.  Additionally@comma{} @code{ada-ts-mode} must be able to determine which LSP
 client is active in the buffer.  If there is no active LSP client in
-the buffer, @code{ada-ts-mode} will not be able to make use of LSP provided
+the buffer@comma{} @code{ada-ts-mode} will not be able to make use of LSP provided
 capabilities and thus falls back on providing this capability without
-it's support, which likely will be less precise.
+it's support@comma{} which likely will be less precise.
 
-There are already two LSP clients supported by @code{ada-ts-mode}, @code{eglot} and
-@code{lsp-mode}, so it is unlikely that a user will need to provide their own
-support for a new client.  In the event that is not the case, a
+There are already two LSP clients supported by @code{ada-ts-mode}@comma{} @code{eglot} and
+@code{lsp-mode}@comma{} so it is unlikely that a user will need to provide their own
+support for a new client.  In the event that is not the case@comma{} a
 generic interface is used to support different LSP clients.  This
 interface is described in @samp{ada-ts-lspclient.el}.  There are separate
 files for each supported LSP client which implement those interfaces.
 These separate files are configured to automatically load when both
 @code{ada-ts-mode} and the corresponding LSP client package have been loaded.
 
-To add an unsupported LSP client, add client-specific methods for all
-of the interfaces described in @samp{ada-ts-lspclient.el}.  In addition, a
+To add an unsupported LSP client@comma{} add client-specific methods for all
+of the interfaces described in @samp{ada-ts-lspclient.el}.  In addition@comma{} a
 parameter-less function for that client should be added to the
 @code{ada-ts-lspclient-find-functions} hook variable (via @code{add-hook}).  That
-function, when invoked, should determine if the LSP client is active
-in the current buffer, and when active, return an LSP client instance
-(which can be used to dispatch on the client-specific methods), else
+function@comma{} when invoked@comma{} should determine if the LSP client is active
+in the current buffer@comma{} and when active@comma{} return an LSP client instance
+(which can be used to dispatch on the client-specific methods)@comma{} else
 return @code{nil}.
 
 @node Ada Language Server
@@ -705,40 +705,40 @@ return @code{nil}.
 
 Functionality provided by the Ada Language Server is seamlessly
 integrated into the corresponding functional areas as appropriate
-(i.e., indentation, cross-references, etc.).  However, there is other
+(i.e.@comma{} indentation@comma{} cross-references@comma{} etc.).  However@comma{} there is other
 support @code{ada-ts-mode} provides which is specific to managing the Ada
-Language Server itself, not the functionality it provides.
+Language Server itself@comma{} not the functionality it provides.
 
 @deffn Command ada-ts-als-find-user-config-file
 Find Ada Language Server user configuration file.  If the variable
-@samp{$XDG_CONFIG_HOME} exists, the user configuration file is
-@samp{$XDG_CONFIG_HOME/als/config.json}.  Otherwise, the user configuration
-file is @samp{~/.config/als/config.json}.  If the file does not exist, a
+@samp{$XDG_CONFIG_HOME} exists@comma{} the user configuration file is
+@samp{$XDG_CONFIG_HOME/als/config.json}.  Otherwise@comma{} the user configuration
+file is @samp{~/.config/als/config.json}.  If the file does not exist@comma{} a
 new file will be visited.
 @end deffn
 
 @deffn Command ada-ts-als-find-workspace-config-file
 Find Ada Language Server workspace configuration file.  The file is
-found in the LSP client defined workspace root directory, when an
-LSP client is active, otherwise the file is found relative to the
+found in the LSP client defined workspace root directory@comma{} when an
+LSP client is active@comma{} otherwise the file is found relative to the
 project root as determined by @samp{project.el}.  If the file does not
-exist, a new file will be visited.
+exist@comma{} a new file will be visited.
 @end deffn
 
 @deffn Command ada-ts-als-show-composite-config
 Show the composite JSON-formatted configuration for the Ada Language
-Server combining the user configuration file (when exists), the
+Server combining the user configuration file (when exists)@comma{} the
 workspace configuration file (when exists) and the LSP client
 specific configuration (when an LSP client is active).  This
 provides a holistic view of the separate parts that comprise the
-configuration, which can be helpful when troubleshooting
+configuration@comma{} which can be helpful when troubleshooting
 configuration problems.  Overlapping configuration from these
-sources are combined based on priority, such that the LSP client
-configuration is higher priority than the workspace configuration,
+sources are combined based on priority@comma{} such that the LSP client
+configuration is higher priority than the workspace configuration@comma{}
 which is higher priority than the user configuration.  This is
 consistent with how the Language Server resolves overlapping
 configuration.  Note that the Ada Language Server has a default
-configuration, when not specified by any of these sources.  Refer to
+configuration@comma{} when not specified by any of these sources.  Refer to
 the Ada Language Server documentation for full details.
 @end deffn
 
@@ -751,18 +751,29 @@ options which don't fit elsewhere.
 @defopt ada-ts-mode-keymap-prefix
 Prefix key used to activate the mode's keymap.  This can be
 configured as desired to change the prefix while still preserving
-the rest of the mode map.  If the keymap prefix is set to nil, then
+the rest of the mode map.  If the keymap prefix is set to nil@comma{} then
 the mode commands won't be mapped at all.
+@end defopt
+
+@defopt ada-ts-project-root-markers
+File and directory identifiers which indicate the root of an Ada
+project.  These markers are used to determine the boundary of an
+Emacs (i.e.@comma{} @samp{project.el}) project.  If this value is set to nil@comma{} no
+special detection is provided for Ada projects.  The user can still
+configure @code{project-vc-extra-root-markers} manually to realize the same
+benefits@comma{} in such a case.  The intent of this option is to provide
+out-of-the-box settings to prevent or minimize the user from
+explicitly having to configure Ada project markers.
 @end defopt
 
 @deffn Command ada-ts-mode-defun-comment-box
 Creates a comment box above the defun enclosing point.  A comment
 box is typically used to visually identify the start of a
-subprogram.  Not only can this command be used in subprograms, but
-it can be used within anything considered a defun, which includes
-declarations, bodies, body stubs, generic instantiations and
-renaming declarations for packages, task units, protected units,
-subprograms, etc.  The comment box will be indented to the same
+subprogram.  Not only can this command be used in subprograms@comma{} but
+it can be used within anything considered a defun@comma{} which includes
+declarations@comma{} bodies@comma{} body stubs@comma{} generic instantiations and
+renaming declarations for packages@comma{} task units@comma{} protected units@comma{}
+subprograms@comma{} etc.  The comment box will be indented to the same
 level as the enclosing defun.  The following demonstrates the look
 of a defun comment box for a subprogram body.
 
@@ -773,7 +784,7 @@ of a defun comment box for a subprogram body.
 
 procedure Hello_World is
 begin
-   Put_Line ("Hello, world!");
+   Put_Line ("Hello@comma{} world!");
 end Hello_World;
 @end example
 @end deffn
@@ -789,20 +800,20 @@ end Hello_World;
 @node Org Mode Source Code Blocks
 @section Org Mode Source Code Blocks
 
-Prior to Org Mode 9.8, when Org Mode doesn't know the major mode for
-the language of a source block, it will guess by appending @samp{-mode} to
+Prior to Org Mode 9.8@comma{} when Org Mode doesn't know the major mode for
+the language of a source block@comma{} it will guess by appending @samp{-mode} to
 the end of the language name.  If a language name of @samp{ada} is used in
-the source block, it will look for a major mode named @code{ada-mode}.  This
+the source block@comma{} it will look for a major mode named @code{ada-mode}.  This
 default behavior doesn't work when using Tree-Sitter enabled modes.
 
-As of Org Mode 9.8, Tree-Sitter enabled modes are properly detected
-and mapped correctly from the corresponding language.  However, if you
-are still using an older version, you can explicitly configure Org
+As of Org Mode 9.8@comma{} Tree-Sitter enabled modes are properly detected
+and mapped correctly from the corresponding language.  However@comma{} if you
+are still using an older version@comma{} you can explicitly configure Org
 Mode to map to the Tree-Sitter major mode using the customization
 variable @samp{org-src-lang-modes}.
 
 The following can be added to your configuration to detect the version
-of Org Mode being used, and conditionally apply the workaround:
+of Org Mode being used@comma{} and conditionally apply the workaround:
 
 @lisp
 (with-eval-after-load 'org-src
@@ -814,19 +825,19 @@ of Org Mode being used, and conditionally apply the workaround:
 @section Function Calls not Highlighted Correctly
 
 If you observe places in the syntax highlighting where functions calls
-are not being properly highlighted, such as an array being highlighted
-as a function call, or a parameterless function call not being
-highlighted, this is due to ambiguities in the syntax.  From a pure
-syntax perspective, array accesses look the same as function calls.
+are not being properly highlighted@comma{} such as an array being highlighted
+as a function call@comma{} or a parameterless function call not being
+highlighted@comma{} this is due to ambiguities in the syntax.  From a pure
+syntax perspective@comma{} array accesses look the same as function calls.
 Also parameterless function calls look the same as variable accesses.
 In places where it can be determined from the syntax (such as a
 generic package instantiation) care is taken to avoid highlighting
-these places as function calls.  In other places, it cannot be known
+these places as function calls.  In other places@comma{} it cannot be known
 from the syntax tree alone and that is where the syntax highlighting
 will become inaccurate.
 
 One way to address this slightly inaccurate syntax highlighting of
-function calls, is simply to disable it.  An easy way to perform this
+function calls@comma{} is simply to disable it.  An easy way to perform this
 is through the use of the @samp{treesit-font-lock-recompute-features}
 function.  Using this function when loading the major mode will allow
 you to customize which features are enabled/disabled from the default
@@ -840,22 +851,22 @@ settings.
 @end lisp
 
 If disabling function call highlighting is not sufficiently
-satisfying, another approach is to augment the syntax highlighting of
+satisfying@comma{} another approach is to augment the syntax highlighting of
 @samp{ada-ts-mode} with that of the Ada language server.  The language server
-is capable of providing semantic highlighting, which is what is needed
+is capable of providing semantic highlighting@comma{} which is what is needed
 in this situation.  Refer to the Ada language server and a
 corresponding Emacs Language Server Protocol (LSP) client.  Not all
-LSP clients for Emacs support semantic highlighting, so investigate
+LSP clients for Emacs support semantic highlighting@comma{} so investigate
 first before selecting one.  When semantic highlighting is used with
-@samp{ada-ts-mode}, inaccurate function call highlighting will be corrected.
-This includes both places where function calls are being highlighted,
-which aren't real function calls, as well as places which are function
+@samp{ada-ts-mode}@comma{} inaccurate function call highlighting will be corrected.
+This includes both places where function calls are being highlighted@comma{}
+which aren't real function calls@comma{} as well as places which are function
 calls but are not being highlighted.  In addition to function call
-highlighting, semantic highlighting provides highlighting of other
-semantic information, therefore it is highly recommended.
+highlighting@comma{} semantic highlighting provides highlighting of other
+semantic information@comma{} therefore it is highly recommended.
 
 If you do observe places where function call syntax highlighting is
-inaccurate and it can be determined from the syntax tree, this is
+inaccurate and it can be determined from the syntax tree@comma{} this is
 considered a bug and should be reported by filing an issue against the
 package.
 
@@ -865,9 +876,9 @@ package.
 The following is an example configuration using @samp{use-package} to manage
 this configuration.  It assumes that @samp{package.el} is your package
 manager.  This checks to make sure tree-sitter support is enabled in
-Emacs before attempting to install/configure the package, thus your
+Emacs before attempting to install/configure the package@comma{} thus your
 configuration will remain compatible with versions of Emacs which
-don't yet support tree-sitter, and will not install and configure this
+don't yet support tree-sitter@comma{} and will not install and configure this
 package in its absence.
 
 @lisp
