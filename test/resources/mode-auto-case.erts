@@ -1,0 +1,97 @@
+Name: Auto Case (keyword)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "SPC"))
+
+Point-Char: |
+
+=-=
+PROCEDURE|
+=-=
+procedure |
+=-=-=
+
+Name: Auto Case (identifier)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "_"))
+
+Point-Char: |
+
+=-=
+procedure hello|
+=-=
+procedure Hello_|
+=-=-=
+
+Name: Auto Case (keyword attribute)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press ";"))
+
+Point-Char: |
+
+=-=
+declare
+   X : access Integer := Y'access|
+=-=
+declare
+   X : access Integer := Y'Access;|
+=-=-=
+
+Name: Auto Case (keyword ".all")
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press ";"))
+
+Point-Char: |
+
+=-=
+declare
+   Y : Integer := X.ALL|
+=-=
+declare
+   Y : Integer := X.all;|
+=-=-=
+
+Name: Auto Case (identifier becoming keyword)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "SPC"))
+
+Point-Char: |
+
+=-=
+procedure Hello_World is
+BEGIN|X
+=-=
+procedure Hello_World is
+begin |X
+=-=-=
+
+Name: Auto Case (keyword becoming identifier)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "_"))
+
+Point-Char: |
+
+=-=
+procedure Hello_World is
+   begin|
+=-=
+procedure Hello_World is
+   Begin_|
+=-=-=
