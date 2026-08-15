@@ -1,4 +1,4 @@
-;;; ada-ts-casing.el --- Casing support in Ada files  -*- lexical-binding: t; -*-
+;;; ada-ts-case.el --- Casing support in Ada files  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025-2026 Troy Brown
 
@@ -21,6 +21,7 @@
 
 ;;; Code:
 
+(require 'ada-ts-common)
 (require 'cl-generic)
 (require 'rx)
 (require 'treesit)
@@ -112,10 +113,10 @@ The following keywords are meaningful:
          (setq rules (cdr rules)))
        (null rules)))
 
-(defvar ada-ts-mode--case-dictionary-file-alist nil)
-(defvar ada-ts-mode--case-formatting nil)
+(defvar ada-ts-case--dictionary-file-alist nil)
+(defvar ada-ts-case--formatting nil)
 
-(defun ada-ts-mode--case-dictionary-load (file)
+(defun ada-ts-case--dictionary-load (file)
   "Load dictionary FILE."
   (let (file-words)
     (with-temp-buffer
@@ -132,20 +133,20 @@ The following keywords are meaningful:
               (unless (assoc-string line-word file-words t)
                 (push line-word file-words))))
           (forward-line 1))))
-    (setq ada-ts-mode--case-dictionary-file-alist
-          (assoc-delete-all file ada-ts-mode--case-dictionary-file-alist))
+    (setq ada-ts-case--dictionary-file-alist
+          (assoc-delete-all file ada-ts-case--dictionary-file-alist))
     (push (cons file `( :words ,(reverse file-words)
                         :modification-time ,(file-attribute-modification-time
                                              (file-attributes file))))
-          ada-ts-mode--case-dictionary-file-alist)))
+          ada-ts-case--dictionary-file-alist)))
 
-(defun ada-ts-mode--case-settings-process (symbol newval operation where)
+(defun ada-ts-case--settings-process (symbol newval operation where)
   "Load/Reload dictionary files as needed and compute internal word list.
 
 SYMBOL is expected to be `ada-ts-mode-case-formatting', and OPERATION is
 queried to check that it is a `set' operation (as defined by
 `add-variable-watcher'), otherwise nothing is updated.  Either compute
-the default or buffer-local value for `ada-ts-mode--case-formatting'
+the default or buffer-local value for `ada-ts-case--formatting'
 based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   (when (and (eq symbol 'ada-ts-mode-case-formatting)
              (eq operation 'set))
@@ -167,19 +168,19 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
                       (let* ((dictionary-info
                               (cdr (assoc-string
                                     file-path
-                                    ada-ts-mode--case-dictionary-file-alist))))
+                                    ada-ts-case--dictionary-file-alist))))
                         (when (or (not dictionary-info)
                                   (not (equal
                                         (plist-get dictionary-info :modification-time)
                                         (file-attribute-modification-time
                                          (file-attributes file-path)))))
-                          (ada-ts-mode--case-dictionary-load file-path))))
+                          (ada-ts-case--dictionary-load file-path))))
                     (setq words
                           (append words
                                   (plist-get
                                    (cdr (assoc-string
                                          file-path
-                                         ada-ts-mode--case-dictionary-file-alist))
+                                         ada-ts-case--dictionary-file-alist))
                                    :words)
                                   (plist-get dictionary :words)))))
               (setq words (or (plist-get dictionary :words) dictionary))))
@@ -192,19 +193,19 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
       (setq rules (reverse rules))
       (if where
           (with-current-buffer where
-            (setq-local ada-ts-mode--case-formatting rules))
-        (setq-default ada-ts-mode--case-formatting rules)))))
+            (setq-local ada-ts-case--formatting rules))
+        (setq-default ada-ts-case--formatting rules)))))
 
-(ada-ts-mode--case-settings-process
+(ada-ts-case--settings-process
  'ada-ts-mode-case-formatting
  (default-value 'ada-ts-mode-case-formatting)
  'set nil)
 
 (add-variable-watcher
  'ada-ts-mode-case-formatting
- #'ada-ts-mode--case-settings-process)
+ #'ada-ts-case--settings-process)
 
-(defun ada-ts-mode--case-format-word (beg end formatter &optional dictionary)
+(defun ada-ts-case--format-word (beg end formatter &optional dictionary)
   "Apply case formatting to word bounded by BEG and END using FORMATTER.
 
   When words or subwords are found in the DICTIONARY, the formatting in
@@ -276,9 +277,9 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
       (when-let* ((entry
                    (seq-find
                     (lambda (entry)
-                      (ada-ts-mode-case-category-p (car entry) node))
-                    ada-ts-mode--case-formatting)))
-        (ada-ts-mode--case-format-word
+                      (ada-ts-case-category-p (car entry) node))
+                    ada-ts-case--formatting)))
+        (ada-ts-case--format-word
          node-start
          node-end
          (plist-get (cdr entry) :formatter)
@@ -316,7 +317,7 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
 
 ;;; Case Category Predicates
 
-(cl-defgeneric ada-ts-mode-case-category-p
+(cl-defgeneric ada-ts-case-category-p
     (category _node &optional _last-input _pos)
   "Return non-nil if NODE is a member of CATEGORY.
 
@@ -325,17 +326,13 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   inserted."
   (error "Unknown case category: %s" category))
 
-(defvar ada-ts-mode--casing-keyword-keywords-regex nil)
-(defvar ada-ts-mode--casing-identifier-keywords-regex
+(defconst ada-ts-case--keyword-keywords-regex
+  (rx-to-string `(: bos (or ,@ada-ts-mode--keywords) eos)))
+
+(defconst ada-ts-case--identifier-keywords-regex
   (rx bos (or "all") eos))
 
-(with-eval-after-load 'ada-ts-mode
-  (defvar ada-ts-mode--keywords nil)
-
-  (setq ada-ts-mode--casing-keyword-keywords-regex
-        (rx-to-string `(: bos (or ,@ada-ts-mode--keywords) eos))))
-
-(defun ada-ts-mode--casing-prev-node (node)
+(defun ada-ts-case--prev-node (node)
   "Find previous non-comment NODE, or nil if there isn't one."
   (let* ((prev node)
          (prev-type (treesit-node-type prev)))
@@ -351,7 +348,7 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
                 prev-type (treesit-node-type prev)))))
     prev))
 
-(cl-defmethod ada-ts-mode-case-category-p
+(cl-defmethod ada-ts-case-category-p
   ((_category (eql 'identifier)) node &optional last-input pos)
   "Return non-nil if NODE is a member of the \\='identifier\\=' CATEGORY.
 
@@ -360,13 +357,13 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   inserted."
   (when-let* ((type (treesit-node-type node)))
     (if (null last-input)
-        (or (and (string-match-p ada-ts-mode--casing-keyword-keywords-regex type)
+        (or (and (string-match-p ada-ts-case--keyword-keywords-regex type)
                  ;; An attribute name (e.g., "'Access").
-                 (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+                 (when-let* ((prev (ada-ts-case--prev-node node)))
                    (string-equal (treesit-node-type prev) "tick")))
             (and (string-equal type "identifier")
                  (not (string-match-p
-                       ada-ts-mode--casing-identifier-keywords-regex
+                       ada-ts-case--identifier-keywords-regex
                        (downcase (treesit-node-text node 'no-property))))))
       (let ((text (downcase
                    (buffer-substring-no-properties
@@ -377,30 +374,30 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
          (and (string-equal type "identifier")
               (or (eq last-input ?_)
                   (and (not (string-match-p
-                             ada-ts-mode--casing-identifier-keywords-regex
+                             ada-ts-case--identifier-keywords-regex
                              text))
                        (or (eq last-input ?')
                            ;; Check if by inserting the separator, we
                            ;; will be creating a keyword.
                            (not (string-match-p
-                                 ada-ts-mode--casing-keyword-keywords-regex
+                                 ada-ts-case--keyword-keywords-regex
                                  text))
                            ;; Looks like a keyword, but check if it's
                            ;; actually an attribute name with the same
                            ;; name as a keyword (e.g., "Access").
-                           (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+                           (when-let* ((prev (ada-ts-case--prev-node node)))
                              (string-equal (treesit-node-type prev) "tick"))))))
          ;; Keyword becoming an identifier
-         (and (string-match-p ada-ts-mode--casing-keyword-keywords-regex type)
+         (and (string-match-p ada-ts-case--keyword-keywords-regex type)
               (or (eq last-input ?_)
                   (eq last-input ?')
                   ;; Looks like a keyword, but check if it's actually
                   ;; an attribute name with the same name as a keyword
                   ;; (e.g., "Access").
-                  (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+                  (when-let* ((prev (ada-ts-case--prev-node node)))
                     (string-equal (treesit-node-type prev) "tick")))))))))
 
-(cl-defmethod ada-ts-mode-case-category-p
+(cl-defmethod ada-ts-case-category-p
   ((_category (eql 'keyword)) node &optional last-input pos)
   "Return non-nil if NODE is a member of the \\='keyword\\=' CATEGORY.
 
@@ -409,14 +406,14 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   inserted."
   (when-let* ((type (treesit-node-type node)))
     (if (null last-input)
-        (or (and (string-match-p ada-ts-mode--casing-keyword-keywords-regex type)
+        (or (and (string-match-p ada-ts-case--keyword-keywords-regex type)
                  ;; Not an attribute name (e.g., "'Access").
                  (not
-                  (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+                  (when-let* ((prev (ada-ts-case--prev-node node)))
                     (string-equal (treesit-node-type prev) "tick"))))
             (and (string-equal type "identifier")
                  (string-match-p
-                  ada-ts-mode--casing-identifier-keywords-regex
+                  ada-ts-case--identifier-keywords-regex
                   (downcase (treesit-node-text node 'no-property)))))
       (let ((text (downcase
                    (buffer-substring-no-properties
@@ -424,17 +421,17 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
                     (min pos (treesit-node-end node))))))
         (or
          ;; Keyword staying a keyword
-         (and (string-match-p ada-ts-mode--casing-keyword-keywords-regex type)
+         (and (string-match-p ada-ts-case--keyword-keywords-regex type)
               ;; Not an attribute name (e.g., "'Access").
               (not
-               (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+               (when-let* ((prev (ada-ts-case--prev-node node)))
                  (string-equal (treesit-node-type prev) "tick")))
               (not (eq last-input ?_))
               (not (eq last-input ?')))
          ;; Identifier-Keyword staying a keyword
          (and (string-equal type "identifier")
               (not (eq last-input ?_))
-              (string-match-p ada-ts-mode--casing-identifier-keywords-regex text))
+              (string-match-p ada-ts-case--identifier-keywords-regex text))
          ;; Identifier becoming a keyword
          (and (string-equal type "identifier")
               (not (eq last-input ?_))
@@ -442,18 +439,18 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
               ;; Check if by inserting the separator, a keyword will
               ;; be created.
               (string-match-p
-               ada-ts-mode--casing-keyword-keywords-regex
+               ada-ts-case--keyword-keywords-regex
                text)
               ;; Looks like a keyword, but check if it's actually an
               ;; attribute name with the same name as a keyword (e.g.,
               ;; "Access").
               (not
-               (when-let* ((prev (ada-ts-mode--casing-prev-node node)))
+               (when-let* ((prev (ada-ts-case--prev-node node)))
                  (string-equal (treesit-node-type prev) "tick")))))))))
 
 ;;; Auto-Case Minor Mode
 
-(defun ada-ts-mode--case-format-word-try (_)
+(defun ada-ts-case--format-word-try (_)
   "Attempt to apply case formatting to word before point.
 
 This function returns nil to allow the underlying command associated
@@ -476,14 +473,14 @@ from tiggering case formatting."
                 (entry
                  (seq-find
                   (lambda (entry)
-                    (ada-ts-mode-case-category-p (car entry) node last-input (point)))
-                  ada-ts-mode--case-formatting)))
+                    (ada-ts-case-category-p (car entry) node last-input (point)))
+                  ada-ts-case--formatting)))
       ;; Point might be in the middle of a word and therefore about to
       ;; separate it into two words by the yet-to-be-inserted
       ;; key-press.  Only apply formatting before point.  The category
       ;; predicate already took this into consideration when
       ;; determining the category.
-      (ada-ts-mode--case-format-word
+      (ada-ts-case--format-word
        (treesit-node-start node)
        (min (point) (treesit-node-end node))
        (plist-get (cdr entry) :formatter)
@@ -497,7 +494,7 @@ from tiggering case formatting."
                    "'" "\"" "<" "," "." ">" "/"))
       (define-key map (kbd key)
                   `(menu-item "" ignore
-                              :filter ada-ts-mode--case-format-word-try)))
+                              :filter ada-ts-case--format-word-try)))
     map))
 
 (define-minor-mode ada-ts-auto-case-mode
@@ -506,6 +503,6 @@ from tiggering case formatting."
   :lighter " Ada/c"
   :interactive (ada-ts-mode))
 
-(provide 'ada-ts-casing)
+(provide 'ada-ts-case)
 
-;;; ada-ts-casing.el ends here
+;;; ada-ts-case.el ends here

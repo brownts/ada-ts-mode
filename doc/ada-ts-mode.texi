@@ -567,7 +567,7 @@ additional category is desired@comma{} a custom category can be created and
 used.  In order to create a category@comma{} a new category symbol should be
 added to @samp{ada-ts-mode-case-formatting} along with the corresponding
 formatter and optional dictionary properties.  Additionally@comma{} an
-implementation of @samp{ada-ts-mode-case-category-p} should be created@comma{}
+implementation of @samp{ada-ts-case-category-p} should be created@comma{}
 specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.

@@ -444,7 +444,7 @@ additional category is desired, a custom category can be created and
 used.  In order to create a category, a new category symbol should be
 added to =ada-ts-mode-case-formatting= along with the corresponding
 formatter and optional dictionary properties.  Additionally, an
-implementation of =ada-ts-mode-case-category-p= should be created,
+implementation of =ada-ts-case-category-p= should be created,
 specializing on the new category symbol name.  Refer to existing
 instances of this predicate function to understand how current
 category functions are implemented.

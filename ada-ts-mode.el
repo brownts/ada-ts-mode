@@ -35,7 +35,7 @@
 ;;; Code:
 
 (require 'ada-ts-als)
-(require 'ada-ts-casing)
+(require 'ada-ts-case)
 (require 'ada-ts-common)
 (require 'ada-ts-imenu)
 (require 'ada-ts-indentation)
