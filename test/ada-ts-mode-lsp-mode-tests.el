@@ -94,27 +94,28 @@
   "Test ALS command 'als-other-file'."
   (skip-unless (and (executable-find "ada_language_server")
                     (featurep 'lsp-mode)))
-  (with-file-in-project
-      "hello_world.adb"
-      (ert-resource-file "hello_world")
-      "hello_world.gpr"
-    (should (string-equal (buffer-file-name (window-buffer (selected-window)))
-                          (buffer-file-name (current-buffer))))
-    (with-language-server lsp-mode
-      (ada-ts-lspclient-command-execute
-       client "als-other-file"
-       (ada-ts-lspclient-document-id client))
-      ;; Wait for window/showDocument
-      (with-timeout (5)
-        (while (string-equal (buffer-file-name (window-buffer (selected-window)))
-                             (buffer-file-name (current-buffer)))
-          (sleep-for 0.01)))
-      (let* ((buffer (window-buffer (selected-window)))
-             (buffer-name (buffer-file-name buffer))
-             (filename-adb (buffer-file-name (current-buffer)))
-             (filename-ads (concat (file-name-sans-extension filename-adb) ".ads")))
-        (should (string-equal buffer-name filename-ads))
-        (kill-buffer buffer)))))
+  (let* ((proj-dir (ert-resource-file "hello_world"))
+         (root-marker "hello_world.gpr")
+         (initial-file "hello_world.adb")
+         (initial-path (expand-file-name initial-file proj-dir))
+         (final-file "hello_world.ads")
+         (final-path (expand-file-name final-file proj-dir)))
+    (with-file-in-project initial-file proj-dir root-marker
+      (should (file-equal-p (buffer-file-name (window-buffer (selected-window))) initial-path))
+      (with-language-server lsp-mode
+        (cl-letf (((symbol-function 'ff-find-other-file)
+                   (lambda (&rest _)
+                     (ert-fail "Expected use of LSP command als-other-file, not ff-find-other-file")))
+                  (inhibit-message t))
+          (ert-simulate-command '(ada-ts-mode-find-other-file)))
+        ;; Wait for window/showDocument
+        (with-timeout (5)
+          (while (file-equal-p (buffer-file-name (window-buffer (selected-window))) initial-path)
+            (sleep-for 0.01)))
+        (let* ((buffer (window-buffer (selected-window)))
+               (buffer-name (buffer-file-name buffer)))
+          (should (file-equal-p buffer-name final-path))
+          (kill-buffer buffer))))))
 
 (ert-deftest ada-ts-mode-test-lsp-mode-als-project-file ()
   "Test ALS command 'als-project-file'."

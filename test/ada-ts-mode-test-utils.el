@@ -63,6 +63,8 @@
   "Check buffer indentation is as expected."
   (let ((buffer (buffer-string))
         (point (point)))
+    (when buffer-read-only
+      (read-only-mode -1))
     (ada-ts-mode-tests--modify-and-reindent)
     (should (string-equal buffer (buffer-string)))
     (goto-char point)))
@@ -71,6 +73,8 @@
   "Check line indentation is as expected."
   (let ((buffer (buffer-string))
         (point (point)))
+    (when buffer-read-only
+      (read-only-mode -1))
     (ada-ts-mode-tests--modify-and-reindent-by-line)
     (should (string-equal buffer (buffer-string)))
     (goto-char point)))
