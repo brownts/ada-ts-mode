@@ -301,7 +301,8 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
 (defun ada-ts-mode-case-format-buffer ()
   "Apply case formatting to entire buffer."
   (interactive nil ada-ts-mode)
-  (ada-ts-mode-case-format-region (point-min) (point-max)))
+  (without-restriction
+    (ada-ts-mode-case-format-region (point-min) (point-max))))
 
 (defun ada-ts-mode-case-format-at-point ()
   "Apply case formatting at point."

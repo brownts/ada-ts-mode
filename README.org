@@ -432,7 +432,9 @@ type.
 - Command: ada-ts-mode-case-format-buffer ::
   Applies formatting to the entire buffer for all items in the buffer
   which match the case formatting categories specified in
-  =ada-ts-mode-case-formatting=.
+  =ada-ts-mode-case-formatting=.  If the buffer is narrowed, the
+  restriction will be lifted during the command so the entire buffer
+  is formatted, as opposed to only the narrowed region.
 
 - Command: ada-ts-mode-case-format-dwim ::
   A convenience command which will select between "region" and "at

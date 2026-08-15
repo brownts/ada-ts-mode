@@ -553,7 +553,9 @@ When no category is matched@comma{} no formatting is applied.
 @deffn Command ada-ts-mode-case-format-buffer
 Applies formatting to the entire buffer for all items in the buffer
 which match the case formatting categories specified in
-@samp{ada-ts-mode-case-formatting}.
+@samp{ada-ts-mode-case-formatting}.  If the buffer is narrowed@comma{} the
+restriction will be lifted during the command so the entire buffer
+is formatted@comma{} as opposed to only the narrowed region.
 @end deffn
 
 @deffn Command ada-ts-mode-case-format-dwim

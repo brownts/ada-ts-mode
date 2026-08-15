@@ -1,6 +1,8 @@
-Code: (lambda () (default-transform) (ada-ts-mode-case-format-buffer))
+Code: (lambda ()
+        (default-transform)
+        (ada-ts-mode-case-format-buffer))
 
-Name: Buffer Formatting
+Name: Buffer Formatting (Without Restriction)
 
 =-=
 WITH ada.text_io;
@@ -17,6 +19,36 @@ begin
    Ada.Text_IO.Put_Line ("Hello, world!");
 end Hello_World;
 =-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (narrow-to-defun)
+        (ada-ts-mode-case-format-buffer)
+        (widen))
+
+Point-Char: |
+
+Name: Buffer Formatting (With Restriction)
+
+=-=
+WITH ada.text_io;
+
+PROCEDURE hello_world IS|
+BEGIN
+   ada.text_io.put_line ("Hello, world!");
+END hello_world;
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is|
+begin
+   Ada.Text_IO.Put_Line ("Hello, world!");
+end Hello_World;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (ada-ts-mode-case-format-buffer))
 
 Name: Keyword Attribute Formatting
 
