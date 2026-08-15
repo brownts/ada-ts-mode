@@ -48,6 +48,53 @@ end Hello_World;
 
 Code: (lambda ()
         (default-transform)
+        (setq-local ada-ts-mode-case-formatting
+                    '((identifier :formatter capitalize :dictionary (:words ("hElLo" "WOrLD")))
+                      (keyword :formatter downcase)))
+        (ada-ts-mode-case-format-buffer))
+
+Point-Char: |
+
+Name: Buffer Formatting (dictionary word list)
+
+=-=
+PROCEDURE HELLO_WORLD IS|
+BEGIN
+   NULL;
+END HELLO_WORLD;
+=-=
+procedure hElLo_WOrLD is|
+begin
+   null;
+end hElLo_WOrLD;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (with-dictionary-file '("hElLo" "WOrLD")
+          (setq-local ada-ts-mode-case-formatting
+                      `((identifier :formatter capitalize :dictionary (:files (,dict-file-name)))
+                        (keyword :formatter downcase))))
+        (ada-ts-mode-case-format-buffer))
+
+Point-Char: |
+
+Name: Buffer Formatting (dictionary file)
+
+=-=
+PROCEDURE HELLO_WORLD IS|
+BEGIN
+   NULL;
+END HELLO_WORLD;
+=-=
+procedure hElLo_WOrLD is|
+begin
+   null;
+end hElLo_WOrLD;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
         (ada-ts-mode-case-format-buffer))
 
 Name: Keyword Attribute Formatting

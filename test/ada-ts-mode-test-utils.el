@@ -161,6 +161,20 @@ EXTRA-ROOT-MARKERS are used to anchor the project."
              ,@body)
          (kill-buffer buffer)))))
 
+(defmacro with-dictionary-file (words &rest body)
+  "Create a dictionary file with WORDS and execute forms in BODY.
+
+WORDS should be a string or a list of strings.  Dictionary filename is
+available in BODY as \\='dict-file-name\\='."
+  (declare (indent 1) (debug t))
+  `(let ((dict-file-name
+          (make-temp-file "test-auto-case-dict-"
+                          nil ".txt"
+                          (string-join (ensure-list ,words) "\n"))))
+     (unwind-protect
+         (progn ,@body)
+       (delete-file dict-file-name))))
+
 (provide 'ada-ts-mode-test-utils)
 
 ;;; ada-ts-mode-test-utils.el ends here

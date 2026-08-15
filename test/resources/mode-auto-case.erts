@@ -95,3 +95,40 @@ procedure Hello_World is
 procedure Hello_World is
    Begin_|
 =-=-=
+
+Name: Auto Case (dictionary word list)
+
+Code: (lambda ()
+        (default-transform)
+        (setq-local ada-ts-mode-case-formatting
+                    '((identifier :formatter capitalize :dictionary (:words ("hElLo" "WOrLD")))
+                      (keyword :formatter downcase)))
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "_"))
+
+Point-Char: |
+
+=-=
+procedure Hello|
+=-=
+procedure hElLo_|
+=-=-=
+
+Name: Auto Case (dictionary file)
+
+Code: (lambda ()
+        (default-transform)
+        (with-dictionary-file '("hElLo" "WOrLD")
+          (setq-local ada-ts-mode-case-formatting
+                      `((identifier :formatter capitalize :dictionary (:files (,dict-file-name)))
+                        (keyword :formatter downcase))))
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "_"))
+
+Point-Char: |
+
+=-=
+procedure Hello|
+=-=
+procedure hElLo_|
+=-=-=
