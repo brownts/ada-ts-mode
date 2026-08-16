@@ -46,9 +46,7 @@
 (require 'treesit)
 (eval-when-compile (require 'rx))
 
-(declare-function treesit-parser-create "treesit.c")
-(declare-function treesit-node-child-by-field-name "treesit.c")
-(declare-function treesit-node-type "treesit.c")
+(ada-ts-mode--declare-treesit-functions)
 
 ;;;; Customization
 

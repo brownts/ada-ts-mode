@@ -62,6 +62,36 @@
 
 ;;;; Support Macros
 
+(defmacro ada-ts-mode--declare-treesit-functions ()
+  "Declare C functions defined in treesit.c.
+
+This macro is only needed when a file needs to be able to byte-compile
+in an Emacs not built with tree-sitter library."
+  (if (fboundp 'treesit-declare-unavailable-functions)
+      (treesit-declare-unavailable-functions)
+    '(progn
+       (declare-function treesit-compiled-query-p "treesit.c")
+       (declare-function treesit-induce-sparse-tree "treesit.c")
+       (declare-function treesit-language-available-p "treesit.c")
+       (declare-function treesit-parser-create "treesit.c")
+       (declare-function treesit-node-check "treesit.c")
+       (declare-function treesit-node-child "treesit.c")
+       (declare-function treesit-node-child-by-field-name "treesit.c")
+       (declare-function treesit-node-child-count "treesit.c")
+       (declare-function treesit-node-end "treesit.c")
+       (declare-function treesit-node-eq "treesit.c")
+       (declare-function treesit-node-next-sibling "treesit.c")
+       (declare-function treesit-node-p "treesit.c")
+       (declare-function treesit-node-parent "treesit.c")
+       (declare-function treesit-node-prev-sibling "treesit.c")
+       (declare-function treesit-node-start "treesit.c")
+       (declare-function treesit-node-type "treesit.c")
+       (declare-function treesit-query-compile "treesit.c")
+       (declare-function treesit-query-expand "treesit.c")
+       (declare-function treesit-search-subtree "treesit.c"))))
+
+(ada-ts-mode--declare-treesit-functions)
+
 ;;;; Node Predicates
 
 (defun ada-ts-mode--package-p (node)

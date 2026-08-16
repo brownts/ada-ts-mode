@@ -24,6 +24,8 @@
 (require 'ada-ts-common)
 (require 'treesit)
 
+(ada-ts-mode--declare-treesit-functions)
+
 ;;;; Customization
 
 (defcustom ada-ts-mode-imenu-categories

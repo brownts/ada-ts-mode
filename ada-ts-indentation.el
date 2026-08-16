@@ -27,20 +27,9 @@
 (require 'treesit)
 (eval-when-compile (require 'rx))
 
-(declare-function treesit-compiled-query-p         "treesit.c" (object))
-(declare-function treesit-node-check               "treesit.c" (node property))
-(declare-function treesit-node-child               "treesit.c" (node n &optional named))
-(declare-function treesit-node-child-by-field-name "treesit.c" (node field-name))
-(declare-function treesit-node-end                 "treesit.c" (node))
-(declare-function treesit-node-eq                  "treesit.c" (node1 node2))
-(declare-function treesit-node-next-sibling        "treesit.c" (node &optional named))
-(declare-function treesit-node-p                   "treesit.c" (object))
-(declare-function treesit-node-parent              "treesit.c" (node))
-(declare-function treesit-node-start               "treesit.c" (node))
-(declare-function treesit-node-type                "treesit.c" (node))
-(declare-function treesit-query-expand             "treesit.c" (query))
-(declare-function treesit-query-compile            "treesit.c" (language query &optional eager))
-(declare-function treesit-search-subtree           "treesit.c" (node predicate &optional backward all depth))
+(ada-ts-mode--declare-treesit-functions)
+
+;;;; Customization
 
 (defcustom ada-ts-mode-indent-backend 'tree-sitter
   "Backend used for indentation."

@@ -26,10 +26,9 @@
 (require 'rx)
 (require 'treesit)
 
-(declare-function treesit-node-end   "treesit.c" (node))
-(declare-function treesit-node-eq    "treesit.c" (node1 node2))
-(declare-function treesit-node-start "treesit.c" (node))
-(declare-function treesit-node-type  "treesit.c" (node))
+(ada-ts-mode--declare-treesit-functions)
+
+;;;; Customization
 
 (defcustom ada-ts-mode-case-formatting
   '((identifier :formatter upcase-initials
