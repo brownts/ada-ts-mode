@@ -435,7 +435,7 @@ the string property to those instances."
    ;; Operators
    :language 'ada
    :feature 'operator
-   :override 'prepend
+   :override 'append
    `((expression ["and" "else" "or" "then", "xor"] @font-lock-operator-face)
      (factor_power "**" @font-lock-operator-face)
      (factor_abs "abs" @font-lock-operator-face)
