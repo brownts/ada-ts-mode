@@ -1,0 +1,85 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(84 88 189 192) (funcall show-paren-data-function))))
+
+Name: variant_part (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point (D3 : Boolean) is
+   record
+      X : Integer;
+      Y : Integer;
+      |case D3 is
+         when True =>
+            Z : Integer;
+         when False =>
+            null;
+      end case;
+   end record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(189 192 84 88) (funcall show-paren-data-function))))
+
+Name: variant_part (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point (D3 : Boolean) is
+   record
+      X : Integer;
+      Y : Integer;
+      case D3 is
+         when True =>
+            Z : Integer;
+         when False =>
+            null;
+      end| case;
+   end record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(84 88 189 192) (funcall show-paren-data-function))))
+
+Name: partial variant_part (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point (D3 : Boolean) is
+   record
+      X : Integer;
+      Y : Integer;
+      |case D3 is
+         when True =>
+            Z : Integer;
+         when False =>
+            null;
+      end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(189 192 84 88) (funcall show-paren-data-function))))
+
+Name: partial variant_part (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point (D3 : Boolean) is
+   record
+      X : Integer;
+      Y : Integer;
+      case D3 is
+         when True =>
+            Z : Integer;
+         when False =>
+            null;
+      end|
+=-=-=

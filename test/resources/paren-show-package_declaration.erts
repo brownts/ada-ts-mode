@@ -1,0 +1,129 @@
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(1 8 17 20) (funcall show-paren-data-function))))
+
+Name: package_declaration 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+|package Test is
+end Test;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(17 20 1 8) (funcall show-paren-data-function))))
+
+Name: package_declaration 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+package Test is
+end| Test;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(1 8 21 24) (funcall show-paren-data-function))))
+
+Name: package_declaration 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+|package Test.ABC is
+end Test.ABC;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(21 24 1 8) (funcall show-paren-data-function))))
+
+Name: package_declaration 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+package Test.ABC is
+end| Test.ABC;
+=-=-=
+
+Code: (lambda ()
+     (default-transform 'dont-care)
+     (should (equal '(1 8 17 20) (funcall show-paren-data-function))))
+
+Name: partial package_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|package Test is
+end
+=-=-=
+
+Code: (lambda ()
+     (default-transform 'dont-care)
+     (should (equal '(17 20 1 8) (funcall show-paren-data-function))))
+
+Name: partial package_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+package Test is
+end|
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(1 8 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: package_declaration 1 (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|package Test is
+end Test2;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(17 20 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: package_declaration 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+package Test is
+end| Test2;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(1 8 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: package_declaration 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+|package Test.ABC is
+end Test.ABC2;
+=-=-=
+
+Code: (lambda ()
+     (default-transform)
+     (should (equal '(21 24 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: package_declaration 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+package Test.ABC is
+end| Test.ABC2;
+=-=-=

@@ -1,0 +1,179 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 34 37) (funcall show-paren-data-function))))
+
+Name: procedure subprogram_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|procedure Test is
+begin
+   null;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 37 1 10) (funcall show-paren-data-function))))
+
+Name: procedure subprogram_body (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   null;
+end| Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 10 34 37) (funcall show-paren-data-function))))
+
+Name: partial procedure subprogram_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|procedure Test is
+begin
+   null;
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(34 37 1 10) (funcall show-paren-data-function))))
+
+Name: partial procedure subprogram_body (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   null;
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: procedure subprogram_body (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|procedure Test is
+begin
+   null;
+end Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 37 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: procedure subprogram_body (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   null;
+end| Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 9 48 51) (funcall show-paren-data-function))))
+
+Name: function subprogram_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|function Test return Integer is
+begin
+   null;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(48 51 1 9) (funcall show-paren-data-function))))
+
+Name: function subprogram_body (match @ closer)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   null;
+end| Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 9 48 51) (funcall show-paren-data-function))))
+
+Name: partial function subprogram_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|function Test return Integer is
+begin
+   null;
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(48 51 1 9) (funcall show-paren-data-function))))
+
+Name: partial function subprogram_body (match @ closer)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   null;
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 9 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: function subprogram_body (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|function Test return Integer is
+begin
+   null;
+end Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(48 51 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: procedure subprogram_body (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   null;
+end| Test2;
+=-=-=

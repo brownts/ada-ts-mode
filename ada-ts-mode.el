@@ -40,6 +40,7 @@
 (require 'ada-ts-imenu)
 (require 'ada-ts-indentation)
 (require 'ada-ts-lspclient)
+(require 'ada-ts-paren)
 (require 'find-file)
 (require 'lisp-mnt)
 (require 'project)
@@ -850,10 +851,14 @@ other window, else find the file in the current window."
   ;; Other File.
   (setq-local ff-other-file-alist 'ada-ts-mode-other-file-alist)
 
+  ;; Parenthesis.
+  (ada-ts-paren--setup)
+
   ;; LSP Client.
   (run-hooks 'ada-ts-lspclient-setup-hook)
 
   (treesit-major-mode-setup)
+  (run-hooks 'ada-ts-mode--after-setup-hook)
 
   ;; Override `treesit-major-mode-setup' settings.
   (setq-local indent-region-function #'ada-ts-mode--indent-region)

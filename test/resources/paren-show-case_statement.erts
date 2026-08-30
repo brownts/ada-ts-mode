@@ -1,0 +1,89 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(28 32 77 80) (ada-ts-paren--show-paren-data))))
+
+Name: case_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |case X is
+      when others =>
+         null;
+   end case;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(77 80 28 32) (ada-ts-paren--show-paren-data))))
+
+Name: case_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   case X is
+      when others =>
+         null;
+   end| case;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 32 77 80) (ada-ts-paren--show-paren-data))))
+
+Name: partial case_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |case X is
+      when others =>
+         null;
+   end
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(77 80 28 32) (ada-ts-paren--show-paren-data))))
+
+Name: partial case_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   case X is
+      when others =>
+         null;
+   end|
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (ada-ts-paren--show-paren-data))))
+
+Name: case_statement after 'end'
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   case X is
+      when others =>
+         null;
+   end |case;
+end Test;
+=-=-=

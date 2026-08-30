@@ -1,0 +1,101 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 34 37) (funcall show-paren-data-function))))
+
+Name: task_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|task body Test is
+begin
+   null;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 37 1 5) (funcall show-paren-data-function))))
+
+Name: task_body (match @ closer)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   null;
+end| Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 5 34 37) (funcall show-paren-data-function))))
+
+Name: partial task_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|task body Test is
+begin
+   null;
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(34 37 1 5) (funcall show-paren-data-function))))
+
+Name: partial task_body (match @ closer)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   null;
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: task_body (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|task body Test is
+begin
+   null;
+end Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 37 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: task_body (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   null;
+end| Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: task_body_stub
+
+Point-Char: |
+
+=-=
+|task body Test is separate;
+=-=-=

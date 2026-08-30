@@ -1,0 +1,127 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 66 69) (funcall show-paren-data-function))))
+
+Name: record_type_definition 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point is
+   |record
+      X : Integer;
+      Y : Integer;
+   end record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(66 69 18 24) (funcall show-paren-data-function))))
+
+Name: record_type_definition 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point is
+   record
+      X : Integer;
+      Y : Integer;
+   end| record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 66 69) (funcall show-paren-data-function))))
+
+Name: record_type_definition 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point is
+   |record
+      X : Integer;
+      Y : Integer;
+   end record Point;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(66 69 18 24) (funcall show-paren-data-function))))
+
+Name: record_type_definition 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point is
+   record
+      X : Integer;
+      Y : Integer;
+   end| record Point;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(18 24 66 69) (funcall show-paren-data-function))))
+
+Name: partial record_type_definition (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point is
+   |record
+      X : Integer;
+      Y : Integer;
+   end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(66 69 18 24) (funcall show-paren-data-function))))
+
+Name: partial record_type_definition (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point is
+   record
+      X : Integer;
+      Y : Integer;
+   end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_type_definition (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+type Point is
+   |record
+      X : Integer;
+      Y : Integer;
+   end record Point2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(66 69 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_type_definition (mismismatch @ closer)
+
+Point-Char: |
+
+=-=
+type Point is
+   record
+      X : Integer;
+      Y : Integer;
+   end| record Point2;
+=-=-=

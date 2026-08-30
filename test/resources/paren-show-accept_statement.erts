@@ -1,0 +1,114 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(27 33 57 60) (funcall show-paren-data-function))))
+
+Name: accept_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   |accept Test do
+      null;
+   end Test;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(57 60 27 33) (funcall show-paren-data-function))))
+
+Name: accept_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   accept Test do
+      null;
+   end| Test;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(27 33 57 60) (funcall show-paren-data-function))))
+
+Name: partial accept_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   |accept Test do
+      null;
+   end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(57 60 27 33) (funcall show-paren-data-function))))
+
+Name: partial accept_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   accept Test do
+      null;
+   end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(27 33 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: accept_statement (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   |accept Test do
+      null;
+   end Test2;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(57 60 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: accept_statement (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   accept Test do
+      null;
+   end| Test2;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: accept_statement without sequence of statements
+
+Point-Char: |
+
+=-=
+task body XYZ is
+begin
+   |accept Test;
+end XYZ;
+=-=-=

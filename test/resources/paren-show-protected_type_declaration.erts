@@ -1,0 +1,77 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 24 27) (funcall show-paren-data-function))))
+
+Name: protected_type_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected type Test is
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 1 10) (funcall show-paren-data-function))))
+
+Name: protected_type_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+protected type Test is
+end| Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 10 24 27) (funcall show-paren-data-function))))
+
+Name: partial protected_type_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected type Test is
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(24 27 1 10) (funcall show-paren-data-function))))
+
+Name: partial protected_type_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+protected type Test is
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: protected_type_declaration (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|protected type Test is
+end Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: protected_type_declaration (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+protected type Test is
+end| Test2;
+=-=-=

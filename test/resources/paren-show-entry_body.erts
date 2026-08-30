@@ -1,0 +1,113 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(26 31 75 78) (funcall show-paren-data-function))))
+
+Name: entry_body (match @ opener)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   |entry Test when X > Y is
+   begin
+      null;
+   end Test;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(75 78 26 31) (funcall show-paren-data-function))))
+
+Name: entry_body (match @ closer)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   entry Test when X > Y is
+   begin
+      null;
+   end| Test;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(26 31 75 78) (funcall show-paren-data-function))))
+
+Name: partial entry_body (match @ opener)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   |entry Test when X > Y is
+   begin
+      null;
+   end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(75 78 26 31) (funcall show-paren-data-function))))
+
+Name: partial entry_body (match @ closer)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   entry Test when X > Y is
+   begin
+      null;
+   end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(26 31 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: entry_body (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   |entry Test when X > Y is
+   begin
+      null;
+   end Test2;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(75 78 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: entry_body (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+protected body XYZ is
+   entry Test when X > Y is
+   begin
+      null;
+   end| Test2;
+end XYZ;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: entry_declaration
+
+Point-Char: |
+
+=-=
+protected XYZ is
+   |entry Test;
+end XYZ;
+=-=-=

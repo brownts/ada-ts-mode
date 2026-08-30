@@ -1,0 +1,299 @@
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 33 49 52) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |begin
+      null;
+   end;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(49 52 28 33) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   end|;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 49 71 74) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |begin
+         null;
+      end;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(71 74 44 49) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      begin
+         null;
+      end|;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 49 71 74) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |begin
+         null;
+      end MY_LABEL;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(71 74 44 49) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      begin
+         null;
+      end| MY_LABEL;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 49 nil nil mismatch) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |begin
+         null;
+      end MY_LABEL2;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(71 74 nil nil mismatch) (ada-ts-paren--show-paren-data))))
+
+Name: block_statement with label (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      begin
+         null;
+      end| MY_LABEL2;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 35 79 82) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |declare
+      X : Integer;
+   begin
+      null;
+   end;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(79 82 28 35) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   end|;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 51 107 110) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |declare
+         X : Integer;
+      begin
+         null;
+      end;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(107 110 44 51) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      end|;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 51 107 110) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |declare
+         X : Integer;
+      begin
+         null;
+      end MY_LABEL;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(107 110 44 51) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      end| MY_LABEL;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(44 51 nil nil mismatch) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      |declare
+         X : Integer;
+      begin
+         null;
+      end MY_LABEL2;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(107 110 nil nil mismatch) (ada-ts-paren--show-paren-data))))
+
+Name: declare block_statement with label (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   MY_LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      end| MY_LABEL2;
+end Test;
+=-=-=

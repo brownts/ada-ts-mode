@@ -1,0 +1,119 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 40 63 66) (funcall show-paren-data-function))))
+
+Name: record_extension_part 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   |record
+      Z : Integer;
+   end record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(63 66 34 40) (funcall show-paren-data-function))))
+
+Name: record_extension_part 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   record
+      Z : Integer;
+   end| record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 40 63 66) (funcall show-paren-data-function))))
+
+Name: record_extension_part 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   |record
+      Z : Integer;
+   end record Point3;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(63 66 34 40) (funcall show-paren-data-function))))
+
+Name: record_extension_part 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   record
+      Z : Integer;
+   end| record Point3;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(34 40 63 66) (funcall show-paren-data-function))))
+
+Name: partial record_extension_part (match @ opener)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   |record
+      Z : Integer;
+   end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(63 66 34 40) (funcall show-paren-data-function))))
+
+Name: partial record_extension_part (match @ closer)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   record
+      Z : Integer;
+   end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(34 40 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_extension_part (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   |record
+      Z : Integer;
+   end record Point4;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(63 66 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_extension_part (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+type Point3 is new Point with
+   record
+      Z : Integer;
+   end| record Point4;
+=-=-=

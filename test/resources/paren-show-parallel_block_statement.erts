@@ -1,0 +1,75 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(28 36 74 77) (ada-ts-paren--show-paren-data))))
+
+Name: parallel_block_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |parallel do
+      null;
+   and
+      null;
+   end do;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(74 77 28 36) (ada-ts-paren--show-paren-data))))
+
+Name: parallel_block_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+   end| do;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 36 74 77) (ada-ts-paren--show-paren-data))))
+
+Name: partial parallel_block_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |parallel do
+      null;
+   and
+      null;
+   end
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(74 77 28 36) (ada-ts-paren--show-paren-data))))
+
+Name: partial parallel_block_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+   end|
+end Test;
+=-=-=

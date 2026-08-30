@@ -762,68 +762,6 @@ otherwise rebuild rules with compiled queries for performance."
 
 ;;; Best-Effort Indentation
 
-(defun ada-ts-mode--prev-node (start &optional include-comments)
-  "Find node before START, and possibly INCLUDE-COMMENTS.
-
-START is either a node or a position."
-  (let* ((prev-node-s
-          (if (treesit-node-p start)
-              (treesit-node-start start)
-            start))
-         (first-pass t)
-         prev-node prev-node-e prev-node-t)
-    (save-excursion
-      (while (or first-pass
-                 (and prev-node-t
-                      (not include-comments)
-                      (string-equal prev-node-t "comment")))
-        (setq first-pass nil)
-        (goto-char prev-node-s)
-        (skip-chars-backward " \t\n" (point-min))
-        (setq prev-node (if (bobp) nil (treesit-node-at (1- (point))))
-              prev-node-e (treesit-node-end prev-node))
-        (setq prev-node
-              (treesit-parent-while
-               prev-node
-               (lambda (node)
-                 (and
-                  (not (string-equal (treesit-node-type node) "ERROR"))
-                  (= (treesit-node-end node) prev-node-e))))
-              prev-node-t (treesit-node-type prev-node)
-              prev-node-s (treesit-node-start prev-node))))
-    prev-node))
-
-(defun ada-ts-mode--next-node (start &optional include-comments)
-  "Find node after START, and possibly INCLUDE-COMMENTS.
-
-START is either a node or a position."
-  (let* ((next-node-e
-          (if (treesit-node-p start)
-              (treesit-node-end start)
-            (1+ start)))
-         (first-pass t)
-         next-node next-node-s next-node-t)
-    (save-excursion
-      (while (or first-pass
-                 (and next-node-t
-                      (not include-comments)
-                      (string-equal next-node-t "comment")))
-        (setq first-pass nil)
-        (goto-char next-node-e)
-        (skip-chars-forward " \t\n" (point-max))
-        (setq next-node (if (eobp) nil (treesit-node-at (point)))
-              next-node-s (treesit-node-start next-node))
-        (setq next-node
-              (treesit-parent-while
-               next-node
-               (lambda (node)
-                 (and
-                  (not (string-equal (treesit-node-type node) "ERROR"))
-                  (= (treesit-node-start node) next-node-s))))
-              next-node-t (treesit-node-type next-node)
-              next-node-e (treesit-node-end next-node))))
-    next-node))
-
 (defun ada-ts-mode--prev-leaf-node (start)
   "Find leaf node before START.
 

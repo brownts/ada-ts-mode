@@ -1,0 +1,84 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(28 34 65 68) (funcall show-paren-data-function))))
+
+Name: select_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   |select
+      accept Do_Something;
+   end select;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(65 68 28 34) (funcall show-paren-data-function))))
+
+Name: select_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end| select;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 34 65 68) (funcall show-paren-data-function))))
+
+Name: partial select_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   |select
+      accept Do_Something;
+   end
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(65 68 28 34) (funcall show-paren-data-function))))
+
+Name: partial select_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end|
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: select_statement after 'end'
+
+Point-Char: |
+
+=-=
+task body Test is
+begin
+   select
+      accept Do_Something;
+   end |select;
+end Test;
+=-=-=

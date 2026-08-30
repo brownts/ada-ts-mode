@@ -1,0 +1,89 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 24 27) (funcall show-paren-data-function))))
+
+Name: protected_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected body Test is
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 1 10) (funcall show-paren-data-function))))
+
+Name: protected_body (match @ closer)
+
+Point-Char: |
+
+=-=
+protected body Test is
+end| Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 10 24 27) (funcall show-paren-data-function))))
+
+Name: partial protected_body (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected body Test is
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(24 27 1 10) (funcall show-paren-data-function))))
+
+Name: partial protected_body (match @ closer)
+
+Point-Char: |
+
+=-=
+protected body Test is
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: protected_body (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|protected body Test is
+end Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: protected_body (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+protected body Test is
+end| Test2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: protected_body_stub
+
+Point-Char: |
+
+=-=
+|protected body Test is separate;
+=-=-=

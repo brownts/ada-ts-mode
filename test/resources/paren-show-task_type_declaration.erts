@@ -1,0 +1,89 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 24 27) (funcall show-paren-data-function))))
+
+Name: task_type_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|task type Test_Type is
+end Test_Type;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 1 5) (funcall show-paren-data-function))))
+
+Name: task_type_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+task type Test_Type is
+end| Test_Type;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 5 24 27) (funcall show-paren-data-function))))
+
+Name: partial task_type_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|task type Test_Type is
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(24 27 1 5) (funcall show-paren-data-function))))
+
+Name: partial task_type_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+task type Test_Type is
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: task_type_declaration (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|task type Test_Type is
+end Test_Type2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(24 27 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: task_type_declaration (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+task type Test_Type is
+end| Test_Type2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: task_type_declaration without definition
+
+Point-Char: |
+
+=-=
+|task type Test_Type;
+=-=-=

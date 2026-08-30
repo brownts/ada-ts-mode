@@ -1,0 +1,90 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 21 24) (funcall show-paren-data-function))))
+
+Name: single_task_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|task Test_Object is
+end Test_Object;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(21 24 1 5) (funcall show-paren-data-function))))
+
+Name: single_task_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+task Test_Object is
+end| Test_Object;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 5 21 24) (funcall show-paren-data-function))))
+
+Name: partial single_task_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|task Test_Object is
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(21 24 1 5) (funcall show-paren-data-function))))
+
+Name: partial single_task_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+task Test_Object is
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 5 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: single_task_declaration (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|task Test_Object is
+end Test_Object2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(21 24 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: single_task_declaration (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+task Test_Object is
+end| Test_Object2;
+=-=-=
+
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (funcall show-paren-data-function))))
+
+Name: single_task_declaration without definition
+
+Point-Char: |
+
+=-=
+|task Test_Object;
+=-=-=

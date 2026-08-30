@@ -1,0 +1,84 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(28 30 57 60) (ada-ts-paren--show-paren-data))))
+
+Name: if_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |if A > B then
+      null;
+   end if;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(57 60 28 30) (ada-ts-paren--show-paren-data))))
+
+Name: if_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   if A > B then
+      null;
+   end| if;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(28 30 57 60) (ada-ts-paren--show-paren-data))))
+
+Name: partial if_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   |if A > B then
+      null;
+   end
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(57 60 28 30) (ada-ts-paren--show-paren-data))))
+
+Name: partial if_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   if A > B then
+      null;
+   end|
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (ada-ts-paren--show-paren-data))))
+
+Name: if_statement after 'end'
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   if A > B then
+      null;
+   end |if;
+end Test;
+=-=-=

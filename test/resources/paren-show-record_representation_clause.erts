@@ -1,0 +1,127 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 84 87) (funcall show-paren-data-function))))
+
+Name: record_representation_clause 1 (match @ opener)
+
+Point-Char: |
+
+=-=
+for Point use
+   |record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(84 87 18 24) (funcall show-paren-data-function))))
+
+Name: record_representation_clause 1 (match @ closer)
+
+Point-Char: |
+
+=-=
+for Point use
+   record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end| record;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 84 87) (funcall show-paren-data-function))))
+
+Name: record_representation_clause 2 (match @ opener)
+
+Point-Char: |
+
+=-=
+for Point use
+   |record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end record Point;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(84 87 18 24) (funcall show-paren-data-function))))
+
+Name: record_representation_clause 2 (match @ closer)
+
+Point-Char: |
+
+=-=
+for Point use
+   record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end| record Point;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(18 24 84 87) (funcall show-paren-data-function))))
+
+Name: partial record_representation_clause (match @ opener)
+
+Point-Char: |
+
+=-=
+for Point use
+   |record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(84 87 18 24) (funcall show-paren-data-function))))
+
+Name: partial record_representation_clause (match @ closer)
+
+Point-Char: |
+
+=-=
+for Point use
+   record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(18 24 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_representation_clause (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+for Point use
+   |record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end record Point2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(84 87 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: record_representation_clause (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+for Point use
+   record
+      X at 0 range 0 .. 31;
+      Y at 4 range 0 .. 31;
+   end| record Point2;
+=-=-=

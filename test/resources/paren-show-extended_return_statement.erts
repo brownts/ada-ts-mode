@@ -1,0 +1,99 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(42 48 81 84) (ada-ts-paren--show-paren-data))))
+
+Name: extended_return_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   |return X : Integer do
+      X := 7;
+   end return;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(81 84 42 48) (ada-ts-paren--show-paren-data))))
+
+Name: extended_return_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 7;
+   end| return;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(42 48 81 84) (ada-ts-paren--show-paren-data))))
+
+Name: partial extended_return_statement (match @ opener)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   |return X : Integer do
+      X := 7;
+   end
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(81 84 42 48) (ada-ts-paren--show-paren-data))))
+
+Name: partial extended_return_statement (match @ closer)
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 7;
+   end|
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (ada-ts-paren--show-paren-data))))
+
+Name: extended_return_statement without sequence of statements
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   |return X : constant Integer := 5;
+end Test;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal nil (ada-ts-paren--show-paren-data))))
+
+Name: extended_return_statement after 'end'
+
+Point-Char: |
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      X := 7;
+   end |return;
+end Test;
+=-=-=

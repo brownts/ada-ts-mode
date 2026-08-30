@@ -1,0 +1,77 @@
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 26 29) (funcall show-paren-data-function))))
+
+Name: single_protected_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected Test_Object is
+end Test_Object;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(26 29 1 10) (funcall show-paren-data-function))))
+
+Name: single_protected_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+protected Test_Object is
+end| Test_Object;
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(1 10 26 29) (funcall show-paren-data-function))))
+
+Name: partial single_protected_declaration (match @ opener)
+
+Point-Char: |
+
+=-=
+|protected Test_Object is
+end
+=-=-=
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (should (equal '(26 29 1 10) (funcall show-paren-data-function))))
+
+Name: partial single_protected_declaration (match @ closer)
+
+Point-Char: |
+
+=-=
+protected Test_Object is
+end|
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(1 10 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: single_protected_declaration (mismatch @ opener)
+
+Point-Char: |
+
+=-=
+|protected Test_Object is
+end Test_Object2;
+=-=-=
+
+Code: (lambda ()
+        (default-transform)
+        (should (equal '(26 29 nil nil mismatch) (funcall show-paren-data-function))))
+
+Name: single_protected_declaration (mismatch @ closer)
+
+Point-Char: |
+
+=-=
+protected Test_Object is
+end| Test_Object2;
+=-=-=
