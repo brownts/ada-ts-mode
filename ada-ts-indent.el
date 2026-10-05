@@ -2141,6 +2141,34 @@ following electric punctuation or electric keywords."
   (add-hook 'after-change-functions #'ada-ts-indent--after-change nil 'local)
   (add-hook 'post-command-hook #'ada-ts-indent--maybe-electric-indent nil 'local))
 
+;;; Commands
+
+;; Backport `prog-fill-reindent-defun' to Emacs 29 and avoid the Emacs
+;; 30 issue where `prog-fill-reindent-defun' would reindent the wrong
+;; defun, as reported in https://debbugs.gnu.org/78703.
+
+(if (and (boundp 'prog-fill-reindent-defun-function)
+         (fboundp 'prog-fill-reindent-defun))
+    (defalias 'ada-ts-mode-fill-reindent-defun #'prog-fill-reindent-defun)
+  (defun ada-ts-mode-fill-reindent-defun (&optional justify)
+    "Refill or re-indent the paragraph or defun containing point.
+
+If the point is in a comment, fill the paragraph that contains point or
+follows point.  Otherwise, re-indent the defun that contains point.
+
+If JUSTIFY is non-nil (interactively, with prefix argument), and filling
+a paragraph, justify as well."
+    (interactive "P" ada-ts-mode)
+    (save-excursion
+      (if-let* ((node (treesit-node-at (point)))
+                (node-t (treesit-node-type node))
+                ((string-equal node-t "comment")))
+          (fill-paragraph justify (region-active-p))
+        (when-let* ((node (treesit-defun-at-point))
+                    (start (treesit-node-start node))
+                    (end (treesit-node-end node)))
+          (indent-region start end nil))))))
+
 (provide 'ada-ts-indent)
 
 ;;; ada-ts-indent.el ends here

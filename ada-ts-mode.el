@@ -593,26 +593,6 @@ but it isn't an actual function call."
               prefix "-- " defun-name    " --" ?\n
               prefix "---" defun-comment "---" ?\n ?\n))))
 
-(defun ada-ts-mode-fill-reindent-defun (&optional argument)
-  "Refill or re-indent the paragraph or defun containing point.
-
-If the point is in a comment, fill the paragraph that contains point or
-follows point.  Otherwise, re-indent the function definition that
-contains point.
-
-If ARGUMENT is specified, it is used to specify the column when filling
-a paragraph."
-  (interactive "P" ada-ts-mode)
-  (save-excursion
-    (if-let* ((node (treesit-node-at (point)))
-              (node-t (treesit-node-type node))
-              ((string-equal node-t "comment")))
-        (fill-paragraph argument (region-active-p))
-      (when-let* ((node (treesit-defun-at-point))
-                  (start (treesit-node-start node))
-                  (end (treesit-node-end node)))
-        (indent-region start end nil)))))
-
 (defun ada-ts-mode-find-other-file (&optional in-other-window)
   "Find other Ada file.
 
@@ -701,8 +681,11 @@ other window, else find the file in the current window."
 ;;;; Keymap / Menu
 
 (defvar ada-ts-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-q") #'ada-ts-mode-fill-reindent-defun)
+  (let ((map (make-sparse-keymap))
+        (key (if (fboundp 'prog-fill-reindent-defun)
+                 "<remap> <prog-fill-reindent-defun>"
+               "M-q")))
+    (keymap-set map key #'ada-ts-mode-fill-reindent-defun)
     (when ada-ts-mode-keymap-prefix
       (define-key map
                   (kbd ada-ts-mode-keymap-prefix)
@@ -716,23 +699,23 @@ other window, else find the file in the current window."
 (easy-menu-define ada-ts-mode-menu ada-ts-mode-map
   "Menu keymap for `ada-ts-mode'."
   '("Ada"
-    ["Find Other File"              ada-ts-mode-find-other-file             t]
-    ["Find Project File"            ada-ts-mode-find-project-file           t]
-    ["-----"                        nil                                     nil]
-    ["Toggle Auto-Casing"           ada-ts-auto-case-mode                   t]
-    ["Case Format Buffer"           ada-ts-mode-case-format-buffer          t]
-    ["Case Format Point/Region"     ada-ts-mode-case-format-dwim            t]
-    ["-----"                        nil                                     nil]
-    ["Indent Defun / Fill Comment"  ada-ts-mode-fill-reindent-defun         t]
-    ["Indent Buffer"                (indent-region (point-min) (point-max)) t]
-    ["-----"                        nil                                     nil]
-    ["Add Comment Box"              ada-ts-mode-defun-comment-box           t]
-    ["-----"                        nil                                     nil]
+    ["Find Other File"                ada-ts-mode-find-other-file             t]
+    ["Find Project File"              ada-ts-mode-find-project-file           t]
+    "-----"
+    ["Toggle Auto-Casing"             ada-ts-auto-case-mode                   t]
+    ["Case Format Buffer"             ada-ts-mode-case-format-buffer          t]
+    ["Case Format Point/Region"       ada-ts-mode-case-format-dwim            t]
+    "-----"
+    ["Re-Indent Defun / Fill Comment" ada-ts-mode-fill-reindent-defun         t]
+    ["Re-Indent Buffer"               (indent-region (point-min) (point-max)) t]
+    "-----"
+    ["Add Comment Box"                ada-ts-mode-defun-comment-box           t]
+    "-----"
     ("Language Server"
      ["Find Workspace Configuration File" als/find-workspace-config-file t]
      ["Find User Configuration File"      als/find-user-config-file      t]
      ["Show Composite Configuration"      als/show-composite-config      t])
-    ["-----"                        nil                                     nil]
+    "-----"
     ["Manual"                       (info "(ada-ts-mode)Top")               t]
     ["Customize"                    (customize-group 'ada-ts)               t]))
 
