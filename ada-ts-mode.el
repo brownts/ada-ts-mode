@@ -707,7 +707,7 @@ other window, else find the file in the current window."
     ["Case Format Point/Region"       ada-ts-mode-case-format-dwim            t]
     "-----"
     ["Re-Indent Defun / Fill Comment" ada-ts-mode-fill-reindent-defun         t]
-    ["Re-Indent Buffer"               (indent-region (point-min) (point-max)) t]
+    ["Re-Indent Buffer"               ada-ts-mode-reindent-buffer             t]
     "-----"
     ["Add Comment Box"                ada-ts-mode-defun-comment-box           t]
     "-----"

@@ -2169,6 +2169,12 @@ a paragraph, justify as well."
                     (end (treesit-node-end node)))
           (indent-region start end nil))))))
 
+(defun ada-ts-mode-reindent-buffer ()
+  "Reindent buffer."
+  (interactive nil ada-ts-mode)
+  (without-restriction
+    (indent-region (point-min) (point-max))))
+
 (provide 'ada-ts-indent)
 
 ;;; ada-ts-indent.el ends here
