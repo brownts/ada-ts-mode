@@ -1,4 +1,4 @@
-;;; ada-ts-indentation.el -- Indentation support in Ada files -*- lexical-binding: t; -*-
+;;; ada-ts-indent.el -- Indentation support in Ada files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025-2026 Troy Brown
 
@@ -2141,9 +2141,9 @@ following electric punctuation or electric keywords."
   (add-hook 'after-change-functions #'ada-ts-indent--after-change nil 'local)
   (add-hook 'post-command-hook #'ada-ts-indent--maybe-electric-indent nil 'local))
 
-(provide 'ada-ts-indentation)
+(provide 'ada-ts-indent)
 
-;;; ada-ts-indentation.el ends here
+;;; ada-ts-indent.el ends here
 ;; Local Variables:
 ;; read-symbol-shorthands: (("als/"     . "ada-ts-als-")
 ;;                          ("advice/"  . "ada-ts-mode--advice-")

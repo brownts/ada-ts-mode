@@ -38,7 +38,7 @@
 (require 'ada-ts-case)
 (require 'ada-ts-common)
 (require 'ada-ts-imenu)
-(require 'ada-ts-indentation)
+(require 'ada-ts-indent)
 (require 'ada-ts-lspclient)
 (require 'ada-ts-paren)
 (require 'find-file)
