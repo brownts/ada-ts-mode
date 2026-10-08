@@ -41,6 +41,7 @@
 (require 'ada-ts-indent)
 (require 'ada-ts-lspclient)
 (require 'ada-ts-paren)
+(require 'ada-ts-tags)
 (require 'find-file)
 (require 'lisp-mnt)
 (require 'project)
@@ -840,6 +841,9 @@ other window, else find the file in the current window."
   ;; LSP Client.
   (run-hooks 'ada-ts-lspclient-setup-hook)
 
+  ;; TAGS.
+  (ada-ts-tags--setup)
+
   (treesit-major-mode-setup)
   (run-hooks 'ada-ts-mode--after-setup-hook)
 
@@ -849,8 +853,16 @@ other window, else find the file in the current window."
 
 ;;;###autoload
 (progn
-  (add-to-list 'auto-mode-alist
-               `(,(rx (or ".ada" ".adb" ".ads" ".adc") eos) . ada-ts-mode))
+  ;; Use multiple entries for the supported file extensions, so the
+  ;; regular expressions conform to the "simple pattern" expected by
+  ;; `semantic-symref-derived-find-filepatterns', used indirectly by
+  ;; the default `xref-backend-references' implementation.  This
+  ;; default implementation is used by the etags backend for
+  ;; `xref-find-references'.
+  (add-to-list 'auto-mode-alist `(,(rx ".ada" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".adb" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".adc" eos) . ada-ts-mode))
+  (add-to-list 'auto-mode-alist `(,(rx ".ads" eos) . ada-ts-mode))
   ;; Add ada-mode as an "extra" parent so ada-ts-mode can handle
   ;; directory local variables for ada-mode, etc. (Emacs 30+)
   (when (fboundp 'derived-mode-add-parents)
