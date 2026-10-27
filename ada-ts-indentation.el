@@ -465,6 +465,9 @@ SYMBOL, else the default value is updated instead."
             (anchor/first-sibling "exception_choice")
             0)
 
+           ;; sequence_of_statements
+           ((matcher/parent-is "sequence_of_statements") parent-bol 0)
+
            ;; non_empty_declarative_part
            ((matcher/parent-is "non_empty_declarative_part") parent-bol 0)
 
