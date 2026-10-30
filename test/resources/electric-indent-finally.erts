@@ -1,0 +1,475 @@
+Code: (lambda () (electric-indent-transform "y"))
+
+Point-Char: |
+
+Name: package_body (1)
+
+=-=
+package body Test is
+begin
+   null;
+   finall|
+=-=
+package body Test is
+begin
+   null;
+finally|
+=-=-=
+
+Name: package_body (2)
+
+=-=
+package body Test is
+begin
+   null;
+finally|
+=-=
+package body Test is
+begin
+   null;
+   finallyy|
+=-=-=
+
+Name: subprogram_body (1)
+
+=-=
+procedure Test_Procedure is
+begin
+   null;
+   finall|
+=-=
+procedure Test_Procedure is
+begin
+   null;
+finally|
+=-=-=
+
+Name: subprogram_body (2)
+
+=-=
+procedure Test_Procedure is
+begin
+   null;
+finally|
+=-=
+procedure Test_Procedure is
+begin
+   null;
+   finallyy|
+=-=-=
+
+Name: subprogram_body (3)
+
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+      finall|
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: subprogram_body (4)
+
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+   finally|
+=-=
+package body Test is
+   procedure Test_Procedure is
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: subprogram_body (5)
+
+=-=
+function Test_Function return Integer is
+begin
+   null;
+   finall|
+=-=
+function Test_Function return Integer is
+begin
+   null;
+finally|
+=-=-=
+
+Name: subprogram_body (6)
+
+=-=
+function Test_Function return Integer is
+begin
+   null;
+finally|
+=-=
+function Test_Function return Integer is
+begin
+   null;
+   finallyy|
+=-=-=
+
+Name: subprogram_body (7)
+
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+      finall|
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: subprogram_body (8)
+
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+   finally|
+=-=
+package body Test is
+   function Test_Function return Integer is
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: subprogram_body (9)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      finall|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   finally|
+=-=-=
+
+Name: subprogram_body (10)
+
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+   finally|
+=-=
+package body Test is
+   overriding procedure Test_Procedure (X : Integer;
+                                        Y : Integer) is begin
+      null;
+      finallyy|
+=-=-=
+
+Name: task_body (1)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+      finall|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: task_body (2)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   finally|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: entry_body (1)
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+         finall|
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      finally|
+=-=-=
+
+Name: entry_body (2)
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      finally|
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+         finallyy|
+=-=-=
+
+Name: accept_statement (1)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+         finall|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+      finally|
+=-=-=
+
+Name: accept_statement (2)
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+      finally|
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+         finallyy|
+=-=-=
+
+Name: block_statement (1)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      finall|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: block_statement (2)
+
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+   finally|
+=-=
+procedure Test is
+begin
+   declare
+      X : Integer;
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: block_statement (3)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      finall|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: block_statement (4)
+
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+   finally|
+=-=
+procedure Test is
+begin
+   LABEL: declare
+      X : Integer;
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: block_statement (5)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         finall|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      finally|
+=-=-=
+
+Name: block_statement (6)
+
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+      finally|
+=-=
+procedure Test is
+begin
+   LABEL:
+      declare
+         X : Integer;
+      begin
+         null;
+         finallyy|
+=-=-=
+
+Name: block_statement (7)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      finall|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   finally|
+=-=-=
+
+Name: block_statement (8)
+
+=-=
+procedure Test is
+begin
+   begin
+      null;
+   finally|
+=-=
+procedure Test is
+begin
+   begin
+      null;
+      finallyy|
+=-=-=
+
+Name: extended_return_statement (1)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+      finall|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+   finally|
+=-=-=
+
+Name: extended_return_statement (2)
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+   finally|
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+      finallyy|
+=-=-=

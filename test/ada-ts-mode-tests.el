@@ -122,6 +122,26 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
 
 ;;;; Test Loop
 
+(defconst supported-info
+  '(("command-casing-finally.erts"  . #'ada-ts-mode--finally-supported-p)
+    ("electric-indent-finally.erts" . #'ada-ts-mode--finally-supported-p)
+    ("font-lock-finally_part.ada"   . #'ada-ts-mode--finally-supported-p)
+    ("indent-finally_part.erts"     . #'ada-ts-mode--finally-supported-p)
+    ("mode-auto-case-finally.erts"  . #'ada-ts-mode--finally-supported-p)))
+
+(defun ada-ts-mode-tests-skip-p (predicate)
+  "If PREDICATE is non-nil run predicate to see if test is supported.
+
+If PREDICATE is nil, the assumption is that the test is supported.
+
+Since grammar predicates are not accurate unless the grammar is
+available, and the grammar might not be installed until the major mode
+is enabled, the mode is enabled before invoking the predicate function."
+  (and predicate
+       (with-temp-buffer
+         (ada-ts-mode)
+         (not (funcall predicate)))))
+
 (dolist (file (directory-files (ert-resource-directory)
                                nil
                                directory-files-no-dot-files-regexp))
@@ -134,7 +154,8 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
                                (t #'default-transform))))
     (if (string-prefix-p "font-lock" file-noext)
         (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
-                 (skip-unless (featurep 'ert-font-lock))
+                 (skip-unless (and (featurep 'ert-font-lock)
+                                   (not (ada-ts-mode-tests-skip-p ,(cdr (assoc-string file supported-info))))))
                  (with-temp-buffer
                    (insert-file-contents ,file-path)
                    (funcall #',transform))
@@ -146,6 +167,7 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
                          (ert-font-lock-test-file ,file-path 'ada-ts-mode))
                      (setq treesit-font-lock-level prev-level)))))
       (eval `(ert-deftest ,(intern (concat "ada-ts-mode-test-" file-noext)) ()
+               (skip-unless (not (ada-ts-mode-tests-skip-p ,(cdr (assoc-string file supported-info)))))
                (ert-test-erts-file ,file-path #',transform))))))
 
 (provide 'ada-ts-mode-tests)

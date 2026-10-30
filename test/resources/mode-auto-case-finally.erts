@@ -1,0 +1,20 @@
+Name: Auto Case (keyword)
+
+Code: (lambda ()
+        (default-transform 'dont-care)
+        (ada-ts-auto-case-mode)
+        (ada-ts-mode-tests--simulate-key-press "SPC"))
+
+Point-Char: |
+
+=-=
+procedure Test is
+begin
+   null;
+FINALLY|
+=-=
+procedure Test is
+begin
+   null;
+finally |
+=-=-=

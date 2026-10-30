@@ -1,0 +1,25 @@
+Code: (lambda ()
+        (default-transform)
+        (ada-ts-mode-case-format-buffer))
+
+Name: Buffer Formatting
+
+=-=
+WITH ada.text_io;
+
+PROCEDURE hello_world IS
+BEGIN
+   NULL;
+FINALLY
+   NULL;
+END hello_world;
+=-=
+with Ada.Text_IO;
+
+procedure Hello_World is
+begin
+   null;
+finally
+   null;
+end Hello_World;
+=-=-=

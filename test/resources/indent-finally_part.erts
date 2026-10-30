@@ -1,0 +1,349 @@
+Name: package_body
+
+=-=
+package body Test is
+   package body ABC is
+   begin
+      null;
+   finally
+      null;
+   end ABC;
+
+   package body ABC is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end ABC;
+begin
+   null;
+finally
+   null;
+end Test;
+=-=-=
+
+Name: procedure subprogram_body
+
+=-=
+procedure Test_Procedure is
+   procedure ABC is
+   begin
+      null;
+   finally
+      null;
+   end ABC;
+
+   procedure ABC is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end ABC;
+begin
+   null;
+finally
+   null;
+end Test_Procedure;
+=-=-=
+
+Name: function subprogram_body
+
+=-=
+function Test_Function return Integer is
+   function ABC return Integer is
+   begin
+      null;
+   finally
+      null;
+   end ABC;
+
+   function ABC return Integer is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end ABC;
+begin
+   null;
+finally
+   null;
+end Test_Function;
+=-=-=
+
+Name: task_body
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      null;
+   finally
+      null;
+   end Task_Body;
+
+   task body Task_Body is
+   begin
+      null;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end Task_Body;
+end Test;
+=-=-=
+
+Name: entry_body
+
+=-=
+package body Test is
+   protected body Protected_Body is
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      finally
+         null;
+      end Entry_Body;
+
+      entry Entry_Body when X > Y is
+      begin
+         null;
+      exception
+         when others =>
+            null;
+      finally
+         null;
+      end Entry_Body;
+   end Protected_Body;
+end Test;
+=-=-=
+
+Name: accept_statement
+
+=-=
+package body Test is
+   task body Task_Body is
+   begin
+      accept Operation (X : Integer) do
+         null;
+      finally
+         null;
+      end Operation;
+
+      accept Operation (X : Integer) do
+         null;
+      exception
+         when others =>
+            null;
+      finally
+         null;
+      end Operation;
+   end Task_Body;
+end Test;
+=-=-=
+
+Name: block_statement
+
+=-=
+package body Test is
+begin
+   begin
+      X := X + 1;
+   finally
+      null;
+   end;
+
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end;
+
+   BLOCK_LABEL: begin
+      X := X + 1;
+   finally
+      null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL: begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      begin
+         X := X + 1;
+      finally
+         null;
+      end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      begin
+         X := X + 1;
+      exception
+         when others =>
+            null;
+      finally
+         null;
+      end BLOCK_LABEL;
+end Test;
+=-=-=
+
+Name: declare block_statement
+
+=-=
+package body Test is
+begin
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   finally
+      null;
+   end;
+
+   declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end;
+
+   BLOCK_LABEL: declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   finally
+      null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL: declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      declare
+         X : Integer := 0;
+      begin
+         X := X + 1;
+      finally
+         null;
+      end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+      declare
+         X : Integer := 0;
+      begin
+         X := X + 1;
+      exception
+         when others =>
+            null;
+      finally
+         null;
+      end BLOCK_LABEL;
+end Test;
+=-=-=
+
+Name: extended_return_statement
+
+=-=
+function Test return Integer is
+begin
+   return X : Integer do
+      null;
+   finally
+      null;
+   end return;
+
+   return X : Integer do
+      null;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end return;
+end Test;
+=-=-=
+
+Name: Custom "label" offset
+
+Code:
+  (lambda ()
+    (indent-transform
+     (lambda ()
+     (setq-local ada-ts-mode-indent-label-offset 8))))
+
+=-=
+package body Test is
+begin
+   BLOCK_LABEL: begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end;
+
+   BLOCK_LABEL:
+           begin
+              X := X + 1;
+           exception
+              when others =>
+                 null;
+           finally
+              null;
+           end;
+
+   BLOCK_LABEL: declare
+      X : Integer := 0;
+   begin
+      X := X + 1;
+   exception
+      when others =>
+         null;
+   finally
+      null;
+   end BLOCK_LABEL;
+
+   BLOCK_LABEL:
+           declare
+              X : Integer := 0;
+           begin
+              X := X + 1;
+           exception
+              when others =>
+                 null;
+           finally
+              null;
+           end BLOCK_LABEL;
+end Test;
+=-=-=

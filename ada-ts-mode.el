@@ -163,372 +163,386 @@ the string property to those instances."
   '("#if" "#elsif" "#else" "#end" "if" "then" ";")
   "Ada preprocessor keywords for tree-sitter font-locking.")
 
-(defvar ada-ts-mode--font-lock-settings
-  (treesit-font-lock-rules
+(defun ada-ts-mode--finally-supported-p ()
+  "Return non-nil if \\='finally\\=' is supported in the grammar.
 
-   ;; Assignment
-   :language 'ada
-   :feature 'assignment
-   '((assignment_statement
-      variable_name: (identifier) @font-lock-variable-use-face)
-     ((assignment_statement
-       variable_name: (selected_component
-                       selector_name: (identifier) @font-lock-variable-use-face))
-      (:match "^\\(?:[^aA]\\|[aA][^lL]\\|[aA][lL][^lL]\\|[aA][lL][lL].\\)"
-              @font-lock-variable-use-face))
-     (assignment_statement
-      variable_name: (slice
-                      prefix: (identifier) @font-lock-variable-use-face))
-     ((assignment_statement
-       variable_name: (slice
-                       prefix: (selected_component
-                                selector_name: (identifier) @font-lock-variable-use-face)))
-      (:match "^\\(?:[^aA]\\|[aA][^lL]\\|[aA][lL][^lL]\\|[aA][lL][lL].\\)"
-              @font-lock-variable-use-face)))
+The \\='finally\\=' keyword is is a GNAT extension."
+  (ignore-errors
+    (or (treesit-query-string "" '((finally_part)) 'ada) t)))
 
-   ;; Attributes
-   :language 'ada
-   :feature 'attribute
-   '(((attribute_designator) @font-lock-property-use-face)
-     (range_attribute_designator "range" @font-lock-property-use-face)
-     (reduction_attribute_designator (identifier) @font-lock-property-use-face)
-     (component_declaration (identifier) @font-lock-property-name-face)
-     (component_choice_list (identifier) @font-lock-property-name-face)
-     (component_clause local_name: _ @font-lock-property-name-face)
-     (discriminant_association (identifier) @font-lock-property-name-face))
+(defvar ada-ts-mode--font-lock-settings-cache nil
+  "Cached font-lock settings for `ada-ts-mode'.")
 
-   ;; Brackets
-   :language 'ada
-   :feature 'bracket
-   '((["(" ")" "[" "]"]) @font-lock-bracket-face)
+(defun ada-ts-mode--font-lock-settings ()
+  "Return font-lock settings for `ada-ts-mode'."
+  (if ada-ts-mode--font-lock-settings-cache
+      ada-ts-mode--font-lock-settings-cache
+    (when (ada-ts-mode--finally-supported-p)
+      (push "finally" ada-ts-mode--keywords))
+    (setq ada-ts-mode--font-lock-settings-cache
+          (treesit-font-lock-rules
 
-   ;; Comments
-   :language 'ada
-   :feature 'comment
-   '((comment) @font-lock-comment-face)
+           ;; Assignment
+           :language 'ada
+           :feature 'assignment
+           '((assignment_statement
+              variable_name: (identifier) @font-lock-variable-use-face)
+             ((assignment_statement
+               variable_name: (selected_component
+                               selector_name: (identifier) @font-lock-variable-use-face))
+              (:match "^\\(?:[^aA]\\|[aA][^lL]\\|[aA][lL][^lL]\\|[aA][lL][lL].\\)"
+                      @font-lock-variable-use-face))
+             (assignment_statement
+              variable_name: (slice
+                              prefix: (identifier) @font-lock-variable-use-face))
+             ((assignment_statement
+               variable_name: (slice
+                               prefix: (selected_component
+                                        selector_name: (identifier) @font-lock-variable-use-face)))
+              (:match "^\\(?:[^aA]\\|[aA][^lL]\\|[aA][lL][^lL]\\|[aA][lL][lL].\\)"
+                      @font-lock-variable-use-face)))
 
-   ;; Constants
-   :language 'ada
-   :feature 'constant
-   '(((term name: (identifier) @font-lock-constant-face)
-      (:match "^\\(?:[tT][rR][uU][eE]\\|[fF][aA][lL][sS][eE]\\)$"
-              @font-lock-constant-face))
-     (enumeration_type_definition (identifier) @font-lock-constant-face)
-     (enumeration_representation_clause
-      (enumeration_aggregate
-       (named_array_aggregate
-        (array_component_association
-         (discrete_choice_list
-          (discrete_choice
-           (expression
-            (term name: (identifier) @font-lock-constant-face))))))))
-     ((primary_null) @font-lock-constant-face))
+           ;; Attributes
+           :language 'ada
+           :feature 'attribute
+           '(((attribute_designator) @font-lock-property-use-face)
+             (range_attribute_designator "range" @font-lock-property-use-face)
+             (reduction_attribute_designator (identifier) @font-lock-property-use-face)
+             (component_declaration (identifier) @font-lock-property-name-face)
+             (component_choice_list (identifier) @font-lock-property-name-face)
+             (component_clause local_name: _ @font-lock-property-name-face)
+             (discriminant_association (identifier) @font-lock-property-name-face))
 
-   ;; Delimiters
-   :language 'ada
-   :feature 'delimiter
-   '(["," "." ":" ";"] @font-lock-delimiter-face)
+           ;; Brackets
+           :language 'ada
+           :feature 'bracket
+           '((["(" ")" "[" "]"]) @font-lock-bracket-face)
 
-   ;; Definitions
-   :language 'ada
-   :feature 'definition
-   :override 'prepend
-   '((procedure_specification name: (identifier) @font-lock-function-name-face)
-     (procedure_specification name: (selected_component
-                                     selector_name: (identifier)
-                                     @font-lock-function-name-face))
-     (function_specification name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (function_specification name: (selected_component
-                                    selector_name: _ @font-lock-function-name-face))
-     (subprogram_body endname: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (subprogram_body endname: (selected_component
-                                selector_name: _ @font-lock-function-name-face))
-     (subprogram_default default_name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (subprogram_default default_name: (selected_component
+           ;; Comments
+           :language 'ada
+           :feature 'comment
+           '((comment) @font-lock-comment-face)
+
+           ;; Constants
+           :language 'ada
+           :feature 'constant
+           '(((term name: (identifier) @font-lock-constant-face)
+              (:match "^\\(?:[tT][rR][uU][eE]\\|[fF][aA][lL][sS][eE]\\)$"
+                      @font-lock-constant-face))
+             (enumeration_type_definition (identifier) @font-lock-constant-face)
+             (enumeration_representation_clause
+              (enumeration_aggregate
+               (named_array_aggregate
+                (array_component_association
+                 (discrete_choice_list
+                  (discrete_choice
+                   (expression
+                    (term name: (identifier) @font-lock-constant-face))))))))
+             ((primary_null) @font-lock-constant-face))
+
+           ;; Delimiters
+           :language 'ada
+           :feature 'delimiter
+           '(["," "." ":" ";"] @font-lock-delimiter-face)
+
+           ;; Definitions
+           :language 'ada
+           :feature 'definition
+           :override 'prepend
+           '((procedure_specification name: (identifier) @font-lock-function-name-face)
+             (procedure_specification name: (selected_component
+                                             selector_name: (identifier)
+                                             @font-lock-function-name-face))
+             (function_specification name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (function_specification name: (selected_component
+                                            selector_name: _ @font-lock-function-name-face))
+             (subprogram_body endname: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (subprogram_body endname: (selected_component
                                         selector_name: _ @font-lock-function-name-face))
-     (entry_declaration "entry"
-                        :anchor (comment) :*
-                        :anchor (identifier) @font-lock-function-name-face)
-     (entry_body (identifier) @font-lock-function-name-face)
-     (accept_statement entry_direct_name: _ @font-lock-function-name-face)
-     (accept_statement entry_identifier: _ @font-lock-function-name-face)
-     (single_protected_declaration "protected"
-                                   :anchor (comment) :*
-                                   :anchor (identifier) @font-lock-variable-name-face)
-     (single_protected_declaration
-      (protected_definition "end" (identifier) @font-lock-variable-name-face))
-     (protected_body (identifier) @font-lock-variable-name-face)
-     (protected_body_stub (identifier) @font-lock-variable-name-face)
-     (single_task_declaration "task"
-                              :anchor (comment) :*
-                              :anchor (identifier) @font-lock-variable-name-face)
-     (single_task_declaration
-      (task_definition "end" (identifier) @font-lock-variable-name-face))
-     (task_body (identifier) @font-lock-variable-name-face)
-     (task_body_stub (identifier) @font-lock-variable-name-face)
-     (generic_instantiation
-      ["procedure" "function"]
-      name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (generic_instantiation
-      ["procedure" "function"]
-      name: (selected_component
-             selector_name: _ @font-lock-function-name-face))
-     (generic_instantiation
-      ["procedure" "function"]
-      generic_name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (generic_instantiation
-      ["procedure" "function"]
-      generic_name: (function_call name: [(identifier) (string_literal)]
-                                   @font-lock-function-name-face))
-     (generic_instantiation
-      ["procedure" "function"]
-      generic_name: (selected_component
+             (subprogram_default default_name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (subprogram_default default_name: (selected_component
+                                                selector_name: _ @font-lock-function-name-face))
+             (entry_declaration "entry"
+                                :anchor (comment) :*
+                                :anchor (identifier) @font-lock-function-name-face)
+             (entry_body (identifier) @font-lock-function-name-face)
+             (accept_statement entry_direct_name: _ @font-lock-function-name-face)
+             (accept_statement entry_identifier: _ @font-lock-function-name-face)
+             (single_protected_declaration "protected"
+                                           :anchor (comment) :*
+                                           :anchor (identifier) @font-lock-variable-name-face)
+             (single_protected_declaration
+              (protected_definition "end" (identifier) @font-lock-variable-name-face))
+             (protected_body (identifier) @font-lock-variable-name-face)
+             (protected_body_stub (identifier) @font-lock-variable-name-face)
+             (single_task_declaration "task"
+                                      :anchor (comment) :*
+                                      :anchor (identifier) @font-lock-variable-name-face)
+             (single_task_declaration
+              (task_definition "end" (identifier) @font-lock-variable-name-face))
+             (task_body (identifier) @font-lock-variable-name-face)
+             (task_body_stub (identifier) @font-lock-variable-name-face)
+             (generic_instantiation
+              ["procedure" "function"]
+              name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (generic_instantiation
+              ["procedure" "function"]
+              name: (selected_component
                      selector_name: _ @font-lock-function-name-face))
-     (generic_instantiation
-      ["procedure" "function"]
-      generic_name: (function_call name: (selected_component
-                                          selector_name: _ @font-lock-function-name-face)))
-     (subprogram_renaming_declaration
-      callable_entity_name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (subprogram_renaming_declaration
-      callable_entity_name: (selected_component
+             (generic_instantiation
+              ["procedure" "function"]
+              generic_name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (generic_instantiation
+              ["procedure" "function"]
+              generic_name: (function_call name: [(identifier) (string_literal)]
+                                           @font-lock-function-name-face))
+             (generic_instantiation
+              ["procedure" "function"]
+              generic_name: (selected_component
                              selector_name: _ @font-lock-function-name-face))
-     (generic_renaming_declaration
-      ["procedure" "function"]
-      defining_program_unit_name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (generic_renaming_declaration
-      ["procedure" "function"]
-      defining_program_unit_name: (selected_component
-                                   selector_name: _ @font-lock-function-name-face))
-     (generic_renaming_declaration
-      generic_function_name: [(identifier) (string_literal)] @font-lock-function-name-face)
-     (generic_renaming_declaration
-      generic_function_name: (selected_component
-                              selector_name: _ @font-lock-function-name-face))
-     (generic_renaming_declaration
-      generic_procedure_name: (identifier) @font-lock-function-name-face)
-     (generic_renaming_declaration
-      generic_procedure_name: (selected_component
-                               selector_name: (identifier)
-                               @font-lock-function-name-face))
-     (object_declaration (identifier) @font-lock-variable-name-face ":")
-     (object_declaration (identifier) @font-lock-constant-face ":" "constant")
-     (number_declaration (identifier) @font-lock-constant-face ":")
-     (extended_return_object_declaration (identifier) @font-lock-variable-name-face ":")
-     (extended_return_object_declaration (identifier) @font-lock-constant-face ":" "constant")
-     (exception_declaration (identifier) @font-lock-type-face)
-     (exception_renaming_declaration :anchor (identifier) @font-lock-type-face)
-     (exception_renaming_declaration
-      exception_name: (identifier) @font-lock-type-face)
-     (exception_renaming_declaration
-      exception_name: (selected_component
-                       selector_name: (identifier) @font-lock-type-face))
-     (raise_expression
-      exception_name: (identifier) @font-lock-type-face)
-     (raise_expression
-      exception_name: (selected_component
-                       selector_name: (identifier) @font-lock-type-face))
-     (raise_statement name: (identifier) @font-lock-type-face)
-     (raise_statement
-      name: (selected_component
-             selector_name: (identifier) @font-lock-type-face))
-     (choice_parameter_specification (identifier) @font-lock-variable-name-face)
-     (choice_parameter_specification (identifier) @font-lock-constant-face)
-     (parameter_specification (identifier) @font-lock-variable-name-face ":")
-     ((parameter_specification
-       (identifier) @font-lock-constant-face ":")
-      @param-spec
-      (:pred ada-ts-mode--mode-in-p @param-spec))
-     (formal_object_declaration (identifier) @font-lock-variable-name-face ":")
-     ((formal_object_declaration
-       (identifier) @font-lock-constant-face ":")
-      @object-spec
-      (:pred ada-ts-mode--mode-in-p @object-spec))
-     (loop_parameter_specification
-      :anchor (identifier) @font-lock-variable-name-face)
-     (loop_parameter_specification
-      :anchor (identifier) @font-lock-constant-face)
-     (iterator_specification :anchor (identifier) @font-lock-variable-name-face)
-     (discriminant_specification (identifier) @font-lock-variable-name-face ":")
-     (discriminant_specification (identifier) @font-lock-constant-face ":")
-     (variant_part (identifier) @font-lock-variable-name-face)
-     (variant_part (identifier) @font-lock-constant-face)
-     (reduction_specification :anchor [(identifier) (string_literal)] @font-lock-function-name-face)
-     (reduction_specification :anchor (selected_component
-                                       selector_name: _ @font-lock-function-name-face)))
+             (generic_instantiation
+              ["procedure" "function"]
+              generic_name: (function_call name: (selected_component
+                                                  selector_name: _ @font-lock-function-name-face)))
+             (subprogram_renaming_declaration
+              callable_entity_name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (subprogram_renaming_declaration
+              callable_entity_name: (selected_component
+                                     selector_name: _ @font-lock-function-name-face))
+             (generic_renaming_declaration
+              ["procedure" "function"]
+              defining_program_unit_name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (generic_renaming_declaration
+              ["procedure" "function"]
+              defining_program_unit_name: (selected_component
+                                           selector_name: _ @font-lock-function-name-face))
+             (generic_renaming_declaration
+              generic_function_name: [(identifier) (string_literal)] @font-lock-function-name-face)
+             (generic_renaming_declaration
+              generic_function_name: (selected_component
+                                      selector_name: _ @font-lock-function-name-face))
+             (generic_renaming_declaration
+              generic_procedure_name: (identifier) @font-lock-function-name-face)
+             (generic_renaming_declaration
+              generic_procedure_name: (selected_component
+                                       selector_name: (identifier)
+                                       @font-lock-function-name-face))
+             (object_declaration (identifier) @font-lock-variable-name-face ":")
+             (object_declaration (identifier) @font-lock-constant-face ":" "constant")
+             (number_declaration (identifier) @font-lock-constant-face ":")
+             (extended_return_object_declaration (identifier) @font-lock-variable-name-face ":")
+             (extended_return_object_declaration (identifier) @font-lock-constant-face ":" "constant")
+             (exception_declaration (identifier) @font-lock-type-face)
+             (exception_renaming_declaration :anchor (identifier) @font-lock-type-face)
+             (exception_renaming_declaration
+              exception_name: (identifier) @font-lock-type-face)
+             (exception_renaming_declaration
+              exception_name: (selected_component
+                               selector_name: (identifier) @font-lock-type-face))
+             (raise_expression
+              exception_name: (identifier) @font-lock-type-face)
+             (raise_expression
+              exception_name: (selected_component
+                               selector_name: (identifier) @font-lock-type-face))
+             (raise_statement name: (identifier) @font-lock-type-face)
+             (raise_statement
+              name: (selected_component
+                     selector_name: (identifier) @font-lock-type-face))
+             (choice_parameter_specification (identifier) @font-lock-variable-name-face)
+             (choice_parameter_specification (identifier) @font-lock-constant-face)
+             (parameter_specification (identifier) @font-lock-variable-name-face ":")
+             ((parameter_specification
+               (identifier) @font-lock-constant-face ":")
+              @param-spec
+              (:pred ada-ts-mode--mode-in-p @param-spec))
+             (formal_object_declaration (identifier) @font-lock-variable-name-face ":")
+             ((formal_object_declaration
+               (identifier) @font-lock-constant-face ":")
+              @object-spec
+              (:pred ada-ts-mode--mode-in-p @object-spec))
+             (loop_parameter_specification
+              :anchor (identifier) @font-lock-variable-name-face)
+             (loop_parameter_specification
+              :anchor (identifier) @font-lock-constant-face)
+             (iterator_specification :anchor (identifier) @font-lock-variable-name-face)
+             (discriminant_specification (identifier) @font-lock-variable-name-face ":")
+             (discriminant_specification (identifier) @font-lock-constant-face ":")
+             (variant_part (identifier) @font-lock-variable-name-face)
+             (variant_part (identifier) @font-lock-constant-face)
+             (reduction_specification :anchor [(identifier) (string_literal)] @font-lock-function-name-face)
+             (reduction_specification :anchor (selected_component
+                                               selector_name: _ @font-lock-function-name-face)))
 
-   ;; Function/Procedure Calls
-   :language 'ada
-   :feature 'function
-   :override 'prepend
-   '(((function_call
-       name: [(identifier) (string_literal)] @font-lock-function-call-face
-       :anchor (comment) :*
-       :anchor (actual_parameter_part))
-      @function-call
-      (:pred ada-ts-mode--named-function-call-p @function-call))
-     ((function_call
-       name: (selected_component
-              selector_name: _ @font-lock-function-call-face)
-       :anchor (comment) :*
-       :anchor (actual_parameter_part))
-      @function-call
-      (:pred ada-ts-mode--named-function-call-p @function-call))
-     (function_call (attribute_designator) @font-lock-function-call-face
-                    :anchor (comment) :*
-                    :anchor (actual_parameter_part))
-     ((procedure_call_statement
-       name: (identifier) @font-lock-function-call-face :anchor)
-      @procedure-call
-      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-     ((procedure_call_statement
-       name: (identifier) @font-lock-function-call-face
-       :anchor (comment) :*
-       :anchor (actual_parameter_part))
-      @procedure-call
-      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-     ((procedure_call_statement
-       name: (selected_component
-              selector_name: (identifier) @font-lock-function-call-face)
-       :anchor)
-      @procedure-call
-      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-     ((procedure_call_statement
-       name: (selected_component
-              selector_name: (identifier) @font-lock-function-call-face)
-       :anchor (comment) :*
-       :anchor (actual_parameter_part))
-      @procedure-call
-      (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-     (procedure_call_statement
-      (attribute_designator) @font-lock-function-call-face :anchor)
-     (procedure_call_statement
-      (attribute_designator) @font-lock-function-call-face
-      :anchor (comment) :*
-      :anchor (actual_parameter_part))
-     (reduction_attribute_designator
-      (identifier) @font-lock-function-call-face))
+           ;; Function/Procedure Calls
+           :language 'ada
+           :feature 'function
+           :override 'prepend
+           '(((function_call
+               name: [(identifier) (string_literal)] @font-lock-function-call-face
+               :anchor (comment) :*
+               :anchor (actual_parameter_part))
+              @function-call
+              (:pred ada-ts-mode--named-function-call-p @function-call))
+             ((function_call
+               name: (selected_component
+                      selector_name: _ @font-lock-function-call-face)
+               :anchor (comment) :*
+               :anchor (actual_parameter_part))
+              @function-call
+              (:pred ada-ts-mode--named-function-call-p @function-call))
+             (function_call (attribute_designator) @font-lock-function-call-face
+                            :anchor (comment) :*
+                            :anchor (actual_parameter_part))
+             ((procedure_call_statement
+               name: (identifier) @font-lock-function-call-face :anchor)
+              @procedure-call
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+             ((procedure_call_statement
+               name: (identifier) @font-lock-function-call-face
+               :anchor (comment) :*
+               :anchor (actual_parameter_part))
+              @procedure-call
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+             ((procedure_call_statement
+               name: (selected_component
+                      selector_name: (identifier) @font-lock-function-call-face)
+               :anchor)
+              @procedure-call
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+             ((procedure_call_statement
+               name: (selected_component
+                      selector_name: (identifier) @font-lock-function-call-face)
+               :anchor (comment) :*
+               :anchor (actual_parameter_part))
+              @procedure-call
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+             (procedure_call_statement
+              (attribute_designator) @font-lock-function-call-face :anchor)
+             (procedure_call_statement
+              (attribute_designator) @font-lock-function-call-face
+              :anchor (comment) :*
+              :anchor (actual_parameter_part))
+             (reduction_attribute_designator
+              (identifier) @font-lock-function-call-face))
 
-   ;; Keywords
-   :language 'ada
-   :feature 'keyword
-   `(([,@ada-ts-mode--keywords] @font-lock-keyword-face)
-     ((identifier) @font-lock-keyword-face
-      (:match "^[aA][lL][lL]$" @font-lock-keyword-face)))
+           ;; Keywords
+           :language 'ada
+           :feature 'keyword
+           `(([,@ada-ts-mode--keywords] @font-lock-keyword-face)
+             ((identifier) @font-lock-keyword-face
+              (:match "^[aA][lL][lL]$" @font-lock-keyword-face)))
 
-   ;; Labels
-   :language 'ada
-   :feature 'label
-   '((label statement_identifier: _ @font-lock-constant-face)
-     (loop_label statement_identifier: _ @font-lock-constant-face)
-     (block_statement
-      "end" (identifier) @font-lock-constant-face)
-     (loop_statement
-      "end" "loop" (identifier) @font-lock-constant-face)
-     (exit_statement loop_name: _ @font-lock-constant-face)
-     (goto_statement label_name: _ @font-lock-constant-face))
+           ;; Labels
+           :language 'ada
+           :feature 'label
+           '((label statement_identifier: _ @font-lock-constant-face)
+             (loop_label statement_identifier: _ @font-lock-constant-face)
+             (block_statement
+              "end" (identifier) @font-lock-constant-face)
+             (loop_statement
+              "end" "loop" (identifier) @font-lock-constant-face)
+             (exit_statement loop_name: _ @font-lock-constant-face)
+             (goto_statement label_name: _ @font-lock-constant-face))
 
-   ;; Numeric literals
-   :language 'ada
-   :feature 'number
-   '((numeric_literal) @font-lock-number-face)
+           ;; Numeric literals
+           :language 'ada
+           :feature 'number
+           '((numeric_literal) @font-lock-number-face)
 
-   ;; Operators
-   :language 'ada
-   :feature 'operator
-   :override 'append
-   `((expression ["and" "else" "or" "then", "xor"] @font-lock-operator-face)
-     (factor_power "**" @font-lock-operator-face)
-     (factor_abs "abs" @font-lock-operator-face)
-     (factor_not "not" @font-lock-operator-face)
-     (relation_membership ["not" "in"] @font-lock-operator-face)
-     ((relational_operator) @font-lock-operator-face)    ; =, /=, <, >, >=
-     ((binary_adding_operator) @font-lock-operator-face) ; +, -, &
-     ((unary_adding_operator) @font-lock-operator-face)  ; +, -
-     ((multiplying_operator) @font-lock-operator-face)   ; *, /, mod, rem
-     ([":=" ".." "|" "=>" "<>" "<<" ">>"] @font-lock-operator-face))
+           ;; Operators
+           :language 'ada
+           :feature 'operator
+           :override 'append
+           `((expression ["and" "else" "or" "then", "xor"] @font-lock-operator-face)
+             (factor_power "**" @font-lock-operator-face)
+             (factor_abs "abs" @font-lock-operator-face)
+             (factor_not "not" @font-lock-operator-face)
+             (relation_membership ["not" "in"] @font-lock-operator-face)
+             ((relational_operator) @font-lock-operator-face)    ; =, /=, <, >, >=
+             ((binary_adding_operator) @font-lock-operator-face) ; +, -, &
+             ((unary_adding_operator) @font-lock-operator-face)  ; +, -
+             ((multiplying_operator) @font-lock-operator-face)   ; *, /, mod, rem
+             ([":=" ".." "|" "=>" "<>" "<<" ">>"] @font-lock-operator-face))
 
-   ;; Preprocessor
-   :language 'ada
-   :feature 'preprocessor
-   :override t
-   `(((gnatprep_declarative_if_statement
-       [,@ada-ts-mode--preproc-keywords] @font-lock-preprocessor-face))
-     ((gnatprep_if_statement
-       [,@ada-ts-mode--preproc-keywords] @font-lock-preprocessor-face))
-     ((gnatprep_identifier) @font-lock-preprocessor-face))
+           ;; Preprocessor
+           :language 'ada
+           :feature 'preprocessor
+           :override t
+           `(((gnatprep_declarative_if_statement
+               [,@ada-ts-mode--preproc-keywords] @font-lock-preprocessor-face))
+             ((gnatprep_if_statement
+               [,@ada-ts-mode--preproc-keywords] @font-lock-preprocessor-face))
+             ((gnatprep_identifier) @font-lock-preprocessor-face))
 
-   ;; String literals
-   :language 'ada
-   :feature 'string
-   '(((string_literal) @font-lock-string-face)
-     ((character_literal) @font-lock-constant-face))
+           ;; String literals
+           :language 'ada
+           :feature 'string
+           '(((string_literal) @font-lock-string-face)
+             ((character_literal) @font-lock-constant-face))
 
-   ;; Types
-   :language 'ada
-   :feature 'type
-   '((full_type_declaration (identifier) @font-lock-type-face)
-     (record_definition (identifier) @font-lock-type-face) ; Ada 2022
-     (incomplete_type_declaration (identifier) @font-lock-type-face)
-     (private_type_declaration (identifier) @font-lock-type-face)
-     (private_extension_declaration (identifier) @font-lock-type-face)
-     (private_extension_declaration (selected_component
-                                     selector_name: _ @font-lock-type-face))
-     (protected_type_declaration (identifier) @font-lock-type-face)
-     (protected_type_declaration (selected_component
-                                  selector_name: _ @font-lock-type-face))
-     (protected_type_declaration
-      (protected_definition "end" (identifier) @font-lock-type-face))
-     (single_protected_declaration "new" (identifier) @font-lock-type-face)
-     (single_protected_declaration "new" (selected_component
+           ;; Types
+           :language 'ada
+           :feature 'type
+           '((full_type_declaration (identifier) @font-lock-type-face)
+             (record_definition (identifier) @font-lock-type-face) ; Ada 2022
+             (incomplete_type_declaration (identifier) @font-lock-type-face)
+             (private_type_declaration (identifier) @font-lock-type-face)
+             (private_extension_declaration (identifier) @font-lock-type-face)
+             (private_extension_declaration (selected_component
+                                             selector_name: _ @font-lock-type-face))
+             (protected_type_declaration (identifier) @font-lock-type-face)
+             (protected_type_declaration (selected_component
                                           selector_name: _ @font-lock-type-face))
-     (task_type_declaration (identifier) @font-lock-type-face)
-     (task_type_declaration (selected_component
-                             selector_name: _ @font-lock-type-face))
-     (task_type_declaration (task_definition endname: _ @font-lock-type-face))
-     (single_task_declaration "new" (identifier) @font-lock-type-face)
-     (single_task_declaration "new" (selected_component
+             (protected_type_declaration
+              (protected_definition "end" (identifier) @font-lock-type-face))
+             (single_protected_declaration "new" (identifier) @font-lock-type-face)
+             (single_protected_declaration "new" (selected_component
+                                                  selector_name: _ @font-lock-type-face))
+             (task_type_declaration (identifier) @font-lock-type-face)
+             (task_type_declaration (selected_component
                                      selector_name: _ @font-lock-type-face))
-     (subtype_declaration (identifier) @font-lock-type-face)
-     (_ subtype_mark: (selected_component
-                       selector_name: _ @font-lock-type-face))
-     (_ subtype_mark: (identifier) @font-lock-type-face)
-     (_ subtype_mark: (slice prefix: (identifier) @font-lock-type-face))
-     (_ subtype_mark: (slice prefix: (selected_component
-                                      selector_name: _ @font-lock-type-face)))
-     (use_clause "type" (identifier) @font-lock-type-face)
-     (use_clause "type" (selected_component
-                         selector_name: _ @font-lock-type-face))
-     (qualified_expression
-      subtype_name: (identifier) @font-lock-type-face)
-     (qualified_expression
-      subtype_name: (selected_component selector_name: _ @font-lock-type-face))
-     (exception_choice
-      exception_name: (identifier) @font-lock-type-face)
-     (exception_choice
-      exception_name: (selected_component
-                       selector_name: _ @font-lock-type-face))
-     (enumeration_representation_clause local_name: _ @font-lock-type-face)
-     (record_representation_clause local_name: _ @font-lock-type-face)
-     (record_representation_clause end_local_name: _ @font-lock-type-face) ; Ada 2022
-     (formal_complete_type_declaration (identifier) @font-lock-type-face)
-     (formal_incomplete_type_declaration (identifier) @font-lock-type-face)
-     (formal_derived_type_definition (identifier) @font-lock-type-face)
-     (formal_derived_type_definition (selected_component
-                                      selector_name: _ @font-lock-type-face))
-     (interface_type_definition (identifier) @font-lock-type-face)
-     (interface_type_definition (selected_component
+             (task_type_declaration (task_definition endname: _ @font-lock-type-face))
+             (single_task_declaration "new" (identifier) @font-lock-type-face)
+             (single_task_declaration "new" (selected_component
+                                             selector_name: _ @font-lock-type-face))
+             (subtype_declaration (identifier) @font-lock-type-face)
+             (_ subtype_mark: (selected_component
+                               selector_name: _ @font-lock-type-face))
+             (_ subtype_mark: (identifier) @font-lock-type-face)
+             (_ subtype_mark: (slice prefix: (identifier) @font-lock-type-face))
+             (_ subtype_mark: (slice prefix: (selected_component
+                                              selector_name: _ @font-lock-type-face)))
+             (use_clause "type" (identifier) @font-lock-type-face)
+             (use_clause "type" (selected_component
                                  selector_name: _ @font-lock-type-face))
-     (derived_type_definition (identifier) @font-lock-type-face)
-     (derived_type_definition (selected_component
-                               selector_name: _ @font-lock-type-face)))
+             (qualified_expression
+              subtype_name: (identifier) @font-lock-type-face)
+             (qualified_expression
+              subtype_name: (selected_component selector_name: _ @font-lock-type-face))
+             (exception_choice
+              exception_name: (identifier) @font-lock-type-face)
+             (exception_choice
+              exception_name: (selected_component
+                               selector_name: _ @font-lock-type-face))
+             (enumeration_representation_clause local_name: _ @font-lock-type-face)
+             (record_representation_clause local_name: _ @font-lock-type-face)
+             (record_representation_clause end_local_name: _ @font-lock-type-face) ; Ada 2022
+             (formal_complete_type_declaration (identifier) @font-lock-type-face)
+             (formal_incomplete_type_declaration (identifier) @font-lock-type-face)
+             (formal_derived_type_definition (identifier) @font-lock-type-face)
+             (formal_derived_type_definition (selected_component
+                                              selector_name: _ @font-lock-type-face))
+             (interface_type_definition (identifier) @font-lock-type-face)
+             (interface_type_definition (selected_component
+                                         selector_name: _ @font-lock-type-face))
+             (derived_type_definition (identifier) @font-lock-type-face)
+             (derived_type_definition (selected_component
+                                       selector_name: _ @font-lock-type-face)))
 
-   ;; Syntax errors
-   :language 'ada
-   :feature 'error
-   '((ERROR) @font-lock-warning-face))
-
-  "Font-lock settings for `ada-ts-mode'.")
+           ;; Syntax errors
+           :language 'ada
+           :feature 'error
+           '((ERROR) @font-lock-warning-face)))))
 
 (defun ada-ts-mode--named-function-call-p (node)
   "Check if NODE is a named function call.
@@ -825,7 +839,7 @@ other window, else find the file in the current window."
   (setq-local editorconfig-indent-size-vars '(ada-ts-mode-indent-offset))
 
   ;; Font-lock.
-  (setq-local treesit-font-lock-settings ada-ts-mode--font-lock-settings)
+  (setq-local treesit-font-lock-settings (ada-ts-mode--font-lock-settings))
   (setq-local treesit-font-lock-feature-list
               '((comment definition)
                 (keyword preprocessor string type)

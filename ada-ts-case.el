@@ -326,8 +326,7 @@ based on NEWVAL for SYMBOL and any loaded/reloaded dictionaries."
   inserted."
   (error "Unknown case category: %s" category))
 
-(defconst ada-ts-case--keyword-keywords-regex
-  (rx-to-string `(: bos (or ,@ada-ts-mode--keywords) eos)))
+(defvar ada-ts-case--keyword-keywords-regex nil)
 
 (defconst ada-ts-case--identifier-keywords-regex
   (rx bos (or "all") eos))
@@ -502,6 +501,22 @@ from tiggering case formatting."
   :group 'ada-ts
   :lighter " Ada/c"
   :interactive (ada-ts-mode))
+
+;;; Setup
+
+(defun ada-ts-case--post-setup ()
+  "Casing setup performed after mode initialization."
+
+  ;; Keywords may be added to `ada-ts-mode--keywords' on mode
+  ;; initialization depending on the grammar which is available.  As a
+  ;; result, the keyword regex shouldn't be created until after all
+  ;; keywords have been added.  Wait until setup has completed to
+  ;; create the regular expression.
+  (unless ada-ts-case--keyword-keywords-regex
+    (setq ada-ts-case--keyword-keywords-regex
+          (rx-to-string `(: bos (or ,@ada-ts-mode--keywords) eos)))))
+
+(add-hook 'ada-ts-mode--after-setup-hook #'ada-ts-case--post-setup)
 
 (provide 'ada-ts-case)
 

@@ -451,6 +451,18 @@ SYMBOL, else the default value is updated instead."
             (anchor/gp-skip-label-bol)
             0)
            ((and (matcher/parent-is "handled_sequence_of_statements")
+                 (matcher/node-is "finally_part")
+                 (n-p-gp nil nil "ERROR"))
+            (anchor/best-effort)
+            (offset/best-effort))
+           ((and (matcher/parent-is "handled_sequence_of_statements")
+                 (matcher/node-is "finally_part"))
+            (anchor/gp-skip-label-bol)
+            0)
+           ((matcher/parent-is "finally_part")
+            parent
+            ada-ts-mode-indent-offset)
+           ((and (matcher/parent-is "handled_sequence_of_statements")
                  (matcher/after-first-sibling-p "exception_handler"))
             (anchor/first-sibling "exception_handler")
             0)
@@ -629,7 +641,8 @@ SYMBOL, else the default value is updated instead."
                          (matcher/parent-is "entry_body")
                          (matcher/parent-is "protected_body"))
                      (matcher/between-siblings-p "is" "end"))
-                (and (matcher/parent-is "extended_return_statement")
+                (and (or (matcher/parent-is "extended_return_statement")
+                         (matcher/parent-is "accept_statement"))
                      (matcher/between-siblings-p "do" "end"))
                 (and (matcher/parent-is "if_statement")
                      (matcher/between-siblings-p "then" "end"))
@@ -1141,27 +1154,27 @@ total offset."
       (setq anchor (treesit-node-start prev-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [After Keyword: '#else']"))
-    ;; Keyword: "exception"
+    ;; Keyword: "exception", "finally"
     (when-let* (((not anchor))
-                ((and node-t (string-equal node-t "exception")))
+                ((and node-t (member node-t '("exception" "finally"))))
                 ((and prev-node-t (not (string-equal prev-node-t ":"))))
                 (anchor-node (ada-ts-mode--matching-prev-node
                               node '("begin" "do")))
                 (anchor-node-t (treesit-node-type anchor-node)))
       (cond
-       ;; "begin" ... "exception"
+       ;; "begin" ... "exception"/"finally"
        ((string-equal anchor-node-t "begin")
         (when-let* ((location (ada-ts-indent--location-after-keyword-begin anchor-node)))
           (setq anchor (car location)
                 offset (cons 0 (cddr location)))))
-       ;; "do" ... "exception"
+       ;; "do" ... "exception"/"finally"
        ((string-equal anchor-node-t "do")
         (setq anchor-node (ada-ts-mode--do-keyword-anchor anchor-node))
         (when anchor-node
           (setq anchor (treesit-node-start anchor-node)
                 offset 0))))
       (when anchor
-        (setq scenario "Scenario [Keyword: 'exception']")))
+        (setq scenario "Scenario [Keyword: 'exception', 'finally']")))
     ;; Keyword: "then"
     (when-let* (((not anchor))
                 ((and node-t (string-equal node-t "then")))
@@ -1388,7 +1401,7 @@ total offset."
             scenario "Scenario [After Keyword: begin]"))
     ;; After Keywords: ada-ts-mode-indent-offset
     (when-let* (((not anchor))
-                ((member prev-node-t '("else" "exception" "generic" "private" "record" "select"))))
+                ((member prev-node-t '("else" "exception" "finally" "generic" "private" "record" "select"))))
       (setq anchor (ada-ts-indent--point-at-indentation prev-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [After Keywords: ada-ts-mode-indent-offset]"))
@@ -2065,7 +2078,7 @@ The specified punctuation is only considered if it is entered at the end
 of the line.")
 
 (defconst ada-ts-indent--electric-keywords
-  '("begin" "else" "#else" "elsif" "#elsif" "end" "#end" "exception" "or" "private" "then" "when")
+  '("begin" "else" "#else" "elsif" "#elsif" "end" "#end" "exception" "finally" "or" "private" "then" "when")
   "Ada keywords which should trigger electric indentation.
 
 The specified keywords are only considered if they are the only thing on
