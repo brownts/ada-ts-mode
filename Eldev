@@ -8,6 +8,20 @@
 ;; Configure for automatic build/installation of the Ada grammar library.
 (setq ada-ts-mode-grammar-install 'auto)
 
+;; Configure a specific grammar.
+(when-let* ((url (getenv "GRAMMAR_URL"))
+            ((not (string-empty-p url))))
+  (let ((revision (getenv "GRAMMAR_REVISION"))
+        (commit (getenv "GRAMMAR_COMMIT"))
+        (value (list url)))
+    (when (and revision
+               (not (string-empty-p revision)))
+      (setq value (append value (list revision))))
+    (when (and commit
+               (not (string-empty-p commit)))
+      (setq value (append value (list :commit commit))))
+    (setq ada-ts-mode-grammar value)))
+
 (eldev-add-loading-roots 'test "test")
 
 ;; Install `lsp-mode' for testing.

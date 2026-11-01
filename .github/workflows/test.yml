@@ -12,15 +12,29 @@ jobs:
   test:
     strategy:
       matrix:
-        emacs-version: ['29.1', '29.4', '30.1', '30.2']
+        emacs-version: ['29.1', '29.4', '30.1', '30.2', '31.1', 'snapshot']
         os: [ubuntu-latest, windows-latest, macos-latest]
+        grammar-url: ['']      # Default grammar repository
+        grammar-revision: [''] # Latest grammar revision
         include:
-          - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux', emacs-version: 'snapshot'}
           - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux'}
           - {os: windows-latest, als-pattern: 'als-*-win32-x64.tar.gz',    als-location: 'integration\vscode\ada\x64\win32'}
           - {os: macos-latest,   als-pattern: 'als-*-darwin-arm64.tar.gz', als-location: 'integration/vscode/ada/arm64/darwin'}
+
+          # Test against older grammar revision for backwards compatibility
+          - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux',
+             emacs-version: '29.1', grammar-url: 'https://github.com/brownts/tree-sitter-ada', grammar-revision: 'v0.9.0'}
+          - {os: ubuntu-latest,  als-pattern: 'als-*-linux-x64.tar.gz',    als-location: 'integration/vscode/ada/x64/linux',
+             emacs-version: '31.1', grammar-url: 'https://github.com/brownts/tree-sitter-ada', grammar-revision: 'v0.9.0'}
+        exclude:
+          - {os: macos-latest,   emacs-version: 'snapshot'}
+          - {os: windows-latest, emacs-version: 'snapshot'}
+          - {os: windows-latest, emacs-version: '31.1'} # https://github.com/jcs090218/setup-emacs-windows/pull/471
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.emacs-version == 'snapshot'}}
+    env:
+      GRAMMAR_URL:      ${{matrix.grammar-url}}
+      GRAMMAR_REVISION: ${{matrix.grammar-revision}}
 
     steps:
       - name: Checkout
