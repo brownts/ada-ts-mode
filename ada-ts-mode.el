@@ -170,6 +170,11 @@ The \\='finally\\=' keyword is is a GNAT extension."
   (ignore-errors
     (or (treesit-query-string "" '((finally_part)) 'ada) t)))
 
+(defun ada-ts-mode--parallel-supported-p ()
+  "Return non-nil if \\='parallel\\=' constructs are supported."
+  (ignore-errors
+    (or (treesit-query-string "" '((parallel_block_statement)) 'ada) t)))
+
 (defvar ada-ts-mode--font-lock-settings-cache nil
   "Cached font-lock settings for `ada-ts-mode'.")
 

@@ -123,11 +123,13 @@ mode is \\='ada-ts-mode\\=', otherwise the expected mode is
 ;;;; Test Loop
 
 (defconst supported-info
-  '(("command-casing-finally.erts"  . #'ada-ts-mode--finally-supported-p)
-    ("electric-indent-finally.erts" . #'ada-ts-mode--finally-supported-p)
-    ("font-lock-finally_part.ada"   . #'ada-ts-mode--finally-supported-p)
-    ("indent-finally_part.erts"     . #'ada-ts-mode--finally-supported-p)
-    ("mode-auto-case-finally.erts"  . #'ada-ts-mode--finally-supported-p)))
+  '(("command-casing-finally.erts"              . #'ada-ts-mode--finally-supported-p)
+    ("electric-indent-finally.erts"             . #'ada-ts-mode--finally-supported-p)
+    ("font-lock-finally_part.ada"               . #'ada-ts-mode--finally-supported-p)
+    ("indent-finally_part.erts"                 . #'ada-ts-mode--finally-supported-p)
+    ("mode-auto-case-finally.erts"              . #'ada-ts-mode--finally-supported-p)
+    ("paren-show-parallel_block_statement.erts" . #'ada-ts-mode--parallel-supported-p)
+    ("paren-show-parallel_loop_statement.erts"  . #'ada-ts-mode--parallel-supported-p)))
 
 (defun ada-ts-mode-tests-skip-p (predicate)
   "If PREDICATE is non-nil run predicate to see if test is supported.
