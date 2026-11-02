@@ -1,6 +1,9 @@
 package body Test is
 begin
 
+   All;
+   -- <- font-lock-function-call-face
+
    Foo;
    -- <- font-lock-function-call-face
 

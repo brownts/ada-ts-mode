@@ -267,22 +267,19 @@ The \\='finally\\=' keyword is is a GNAT extension."
              (subprogram_default default_name: [(identifier) (string_literal)] @font-lock-function-name-face)
              (subprogram_default default_name: (selected_component
                                                 selector_name: _ @font-lock-function-name-face))
-             (entry_declaration "entry"
-                                :anchor (comment) :*
-                                :anchor (identifier) @font-lock-function-name-face)
+             ((entry_declaration "entry" (identifier) @font-lock-function-name-face)
+              (:pred ada-ts-mode--declaration-name-p @font-lock-function-name-face))
              (entry_body (identifier) @font-lock-function-name-face)
              (accept_statement entry_direct_name: _ @font-lock-function-name-face)
              (accept_statement entry_identifier: _ @font-lock-function-name-face)
-             (single_protected_declaration "protected"
-                                           :anchor (comment) :*
-                                           :anchor (identifier) @font-lock-variable-name-face)
+             ((single_protected_declaration "protected" (identifier) @font-lock-variable-name-face)
+              (:pred ada-ts-mode--declaration-name-p @font-lock-variable-name-face))
              (single_protected_declaration
               (protected_definition "end" (identifier) @font-lock-variable-name-face))
              (protected_body (identifier) @font-lock-variable-name-face)
              (protected_body_stub (identifier) @font-lock-variable-name-face)
-             (single_task_declaration "task"
-                                      :anchor (comment) :*
-                                      :anchor (identifier) @font-lock-variable-name-face)
+             ((single_task_declaration "task" (identifier) @font-lock-variable-name-face)
+              (:pred ada-ts-mode--declaration-name-p @font-lock-variable-name-face))
              (single_task_declaration
               (task_definition "end" (identifier) @font-lock-variable-name-face))
              (task_body (identifier) @font-lock-variable-name-face)
@@ -383,50 +380,30 @@ The \\='finally\\=' keyword is is a GNAT extension."
            :feature 'function
            :override 'prepend
            '(((function_call
-               name: [(identifier) (string_literal)] @font-lock-function-call-face
-               :anchor (comment) :*
-               :anchor (actual_parameter_part))
+               name: [(identifier) (string_literal)] @font-lock-function-call-face)
               @function-call
-              (:pred ada-ts-mode--named-function-call-p @function-call))
+              (:pred ada-ts-mode--named-function-call-p @function-call @font-lock-function-call-face))
              ((function_call
                name: (selected_component
-                      selector_name: _ @font-lock-function-call-face)
-               :anchor (comment) :*
-               :anchor (actual_parameter_part))
+                      selector_name: _ @font-lock-function-call-face))
               @function-call
-              (:pred ada-ts-mode--named-function-call-p @function-call))
-             (function_call (attribute_designator) @font-lock-function-call-face
-                            :anchor (comment) :*
-                            :anchor (actual_parameter_part))
+              (:pred ada-ts-mode--named-function-call-p @function-call @font-lock-function-call-face))
+             ((function_call (attribute_designator) @font-lock-function-call-face)
+              @function-call
+              (:pred ada-ts-mode--named-function-call-p @function-call @font-lock-function-call-face))
              ((procedure_call_statement
-               name: (identifier) @font-lock-function-call-face :anchor)
+               name: (identifier) @font-lock-function-call-face)
               @procedure-call
-              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-             ((procedure_call_statement
-               name: (identifier) @font-lock-function-call-face
-               :anchor (comment) :*
-               :anchor (actual_parameter_part))
-              @procedure-call
-              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call @font-lock-function-call-face))
              ((procedure_call_statement
                name: (selected_component
-                      selector_name: (identifier) @font-lock-function-call-face)
-               :anchor)
+                      selector_name: (identifier) @font-lock-function-call-face))
               @procedure-call
-              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call @font-lock-function-call-face))
              ((procedure_call_statement
-               name: (selected_component
-                      selector_name: (identifier) @font-lock-function-call-face)
-               :anchor (comment) :*
-               :anchor (actual_parameter_part))
+               (attribute_designator) @font-lock-function-call-face)
               @procedure-call
-              (:pred ada-ts-mode--named-procedure-call-p @procedure-call))
-             (procedure_call_statement
-              (attribute_designator) @font-lock-function-call-face :anchor)
-             (procedure_call_statement
-              (attribute_designator) @font-lock-function-call-face
-              :anchor (comment) :*
-              :anchor (actual_parameter_part))
+              (:pred ada-ts-mode--named-procedure-call-p @procedure-call @font-lock-function-call-face))
              (reduction_attribute_designator
               (identifier) @font-lock-function-call-face))
 
@@ -549,30 +526,42 @@ The \\='finally\\=' keyword is is a GNAT extension."
            :feature 'error
            '((ERROR) @font-lock-warning-face)))))
 
-(defun ada-ts-mode--named-function-call-p (node)
-  "Check if NODE is a named function call.
+(defun ada-ts-mode--named-function-call-p (node name-n)
+  "Check if NODE is a named function call and NAME-N should be highlighted.
 
 Certain places use a function_call node in the syntax tree, such as a
 generic instantiation, because it has similar syntax to a function call,
 but it isn't an actual function call."
-  (let ((node-type (treesit-node-type node))
-        (parent-node-type (treesit-node-type (treesit-node-parent node))))
-    (and (string-equal node-type "function_call")
-         (not (string-equal parent-node-type "generic_instantiation"))
-         (not (string-equal parent-node-type "assignment_statement"))
-         (let ((function-name (ada-ts-mode--node-to-name
-                               (treesit-node-child-by-field-name node "name")
-                               'no-property)))
+  (when-let* ((node-t (treesit-node-type node))
+              (parent-n (treesit-node-parent node))
+              (parent-t (treesit-node-type parent-n)))
+    (and (string-equal node-t "function_call")
+         (not (member parent-t '("generic_instantiation" "assignment_statement")))
+         (when-let* ((next-n (ada-ts-mode--next-node name-n))
+                     (next-t (treesit-node-type next-n)))
+           (string-equal next-t "actual_parameter_part"))
+         (when-let* ((function-name (ada-ts-mode--node-to-name
+                                     (treesit-node-child-by-field-name node "name")
+                                     'no-property)))
            (not (string-suffix-p ".all" function-name 'ignore-case))))))
 
-(defun ada-ts-mode--named-procedure-call-p (node)
-  "Check if NODE is a named procedure call."
-  (let ((node-type (treesit-node-type node)))
-    (and (string-equal node-type "procedure_call_statement")
-         (let ((procedure-name (ada-ts-mode--node-to-name
-                                (treesit-node-child-by-field-name node "name")
-                                'no-property)))
+(defun ada-ts-mode--named-procedure-call-p (node name-n)
+  "Check if NODE is a named procedure call and NAME-N should be highlighted."
+  (when-let* ((node-t (treesit-node-type node)))
+    (and (string-equal node-t "procedure_call_statement")
+         (when-let* ((next-n (ada-ts-mode--next-node name-n))
+                     (next-t (treesit-node-type next-n)))
+           (member next-t '("actual_parameter_part" ";")))
+         (when-let* ((procedure-name (ada-ts-mode--node-to-name
+                                      (treesit-node-child-by-field-name node "name")
+                                      'no-property)))
            (not (string-suffix-p ".all" procedure-name 'ignore-case))))))
+
+(defun ada-ts-mode--declaration-name-p (node)
+  "Check if NODE is the name node of the declaration."
+  (when-let* ((prev-n (ada-ts-mode--prev-node node))
+              (prev-t (treesit-node-type prev-n)))
+    (member prev-t '("entry" "protected" "task"))))
 
 (defun ada-ts-mode--mode-in-p (node)
   "Check if mode for NODE is \\='in\\='."
