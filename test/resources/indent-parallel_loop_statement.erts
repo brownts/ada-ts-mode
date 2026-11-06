@@ -1,0 +1,57 @@
+Name: Nominal
+
+=-=
+package body Test is
+begin
+   parallel for I in 1 .. 5 loop
+      null;
+   end loop;
+
+   FOR_LABEL: parallel for I in 1 .. 5 loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+      parallel for I in 1 .. 5 loop
+         null;
+      end loop FOR_LABEL;
+
+   FOR_LABEL: parallel
+     (
+      5
+     )
+   for I in 1 .. 5 loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+      parallel
+        (
+         5
+        )
+      for I in 1 .. 5 loop
+         null;
+      end loop FOR_LABEL;
+
+   FOR_LABEL: parallel
+     (
+      Chunk
+      in
+      Chunk_Number
+     )
+   for I in 1 .. 5 loop
+      null;
+   end loop FOR_LABEL;
+
+   FOR_LABEL:
+      parallel
+        (
+         Chunk
+         in
+         Chunk_Number
+        )
+      for I in 1 .. 5 loop
+         null;
+      end loop FOR_LABEL;
+end Test;
+=-=-=

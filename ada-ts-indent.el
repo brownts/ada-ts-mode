@@ -637,6 +637,13 @@ SYMBOL, else the default value is updated instead."
            ((matcher/parent-is "entry_call_alternative") parent 0)
            ((matcher/parent-is "triggering_alternative") parent 0)
 
+           ;; chunk_specification
+           ((and (matcher/node-is "chunk_specification")
+                 (matcher/prev-sibling-is "("))
+            (anchor/prev-sibling "(")
+            1)
+           ((matcher/parent-is "chunk_specification") parent 0)
+
            ((or (and (or (matcher/parent-is "subprogram_body")
                          (matcher/parent-is "package_body")
                          (matcher/parent-is "package_declaration")
@@ -645,7 +652,8 @@ SYMBOL, else the default value is updated instead."
                          (matcher/parent-is "protected_body"))
                      (matcher/between-siblings-p "is" "end"))
                 (and (or (matcher/parent-is "extended_return_statement")
-                         (matcher/parent-is "accept_statement"))
+                         (matcher/parent-is "accept_statement")
+                         (matcher/parent-is "parallel_block_statement"))
                      (matcher/between-siblings-p "do" "end"))
                 (and (matcher/parent-is "if_statement")
                      (matcher/between-siblings-p "then" "end"))
@@ -891,7 +899,7 @@ its sole parameter and returns non nil for a match."
 
 (defun ada-ts-mode--do-keyword-anchor (node)
   "Find anchor node for \\='do\\=' keyword NODE."
-  (ada-ts-mode--matching-prev-node node '("accept" "return")))
+  (ada-ts-mode--matching-prev-node node '("accept" "parallel" "return")))
 
 (defun ada-ts-indent--location-after-keyword-loop (node)
   "Find (anchor, offset) when after \\='loop\\=' keyword NODE."
@@ -1040,7 +1048,7 @@ total offset."
                 (anchor-node (ada-ts-mode--matching-prev-node
                               node
                               '("accept" "begin" "case" "if" "loop" "package"
-                                "protected" "record" "return" "select" "task")))
+                                "parallel" "protected" "record" "return" "select" "task")))
                 (anchor-node-t (treesit-node-type anchor-node)))
       (if (ada-ts-indent--node-at-indentation-p anchor-node)
           (setq anchor (treesit-node-start anchor-node)
@@ -1276,6 +1284,23 @@ total offset."
       (setq anchor (treesit-node-start anchor-node)
             offset ada-ts-mode-indent-offset
             scenario "Scenario [After Keyword: 'abort']"))
+    ;; Keyword: "and" (parallel block statement)
+    (when-let* (((not anchor))
+                ((and node-t (string-equal node-t "and")))
+                (prev-token (ada-ts-mode--prev-token node))
+                ((string-equal prev-token ";"))
+                (anchor-node (ada-ts-mode--matching-prev-node node "parallel")))
+      (setq anchor (treesit-node-start anchor-node)
+            offset 0
+            scenario "Scenario [Keyword: 'and' (parallel block statement)]"))
+    ;; After Keyword: "and" (parallel block statement)
+    (when-let* (((not anchor))
+                ((string-equal prev-node-t "and"))
+                (prev-prev-token (ada-ts-mode--prev-token prev-node))
+                ((string-equal prev-prev-token ";")))
+      (setq anchor (treesit-node-start prev-node)
+            offset ada-ts-mode-indent-offset
+            scenario "Scenario [After Keyword 'and' (parallel block statement)]"))
     ;; After ";", "," and "|"
     (when-let* (((not anchor))
                 ((member prev-node-t '(";" "," "|")))
@@ -2081,7 +2106,7 @@ The specified punctuation is only considered if it is entered at the end
 of the line.")
 
 (defconst ada-ts-indent--electric-keywords
-  '("begin" "else" "#else" "elsif" "#elsif" "end" "#end" "exception" "finally" "or" "private" "then" "when")
+  '("and" "begin" "else" "#else" "elsif" "#elsif" "end" "#end" "exception" "finally" "or" "private" "then" "when")
   "Ada keywords which should trigger electric indentation.
 
 The specified keywords are only considered if they are the only thing on

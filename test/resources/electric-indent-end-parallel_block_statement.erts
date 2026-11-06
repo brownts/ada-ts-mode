@@ -1,0 +1,43 @@
+Code: (lambda () (electric-indent-transform "d"))
+
+Point-Char: |
+
+Name: parallel_block_statement (1)
+
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+      en|
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+   end|
+=-=-=
+
+Name: parallel_block_statement (2)
+
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+   end|
+=-=
+procedure Test is
+begin
+   parallel do
+      null;
+   and
+      null;
+      endd|
+=-=-=

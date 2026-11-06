@@ -1,0 +1,47 @@
+Name: Nominal
+
+=-=
+package body Test is
+begin
+
+   parallel do
+      Do_Something (1);
+   and
+      Do_Something (2);
+   end do;
+
+   parallel do
+      Do_Something (1);
+   and
+      Do_Something (2);
+   and
+      Do_Something (3);
+   end do;
+
+   parallel
+     (
+      5
+     )
+   do
+      Do_Something (1);
+   and
+      Do_Something (2);
+   end
+   do
+   ;
+
+   parallel
+     (
+      Chunk
+      in
+      Chunk_Number
+     )
+   do
+      Do_Something (1);
+   and
+      Do_Something (2);
+   end
+   do
+   ;
+end Test;
+=-=-=
