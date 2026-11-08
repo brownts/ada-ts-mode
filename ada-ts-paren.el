@@ -660,7 +660,14 @@ This is expected to be placed on `post-command-hook'."
                               (sit-for blink-matching-delay))
                           (delete-overlay blink-matching--overlay)))))
                 (t
-                 (let* ((line (blink-paren-open-paren-line-string opener-s)))
+                 (let* ((max-arity (cdr (func-arity #'blink-paren-open-paren-line-string)))
+                        (args (if (or (and (numberp max-arity) (> max-arity 1))
+                                      (and (symbolp max-arity) (eq max-arity 'many)))
+                                  ;; Newer versions of Emacs support an optional length parameter.
+                                  ;; https://debbugs.gnu.org/81661
+                                  (list opener-s (- opener-e opener-s))
+                                (list opener-s)))
+                        (line (apply #'blink-paren-open-paren-line-string args)))
                    (minibuffer-message "%s%s"
                                        (propertize "Matches " 'face 'shadow)
                                        line))))
